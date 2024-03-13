@@ -26,10 +26,7 @@ app.get('/', (req, res) => {
 const port = process.env.PORT || 3000;
 mongoose_1.default.connect(process.env.MONGO_URI)
     .then(() => {
-    app.listen(port, () => {
-        console.log('Connected to MongoDB Atlas');
-        console.log(`Server is runing on http://localhost:${port}`);
-    });
+    console.log('Connected to MongoDB Atlas');
 })
     .catch((error) => {
     console.error('Error connecting to MongoDB Atlas:', error);
