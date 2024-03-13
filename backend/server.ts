@@ -27,16 +27,17 @@ app.get('/', (req: Request, res: Response) => {
 // Start the server
 const port = process.env.PORT || 3000;
 
-// TODO: Setup group mongodb atlas account then uncomment this code 
-// mongoose.connect(process.env.MONGO_URI as string)
-//     .then(() => {
-//         app.listen(port, () => {
-//             console.log(`Server is runing on http://localhost:${port}`);
-//         }); 
-//     })
-//     .catch((error) => {
-//         console.log(error);
-//     })
+const mongodbURI = process.env.MONGO_URI || "";
+mongoose.connect(mongodbURI)
+    .then(() => {
+        app.listen(port, () => {
+            console.log('Connected to MongoDB Atlas');
+            console.log(`Server is runing on http://localhost:${port}`);
+        }); 
+    })
+    .catch((error) => {
+       console.error('Error connecting to MongoDB Atlas:', error);
+    })
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
