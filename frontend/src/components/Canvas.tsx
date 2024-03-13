@@ -1,9 +1,5 @@
 import { useRef, useEffect } from 'react';
-
-interface CanvasProps {
-    width: number;
-    height: number;
-}
+import { CanvasProps } from '../interfaces/CanvasProps';
 
 const Canvas: React.FC<CanvasProps> = ({width, height}) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
