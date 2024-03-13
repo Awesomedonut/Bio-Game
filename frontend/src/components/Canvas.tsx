@@ -6,13 +6,11 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
 
     useEffect(() => {
         const canvas = canvasRef.current;
-        if(!canvas) return;
-
-        const ctx = canvas.getContext('2d');
-        if(!ctx) return;
-
-        ctx.fillStyle = 'red';
-        ctx.fillRect(10, 10, 50, 50);
+        const ctx = canvas?.getContext('2d');
+        if (canvas && ctx) {
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
     }, []); 
 
     return ( 
