@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const user_1 = __importDefault(require("../models/user"));
+const bcrypt = require('bcryptjs');
 const router = express_1.default.Router();
 router.get('/all', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -26,11 +27,12 @@ router.get('/all', (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 }));
 router.post('/user/new', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { username, email, password } = req.body;
+        let { username, email, password } = req.body;
         const existingUser = yield user_1.default.findOne({ $or: [{ username }, { email }] });
         if (existingUser) {
             return res.status(400).json({ error: 'Username or email already exists' });
         }
+        password = yield bcrypt.hash(password, 10);
         const newUser = new user_1.default({
             username,
             email,

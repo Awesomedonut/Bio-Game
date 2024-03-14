@@ -1,5 +1,6 @@
 import express from 'express'
 import User from '../models/user'
+const bcrypt = require('bcryptjs');
 
 const router = express.Router()
 
@@ -14,11 +15,13 @@ router.get('/all', async (req, res) => {
 
 router.post('/user/new', async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    let { username, email, password } = req.body;
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
     if (existingUser) {
       return res.status(400).json({ error: 'Username or email already exists' });
     }
+    password = await bcrypt.hash(password, 10);
+
     const newUser = new User({
       username,
       email,
