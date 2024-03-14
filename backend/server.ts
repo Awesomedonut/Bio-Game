@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
-
+import usersRouter from './routes/user'
 
 // setup local environment variables from .env file
 dotenv.config();
@@ -55,6 +55,7 @@ mongoose.connect(process.env.MONGO_URI as string)
     console.error('Error connecting to MongoDB Atlas:', error);
   })
 
+app.use('/routes/users', usersRouter)
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });

@@ -7,6 +7,7 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const mongoose_1 = __importDefault(require("mongoose"));
+const user_1 = __importDefault(require("./routes/user"));
 // setup local environment variables from .env file
 dotenv_1.default.config();
 // express app
@@ -31,6 +32,7 @@ mongoose_1.default.connect(process.env.MONGO_URI)
     .catch((error) => {
     console.error('Error connecting to MongoDB Atlas:', error);
 });
+app.use('/routes/users', user_1.default);
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
