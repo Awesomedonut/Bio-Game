@@ -3,6 +3,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import usersRouter from './routes/user'
+import get_answer from './openai';
 
 // setup local environment variables from .env file
 dotenv.config();
@@ -21,7 +22,20 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 app.get('/', (req: Request, res: Response) => {
-    res.status(200).send('Hello World?');
+  res.status(200).send('Hello World?');
+})
+
+
+
+app.post('/', (req: Request, res: Response) => {
+  res.status(200).send('Hello World?');
+})
+
+app.post('/dialogue', async (req: Request, res: Response) => {
+console.log(req.body);
+
+const output = await get_answer(req.body.message);
+res.status(200).send(output);
 })
 
 // Start the server
@@ -35,7 +49,8 @@ mongoose.connect(process.env.MONGO_URI as string)
       console.error('Error connecting to MongoDB Atlas:', error);
     })
 
-app.use('/routes/users', usersRouter)
+//app.use('/routes/users', usersRouter)
+
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
