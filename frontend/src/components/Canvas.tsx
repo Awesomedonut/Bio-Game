@@ -3,6 +3,8 @@ import { CanvasProps } from '../interfaces/CanvasProps';
 import { Player } from '../classes/Player';
 import { Position } from '../interfaces/Position';
 import { Projectile } from '../classes/Projectile';
+import { Enemy } from '../classes/Enemy';
+import { Velocity } from '../interfaces/Velocity';
 
 // Initialize Canvase
 const Canvas: React.FC<CanvasProps> = ({width, height}) => {
@@ -37,10 +39,18 @@ function handleAnimation(ctx: CanvasRenderingContext2D, width: number, height: n
     const PROJECTILE_SPEED = 10;
 
     const projectiles: Projectile[] = [];
+    const enemies: Enemy[] = [];
 
     // Create player
     let spawn: Position = {x: width/2, y: height/2};
     const player = spawnPlayer(ctx, spawn);
+
+    // Spawn an enemy every 3 seconds
+    window.setInterval(() => {
+        let newEnemy:Enemy = spawnEnemy(width, height);
+        enemies.push(newEnemy);
+        // console.log('Enemies: ', enemies);
+    }, 3000);
 
     function animate() {
         // Create animation loop
@@ -55,6 +65,9 @@ function handleAnimation(ctx: CanvasRenderingContext2D, width: number, height: n
 
         // animate projectiles
         animateProjectiles(ctx, projectiles, width, height);
+
+        // animate enemies
+        animateEnemies(ctx, enemies, width, height);
 
         // update the player's velocity
         player.velocity.x = 0;
@@ -122,7 +135,7 @@ function handleAnimation(ctx: CanvasRenderingContext2D, width: number, height: n
     })
 }
 
-// helper function to spawn the player
+// helper function to spawn the player in the middle
 function spawnPlayer(ctx: CanvasRenderingContext2D, spawn: Position): Player {
     let player = new Player({
         position: {x: spawn.x, y: spawn.y},
@@ -133,8 +146,66 @@ function spawnPlayer(ctx: CanvasRenderingContext2D, spawn: Position): Player {
 }
 
 // helper function to spawn enemies
-function spawnEnemy() {
-    // Insert code here
+function spawnEnemy(width: number, height: number): Enemy {
+    // initialize some variables
+    enum SpawnLocation {
+        Top,
+        Bottom,
+        Left,
+        Right
+    }
+    const location:SpawnLocation = Math.floor(Math.random() * 3);
+
+    let position: Position;
+    let velocity: Velocity;
+    let radius: number = 90 * Math.random() + 10;   // sets radius randomly between 10 or 100
+
+    // Set Position and Velocity based on the randomly chosen spawn location
+    switch(location) {
+        case SpawnLocation.Top:
+            position = {
+                x: Math.random() * width, 
+                y: 0 - radius
+            }
+            velocity = {
+                x: 0,
+                y: 1
+            }
+            break;
+        case SpawnLocation.Bottom:
+            position = {
+                x: Math.random() * width,
+                y: height + radius
+            }
+            velocity = {
+                x: 0,
+                y: -1
+            }
+            break;
+        case SpawnLocation.Left:
+            position = {
+                x: 0 - radius,
+                y: Math.random() * height
+            }
+            velocity = {
+                x: 1,
+                y: 0
+            }
+            break;
+        case SpawnLocation.Right:
+            position = {
+                x: width + radius,
+                y: Math.random() * height
+            }
+            velocity = {
+                x: -1,
+                y: 0
+            }
+            break;
+    }
+
+    // return the newly created enemy
+    return new Enemy({position, velocity, radius});
 }
 
 // helper functions to detect if projectiles and asteroid collide
@@ -150,7 +221,7 @@ function animateProjectiles(ctx: CanvasRenderingContext2D, projectiles: Projecti
         let projectile = projectiles[i];
         projectile.update(ctx);
 
-        // Check if offscreen
+        // Check if each projectile is offscreen and remove if it is
         is_offscreen_left = projectile.position.x + projectile.radius < 0;
         is_offscreen_right = projectile.position.x - projectile.radius > width;
         is_offscreen_top = projectile.position.y - projectile.radius > height;
@@ -161,4 +232,25 @@ function animateProjectiles(ctx: CanvasRenderingContext2D, projectiles: Projecti
         }
     }
 }
+
+// helper function to animate enemies
+function animateEnemies(ctx: CanvasRenderingContext2D, enemies: Enemy[], width: number, height: number) {
+    let is_offscreen_left: boolean, is_offscreen_right: boolean, is_offscreen_top: boolean, is_offscreen_bot: boolean;
+    
+    for (let i = enemies.length - 1; i >= 0; i--) {
+        let enemy = enemies[i];
+        enemy.update(ctx);
+        
+        // Check if each enemy is offscreen and remove if it is
+        is_offscreen_left = enemy.position.x + enemy.radius < 0;
+        is_offscreen_right = enemy.position.x - enemy.radius > width;
+        is_offscreen_top = enemy.position.y - enemy.radius > height;
+        is_offscreen_bot = enemy.position.y + enemy.radius < 0;
+
+        if ( is_offscreen_left || is_offscreen_right || is_offscreen_top || is_offscreen_bot ) {
+            enemies.splice(i, 1);
+        }
+    }
+}
+
 export default Canvas;
