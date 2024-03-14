@@ -2,6 +2,7 @@ import { useRef, useEffect } from 'react';
 import { CanvasProps } from '../interfaces/CanvasProps';
 import { Player } from '../classes/Player';
 import { Position } from '../interfaces/Position';
+import { Projectile } from '../classes/Projectile';
 
 // Initialize Canvase
 const Canvas: React.FC<CanvasProps> = ({width, height}) => {
@@ -29,9 +30,13 @@ function handleAnimation(ctx: CanvasRenderingContext2D, width: number, height: n
         a: { pressed: false },
         d: { pressed: false }
     }
+
     const SPEED = 3;
     const SPEED_CHANGE_DIRECTION = 0.05;
     const FRICTION = 0.97;
+    const PROJECTILE_SPEED = 10;
+
+    const projectiles: Projectile[] = [];
 
     // Create player
     let spawn: Position = {x: width/2, y: height/2};
@@ -48,6 +53,9 @@ function handleAnimation(ctx: CanvasRenderingContext2D, width: number, height: n
         // Draw player
         player.update(ctx)
 
+        // animate projectiles
+        animateProjectiles(ctx, projectiles, width, height);
+
         // update the player's velocity
         player.velocity.x = 0;
         if (keys.w.pressed) {
@@ -63,7 +71,9 @@ function handleAnimation(ctx: CanvasRenderingContext2D, width: number, height: n
         } else if (keys.a.pressed) {
             player.angle -= SPEED_CHANGE_DIRECTION;
         }
+
     }
+
     animate();
 
     // Listen for Events
@@ -80,7 +90,19 @@ function handleAnimation(ctx: CanvasRenderingContext2D, width: number, height: n
                 keys.d.pressed = true;
                 break;
             case 'Space':
-                console.log('Space was pressed!');
+                projectiles.push(
+                    new Projectile({
+                        position: {
+                            x: player.position.x,
+                            y: player.position.y
+                        },
+                        velocity: {
+                            x: Math.cos(player.angle) * PROJECTILE_SPEED,
+                            y: Math.sin(player.angle) * PROJECTILE_SPEED
+                        }
+                    })
+                )
+                // console.log(projectiles);
                 break;
         }
     })
@@ -95,8 +117,6 @@ function handleAnimation(ctx: CanvasRenderingContext2D, width: number, height: n
                 break;
             case 'KeyD':
                 keys.d.pressed = false;
-                break;
-            case 'Space':
                 break;
         }
     })
@@ -120,5 +140,25 @@ function spawnEnemy() {
 // helper functions to detect if projectiles and asteroid collide
 function circleCollision() {
     // insert code here
+}
+
+// helper function to animate th projectiles
+function animateProjectiles(ctx: CanvasRenderingContext2D, projectiles: Projectile[], width: number, height: number) {
+    let is_offscreen_left: boolean, is_offscreen_right: boolean, is_offscreen_top: boolean, is_offscreen_bot: boolean;
+    
+    for (let i = projectiles.length - 1; i >= 0; i--) {
+        let projectile = projectiles[i];
+        projectile.update(ctx);
+
+        // Check if offscreen
+        is_offscreen_left = projectile.position.x + projectile.radius < 0;
+        is_offscreen_right = projectile.position.x - projectile.radius > width;
+        is_offscreen_top = projectile.position.y - projectile.radius > height;
+        is_offscreen_bot = projectile.position.y + projectile.radius < 0;
+
+        if ( is_offscreen_left || is_offscreen_right || is_offscreen_top || is_offscreen_bot ) {
+            projectiles.splice(i, 1);
+        }
+    }
 }
 export default Canvas;
