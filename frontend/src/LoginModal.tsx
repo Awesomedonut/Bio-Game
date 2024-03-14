@@ -7,10 +7,9 @@ interface Props {
 const LoginModal: React.FC<Props> = ({ onClose }) => {
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    // Here you would authenticate the user against your backend
-    // For now, we'll just close the modal and pretend the user is logged in
+
     onClose();
-    window.location.href = '/home'; // Redirect to the home page after login
+    window.location.href = '/home'; 
   };
 
   return (
