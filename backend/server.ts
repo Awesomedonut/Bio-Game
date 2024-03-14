@@ -3,6 +3,8 @@ import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import usersRouter from './routes/user'
+import playerRouter from './routes/player'
+import enemyRouter from './routes/enemy'
 
 // setup local environment variables from .env file
 dotenv.config();
@@ -24,26 +26,6 @@ app.get('/', (req: Request, res: Response) => {
   res.status(200).send('Hello World?');
 })
 
-app.get('/game/player', (req: Request, res: Response) => {
-
-})
-
-app.put('/game/player/update', (req: Request, res: Response) => {
-
-})
-
-app.post('/game/player/create', (req: Request, res: Response) => {
-
-})
-
-app.get('game/enemy', (req: Request, res: Response) => {
-
-})
-
-app.get('game/enemy/:id', (req: Request, res: Response) => {
-
-})
-
 // Start the server
 const port = process.env.PORT || 3000;
 
@@ -55,7 +37,10 @@ mongoose.connect(process.env.MONGO_URI as string)
     console.error('Error connecting to MongoDB Atlas:', error);
   })
 
-app.use('/routes/users', usersRouter)
+app.use('/routes/users', usersRouter);
+app.use('/routes/game', playerRouter);
+app.use('/routes/game', enemyRouter);
+
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
