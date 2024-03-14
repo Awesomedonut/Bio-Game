@@ -1,7 +1,9 @@
 import { useRef, useEffect } from 'react';
 import { CanvasProps } from '../interfaces/CanvasProps';
 import { Player } from '../classes/Player';
+import { Position } from '../interfaces/Position';
 
+// Initialize Canvase
 const Canvas: React.FC<CanvasProps> = ({width, height}) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -10,24 +12,113 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
         const ctx = canvas?.getContext('2d');
 
         if (canvas && ctx) {
-            // Fill background
-            ctx.fillStyle = 'black';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Create player
-            const player = new Player({
-                position: {x: width / 2, y: height /2},
-                velocity: {x: 0, y: 0}
-            });
-
-            player.draw(ctx);
-            console.log(player);
+            handleAnimation(ctx, width, height);
         }
-    }, [width, height]); // Will only rerender when screen size chages or twice on initial render because of React.StrictMode
+    }, [width, height]);
 
     return ( 
         <canvas ref={canvasRef} width={width} height={height}/>
      );
 }
- 
+
+// Animates the game
+function handleAnimation(ctx: CanvasRenderingContext2D, width: number, height: number) {
+    // initialize constants
+    const keys = {
+        w: { pressed: false },
+        a: { pressed: false },
+        d: { pressed: false }
+    }
+    const SPEED = 3;
+    const SPEED_CHANGE_DIRECTION = 0.05;
+    const FRICTION = 0.97;
+
+    // Create player
+    let spawn: Position = {x: width/2, y: height/2};
+    const player = spawnPlayer(ctx, spawn);
+
+    function animate() {
+        // Create animation loop
+        window.requestAnimationFrame(animate);
+        
+        // Clear the background in frame
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0, 0, width, height);
+
+        // Draw player
+        player.update(ctx)
+
+        // update the player's velocity
+        player.velocity.x = 0;
+        if (keys.w.pressed) {
+            player.velocity.x = Math.cos(player.angle) * SPEED;
+            player.velocity.y = Math.sin(player.angle) * SPEED;
+        } else {
+            player.velocity.x *= FRICTION;
+            player.velocity.y *= FRICTION;
+        }
+
+        if (keys.d.pressed) {
+            player.angle += SPEED_CHANGE_DIRECTION;
+        } else if (keys.a.pressed) {
+            player.angle -= SPEED_CHANGE_DIRECTION;
+        }
+    }
+    animate();
+
+    // Listen for Events
+    window.addEventListener('keydown', (event) => {
+        switch (event.code) {
+            case 'KeyW':
+                player.velocity.x = 1;
+                keys.w.pressed = true;
+                break;
+            case 'KeyA':
+                keys.a.pressed = true;
+                break;
+            case 'KeyD':
+                keys.d.pressed = true;
+                break;
+            case 'Space':
+                console.log('Space was pressed!');
+                break;
+        }
+    })
+
+    window.addEventListener('keyup', (event) => {
+        switch (event.code) {
+            case 'KeyW':
+                keys.w.pressed = false;
+                break;
+            case 'KeyA':
+                keys.a.pressed = false;
+                break;
+            case 'KeyD':
+                keys.d.pressed = false;
+                break;
+            case 'Space':
+                break;
+        }
+    })
+}
+
+// helper function to spawn the player
+function spawnPlayer(ctx: CanvasRenderingContext2D, spawn: Position): Player {
+    let player = new Player({
+        position: {x: spawn.x, y: spawn.y},
+        velocity: {x: 0, y: 0}
+    });
+    player.draw(ctx);
+    return player;
+}
+
+// helper function to spawn enemies
+function spawnEnemy() {
+    // Insert code here
+}
+
+// helper functions to detect if projectiles and asteroid collide
+function circleCollision() {
+    // insert code here
+}
 export default Canvas;
