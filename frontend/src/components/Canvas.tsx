@@ -69,6 +69,22 @@ function handleAnimation(ctx: CanvasRenderingContext2D, width: number, height: n
         // animate enemies
         animateEnemies(ctx, enemies, width, height);
 
+        // Check if projectile collides with enemy. If it does decrease the enemies "health" and remove from array if it "dies"
+        for (let i = enemies.length - 1; i >= 0; i--) {
+            let enemy = enemies[i];
+            for (let j = projectiles.length - 1; j >= 0; j--) {
+                let projectile = projectiles[j];
+                if (circleCollision(enemy, projectile)) {
+                    enemy.radius -= 10;
+                    if (enemy.radius <= 10) {
+                        enemies.splice(i, 1);
+                        console.log('Boom!');
+                    }
+                    projectiles.splice(j, 1);
+                }
+            }
+        }
+
         // update the player's velocity
         player.velocity.x = 0;
         if (keys.w.pressed) {
@@ -119,7 +135,6 @@ function handleAnimation(ctx: CanvasRenderingContext2D, width: number, height: n
                 break;
         }
     })
-
     window.addEventListener('keyup', (event) => {
         switch (event.code) {
             case 'KeyW':
@@ -209,8 +224,16 @@ function spawnEnemy(width: number, height: number): Enemy {
 }
 
 // helper functions to detect if projectiles and asteroid collide
-function circleCollision() {
-    // insert code here
+function circleCollision(projectile: Projectile, enemy: Enemy): Boolean {
+    let xDifference = projectile.position.x - enemy.position.x;
+    let yDifference = projectile.position.y - enemy.position.y;
+
+    const distance = Math.sqrt(Math.pow(xDifference, 2) + Math.pow(yDifference, 2));
+    if (distance <= projectile.radius + enemy.radius) {
+        return true;
+    }
+
+    return false;
 }
 
 // helper function to animate th projectiles
