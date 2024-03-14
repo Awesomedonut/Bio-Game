@@ -1,10 +1,12 @@
-import Canvas from './components/Canvas';
+
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import LandingPage from './LandingPage';
+import HomePage from './HomePage';
 
 function App() {
   return (
-    <div className="App">
-      <Canvas width={window.innerWidth} height={window.innerHeight}/>
-    </div>
+      <p>test123</p>
   );
 }
 
