@@ -5,12 +5,14 @@ import { Velocity } from "../interfaces/Velocity";
 export class Enemy {
     position: Position;
     velocity: Velocity;
+    hp: number;
     radius: number;
 
-    constructor({position, velocity, radius}: EnemyProps) {
+    constructor({position, velocity, hp}: EnemyProps) {
         this.position = position;
         this.velocity = velocity;
-        this.radius = radius;
+        this.hp = hp;
+        this.radius = hp;
     }
 
     draw(ctx: CanvasRenderingContext2D):void {

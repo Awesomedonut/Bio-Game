@@ -15,7 +15,7 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
         const ctx = canvas?.getContext('2d');
 
         if (canvas && ctx) {
-            handleAnimation(ctx, width, height);
+            start(ctx, width, height);
         }
     }, [width, height]);
 
@@ -24,8 +24,8 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
      );
 }
 
-// Animates the game
-function handleAnimation(ctx: CanvasRenderingContext2D, width: number, height: number) {
+// Animates the player/enemies/projectiles and detect collisions, and detect keyboard input
+function start(ctx: CanvasRenderingContext2D, width: number, height: number) {
     // initialize constants
     const keys = {
         w: { pressed: false },
@@ -78,7 +78,7 @@ function handleAnimation(ctx: CanvasRenderingContext2D, width: number, height: n
                     enemy.radius -= 10;
                     if (enemy.radius <= 10) {
                         enemies.splice(i, 1);
-                        console.log('Boom!');
+                        // console.log('Boom!');
                     }
                     projectiles.splice(j, 1);
                 }
@@ -173,14 +173,14 @@ function spawnEnemy(width: number, height: number): Enemy {
 
     let position: Position;
     let velocity: Velocity;
-    let radius: number = 90 * Math.random() + 10;   // sets radius randomly between 10 or 100
+    let hp: number = 90 * Math.random() + 10;   // sets radius randomly between 10 or 100
 
     // Set Position and Velocity based on the randomly chosen spawn location
     switch(location) {
         case SpawnLocation.Top:
             position = {
                 x: Math.random() * width, 
-                y: 0 - radius
+                y: 0 - hp
             }
             velocity = {
                 x: 0,
@@ -190,7 +190,7 @@ function spawnEnemy(width: number, height: number): Enemy {
         case SpawnLocation.Bottom:
             position = {
                 x: Math.random() * width,
-                y: height + radius
+                y: height + hp
             }
             velocity = {
                 x: 0,
@@ -199,7 +199,7 @@ function spawnEnemy(width: number, height: number): Enemy {
             break;
         case SpawnLocation.Left:
             position = {
-                x: 0 - radius,
+                x: 0 - hp,
                 y: Math.random() * height
             }
             velocity = {
@@ -209,7 +209,7 @@ function spawnEnemy(width: number, height: number): Enemy {
             break;
         case SpawnLocation.Right:
             position = {
-                x: width + radius,
+                x: width + hp,
                 y: Math.random() * height
             }
             velocity = {
@@ -220,11 +220,11 @@ function spawnEnemy(width: number, height: number): Enemy {
     }
 
     // return the newly created enemy
-    return new Enemy({position, velocity, radius});
+    return new Enemy({position, velocity, hp});
 }
 
 // helper functions to detect if projectiles and asteroid collide
-function circleCollision(projectile: Projectile, enemy: Enemy): Boolean {
+function circleCollision(enemy: Enemy, projectile: Projectile): Boolean {
     let xDifference = projectile.position.x - enemy.position.x;
     let yDifference = projectile.position.y - enemy.position.y;
 
