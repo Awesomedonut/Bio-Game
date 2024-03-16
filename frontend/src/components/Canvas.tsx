@@ -27,6 +27,8 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
 // Animates the player/enemies/projectiles and detect collisions, and detect keyboard input
 function start(ctx: CanvasRenderingContext2D, width: number, height: number) {
     // initialize constants
+    let animationFrameID: number;
+
     const keys = {
         w: { pressed: false },
         a: { pressed: false },
@@ -37,16 +39,17 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number) {
     const SPEED_CHANGE_DIRECTION = 0.05;
     const FRICTION = 0.97;
     const PROJECTILE_SPEED = 10;
+    const ENEMY_DAMAGE = 1;
 
     const projectiles: Projectile[] = [];
     const enemies: Enemy[] = [];
 
     // Create player
     let spawn: Position = {x: width/2, y: height/2};
-    const player = spawnPlayer(ctx, spawn);
+    const player = spawnPlayer(ctx, spawn, 1);
 
     // Spawn an enemy every 3 seconds
-    window.setInterval(() => {
+    const interval = window.setInterval(() => {
         let newEnemy:Enemy = spawnEnemy(width, height);
         enemies.push(newEnemy);
         // console.log('Enemies: ', enemies);
@@ -54,7 +57,7 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number) {
 
     function animate() {
         // Create animation loop
-        window.requestAnimationFrame(animate);
+        animationFrameID = window.requestAnimationFrame(animate);
         
         // Clear the background in frame
         ctx.fillStyle = "rgb(255, 131, 122)";
@@ -68,6 +71,20 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number) {
 
         // animate enemies
         animateEnemies(ctx, enemies, width, height);
+
+        // check if player hit and game over
+        for (let i = enemies.length - 1; i >= 0; i--) {
+            let enemy = enemies[i];
+            if (playerHit(enemy, player)) {
+                player.hp -= ENEMY_DAMAGE;
+                if (player.hp <= 0) {
+                    console.log('GAME OVER');
+                    window.cancelAnimationFrame(animationFrameID);
+                    clearInterval(interval);
+                }
+            }
+        }
+
 
         // Check if projectile collides with enemy. If it does decrease the enemies "health" and remove from array if it "dies"
         for (let i = enemies.length - 1; i >= 0; i--) {
@@ -133,6 +150,11 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number) {
                 )
                 // console.log(projectiles);
                 break;
+            // case 'KeyP':    // Pause
+            //     console.log('Pause');
+            //     window.cancelAnimationFrame(animationFrameID);
+            //     break;
+
         }
     })
     window.addEventListener('keyup', (event) => {
@@ -146,15 +168,19 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number) {
             case 'KeyD':
                 keys.d.pressed = false;
                 break;
+            // case 'KeyP':    // Unpause
+            //     animationFrameID = requestAnimationFrame(animate);
+            //     break;
         }
     })
 }
 
 // helper function to spawn the player in the middle
-function spawnPlayer(ctx: CanvasRenderingContext2D, spawn: Position): Player {
+function spawnPlayer(ctx: CanvasRenderingContext2D, spawn: Position, hp: number): Player {
     let player = new Player({
         position: {x: spawn.x, y: spawn.y},
-        velocity: {x: 0, y: 0}
+        velocity: {x: 0, y: 0},
+        hp: hp   // placeholder for now
     });
     player.draw(ctx);
     return player;
@@ -274,6 +300,19 @@ function animateEnemies(ctx: CanvasRenderingContext2D, enemies: Enemy[], width: 
             enemies.splice(i, 1);
         }
     }
+}
+
+// TODO find a better algorithm to calculate if player is hit
+// For now just reusing the circleCollision logic
+function playerHit(enemy: Enemy, player: Player): Boolean {
+    let xDifference = player.position.x - enemy.position.x;
+    let yDifference = player.position.y - enemy.position.y;
+
+    const distance = Math.sqrt(Math.pow(xDifference, 2) + Math.pow(yDifference, 2));
+    if (distance <= enemy.radius) {
+        return true;
+    }
+    return false;
 }
 
 export default Canvas;
