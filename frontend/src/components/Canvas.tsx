@@ -28,7 +28,7 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
 function start(ctx: CanvasRenderingContext2D, width: number, height: number) {
     // initialize constants
     let animationFrameID: number;
-
+    
     const keys = {
         w: { pressed: false },
         a: { pressed: false },
@@ -78,7 +78,14 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number) {
             if (playerHit(enemy, player)) {
                 player.hp -= ENEMY_DAMAGE;
                 if (player.hp <= 0) {
-                    console.log('GAME OVER');
+                    // console.log('GAME OVER');
+
+                    // Print Game Over On Screen
+                    ctx.font = "60px Arial";
+                    ctx.fillStyle = "white";
+                    ctx.textAlign = "center";
+                    ctx.fillText("GAME OVER", width/2, height/2);
+
                     window.cancelAnimationFrame(animationFrameID);
                     clearInterval(interval);
                 }
