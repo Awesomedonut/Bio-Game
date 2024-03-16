@@ -29,7 +29,7 @@ export class Player {
         ctx.lineTo(this.position.x - 10, this.position.y + 10);
         ctx.closePath();
 
-        ctx.strokeStyle = 'white';
+        ctx.strokeStyle = 'green';
         ctx.stroke();
 
         ctx.restore();

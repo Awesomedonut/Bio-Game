@@ -57,7 +57,7 @@ function handleAnimation(ctx: CanvasRenderingContext2D, width: number, height: n
         window.requestAnimationFrame(animate);
         
         // Clear the background in frame
-        ctx.fillStyle = 'black';
+        ctx.fillStyle = "rgb(255, 131, 122)";
         ctx.fillRect(0, 0, width, height);
 
         // Draw player
