@@ -1,13 +1,5 @@
 import { Pool, QueryResult } from 'pg';
 import bcrypt from 'bcrypt';
-// dbname=postgres user=postgres hostaddr=35.192.184.13
-// const pool = new Pool({
-//     user: 'postgres',
-//     host: '35.192.184.13',
-//     database: 'postgres',
-//     password: "7%>ybO+>p}~>uZ='",
-//     port: 5432,
-// });
 
 const pool = new Pool({
     user: process.env.DB_USER,

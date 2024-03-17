@@ -15,14 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.gamemodel = void 0;
 const pg_1 = require("pg");
 const bcrypt_1 = __importDefault(require("bcrypt"));
-// dbname=postgres user=postgres hostaddr=35.192.184.13
-// const pool = new Pool({
-//     user: 'postgres',
-//     host: '35.192.184.13',
-//     database: 'postgres',
-//     password: "7%>ybO+>p}~>uZ='",
-//     port: 5432,
-// });
 const pool = new pg_1.Pool({
     user: process.env.DB_USER,
     host: process.env.DB_HOST,

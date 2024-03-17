@@ -15,9 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
-// import get_answer from './openai';
-// import mongoose from 'mongoose';
-// import usersRouter from './routes/user'
 // setup local environment variables from .env file
 dotenv_1.default.config();
 const gamedb_1 = require("./models/gamedb");
