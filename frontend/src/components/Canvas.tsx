@@ -5,6 +5,7 @@ import { Position } from '../interfaces/Position';
 import { Projectile } from '../classes/Projectile';
 import { Enemy } from '../classes/Enemy';
 import { Velocity } from '../interfaces/Velocity';
+import { circleCollision, playerHit } from '../utils/collision';
 
 // Initialize Canvase
 const Canvas: React.FC<CanvasProps> = ({width, height}) => {
@@ -75,7 +76,7 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number) {
         // check if player hit and game over
         for (let i = enemies.length - 1; i >= 0; i--) {
             let enemy = enemies[i];
-            if (playerHit(enemy, player)) {
+            if (playerHit(enemy, player.getVertices())) {
                 player.hp -= ENEMY_DAMAGE;
                 if (player.hp <= 0) {
                     // console.log('GAME OVER');
@@ -256,19 +257,6 @@ function spawnEnemy(width: number, height: number): Enemy {
     return new Enemy({position, velocity, hp});
 }
 
-// helper functions to detect if projectiles and asteroid collide
-function circleCollision(enemy: Enemy, projectile: Projectile): Boolean {
-    let xDifference = projectile.position.x - enemy.position.x;
-    let yDifference = projectile.position.y - enemy.position.y;
-
-    const distance = Math.sqrt(Math.pow(xDifference, 2) + Math.pow(yDifference, 2));
-    if (distance <= projectile.radius + enemy.radius) {
-        return true;
-    }
-
-    return false;
-}
-
 // helper function to animate th projectiles
 function animateProjectiles(ctx: CanvasRenderingContext2D, projectiles: Projectile[], width: number, height: number) {
     let is_offscreen_left: boolean, is_offscreen_right: boolean, is_offscreen_top: boolean, is_offscreen_bot: boolean;
@@ -307,19 +295,6 @@ function animateEnemies(ctx: CanvasRenderingContext2D, enemies: Enemy[], width: 
             enemies.splice(i, 1);
         }
     }
-}
-
-// TODO find a better algorithm to calculate if player is hit
-// For now just reusing the circleCollision logic
-function playerHit(enemy: Enemy, player: Player): Boolean {
-    let xDifference = player.position.x - enemy.position.x;
-    let yDifference = player.position.y - enemy.position.y;
-
-    const distance = Math.sqrt(Math.pow(xDifference, 2) + Math.pow(yDifference, 2));
-    if (distance <= enemy.radius) {
-        return true;
-    }
-    return false;
 }
 
 export default Canvas;
