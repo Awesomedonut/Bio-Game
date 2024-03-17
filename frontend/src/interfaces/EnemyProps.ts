@@ -1,8 +1,9 @@
 import { Position } from "./Position";
 import { Velocity } from "./Velocity";
 
-export interface PlayerProps {
+export interface EnemyProps {
     position: Position;
     velocity: Velocity;
     hp: number;
 }
+
