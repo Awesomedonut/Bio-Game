@@ -75,4 +75,32 @@ exports.gamemodel = {
             return undefined;
         }
     }),
+    getUser: function (email, password) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const result = yield pool.query("SELECT * FROM users WHERE email = $1", [email,]);
+                if (result.rows.length > 0) {
+                    const user = result.rows[0];
+                    const storedPassword = user.password;
+                    const valid = yield bcrypt_1.default.compare(password, storedPassword);
+                    if (valid) {
+                        console.log("Success");
+                        return 1;
+                    }
+                    else {
+                        console.log("Incorrect Password");
+                        return 0;
+                    }
+                }
+                else {
+                    console.log("User not found");
+                    return 0;
+                }
+            }
+            catch (err) {
+                console.log(err);
+                return 0;
+            }
+        });
+    }
 };

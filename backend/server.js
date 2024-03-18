@@ -41,7 +41,7 @@ app.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(500).json({ error: 'Failed to fetch data' });
     }
 }));
-app.post('/user/add', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield gamedb_1.gamemodel.addUser(req.body.username, req.body.email, req.body.password);
         res.json({ message: 'User has added successfully' });
@@ -53,8 +53,23 @@ app.post('/user/add', (req, res) => __awaiter(void 0, void 0, void 0, function* 
 }));
 app.get('/users', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const recipes = yield gamedb_1.gamemodel.getAllUsers();
-        res.json(recipes);
+        const allUsers = yield gamedb_1.gamemodel.getAllUsers();
+        res.json(allUsers);
+    }
+    catch (error) {
+        console.error('Error fetching data:', error);
+        res.status(500).json({ error: 'Failed to fetch data' });
+    }
+}));
+app.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const status = yield gamedb_1.gamemodel.getUser(req.body.email, req.body.password);
+        if (status) {
+            res.json("Success");
+        }
+        else {
+            res.status(500).json({ error: 'Incorrect user Password for login' });
+        }
     }
     catch (error) {
         console.error('Error fetching data:', error);
@@ -71,14 +86,6 @@ app.get('/users', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 // })
 // Start the server
 const port = process.env.PORT || 3000;
-// mongoose.connect(process.env.MONGO_URI as string)
-//     .then(() => {
-//           console.log('Connected to MongoDB Atlas');   
-//     })
-//     .catch((error) => {
-//       console.error('Error connecting to MongoDB Atlas:', error);
-//     })
-// app.use('/routes/users', usersRouter)
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });

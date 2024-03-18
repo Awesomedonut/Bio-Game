@@ -1,5 +1,6 @@
 import { Pool, QueryResult } from 'pg';
 import bcrypt from 'bcrypt';
+import { error } from 'console';
 
 const pool = new Pool({
     user: process.env.DB_USER,
@@ -60,4 +61,27 @@ export const gamemodel = {
             return undefined;
         }
     },
+    getUser: async function(email: string, password: string) {
+        try {
+            const result = await pool.query("SELECT * FROM users WHERE email = $1", [email,]);
+            if (result.rows.length > 0) {
+              const user = result.rows[0];
+              const storedPassword = user.password;
+              const valid = await bcrypt.compare(password, storedPassword);
+              if (valid) {
+                console.log("Success");
+                return 1;
+              } else {
+                console.log("Incorrect Password");
+                return 0;
+              }
+            } else {
+                console.log("User not found");
+                return 0;
+            }
+          } catch (err) {
+            console.log(err);
+            return 0;
+        }
+    }
 };
