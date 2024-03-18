@@ -67,8 +67,8 @@ export const gamemodel = {
             if (result.rows.length > 0) {
               const user = result.rows[0];
               const storedPassword = user.password;
-        
-              if (password === storedPassword) {
+              const valid = await bcrypt.compare(password, storedPassword);
+              if (valid) {
                 console.log("Success");
                 return 1;
               } else {
