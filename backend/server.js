@@ -51,10 +51,15 @@ app.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, function* 
         res.status(500).json({ error: 'Failed to fetch data' });
     }
 }));
-app.get('/users', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const recipes = yield gamedb_1.gamemodel.getAllUsers();
-        res.json(recipes);
+        const status = yield gamedb_1.gamemodel.getUser(req.body.email, req.body.password);
+        if (status) {
+            res.json("Success");
+        }
+        else {
+            res.status(500).json({ error: 'Incorrect user Password' });
+        }
     }
     catch (error) {
         console.error('Error fetching data:', error);

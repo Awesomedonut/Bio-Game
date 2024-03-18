@@ -42,15 +42,22 @@ app.post('/register', async (req, res) => {
   } 
 });
 
-app.get('/users', async (req, res) => {
+app.post('/login', async (req, res) => {
   try{
-    const recipes = await gamemodel.getAllUsers();
-    res.json(recipes);
+    const status = await gamemodel.getUser(req.body.email, req.body.password);
+    if(status){
+      res.json("Success");
+    }
+    else{
+      res.status(500).json({ error: 'Incorrect user Password' });
+    }  
   }catch (error) {
     console.error('Error fetching data:', error);
     res.status(500).json({ error: 'Failed to fetch data' });
   } 
 });
+
+
 
 // app.post('/', (req: Request, res: Response) => {
 //   res.status(200).send('Hello World?');
