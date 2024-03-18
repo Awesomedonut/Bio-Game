@@ -41,6 +41,15 @@ app.post('/register', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch data' });
   } 
 });
+app.get('/users', async (req, res) => {
+  try {
+    const allUsers = await gamemodel.getAllUsers();
+    res.json(allUsers);
+  }catch (error) {
+    console.error('Error fetching data:', error);
+    res.status(500).json({ error: 'Failed to fetch data' });
+  } 
+});
 
 app.post('/login', async (req, res) => {
   try{
@@ -49,7 +58,7 @@ app.post('/login', async (req, res) => {
       res.json("Success");
     }
     else{
-      res.status(500).json({ error: 'Incorrect user Password' });
+      res.status(500).json({ error: 'Incorrect user Password for login' });
     }  
   }catch (error) {
     console.error('Error fetching data:', error);
