@@ -7,8 +7,12 @@ const openai = new OpenAI({
   });
 
 async function get_answer(prompt: string) {
-  console.log("get ans function 1234565");
+  console.log("get ans function");
   console.log(prompt);
+  if (prompt == null || prompt.trim() === '') {
+    throw new Error('Prompt cannot be empty');
+  }
+  
   const response = await openai.chat.completions.create({
     model: 'gpt-3.5-turbo',
     messages: [

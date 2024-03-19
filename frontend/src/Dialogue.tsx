@@ -25,7 +25,8 @@ const Dialogue: React.FC = () => {
         body: JSON.stringify({ prompt: inputText }),
       });
       const data = await response.json();
-      const apiResponse: Message = { role: 'white blood cell', content: data };
+      console.log("data is " + data);
+      const apiResponse: Message = { role: 'white blood cell', content: data.message };
       setMessages((prevMessages) => [...prevMessages, apiResponse]);
     } catch (error) {
       console.error('Error sending message:', error);
@@ -33,6 +34,8 @@ const Dialogue: React.FC = () => {
 
     setInputText('');
 };
+
+
 
 
   return (
