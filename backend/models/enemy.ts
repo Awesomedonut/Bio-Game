@@ -1,16 +1,93 @@
-import mongoose from 'mongoose'
+import { Pool, QueryResult } from 'pg';
 
-const EnemySchema = new mongoose.Schema(
-  {
-    name: { type: String, required: true, unique: true },
-    damage: { type: Number, min: 1, default: 1 },
-    hp: { type: Number, min: 1, default: 1 },
-    movementSpeed: { type: Number, min: 1, default: 1 },
+const pool = new Pool({
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASSWORD,
+  port: 5432
+});
+
+export const enemyModel = {
+  init: async () => {
+      try {
+          await pool.query(`
+              CREATE TABLE IF NOT EXISTS enemy (
+                  id SERIAL PRIMARY KEY,
+                  name VARCHAR(255) UNIQUE NOT NULL,
+                  damage INTEGER DEFAULT 1,
+                  hp INTEGER DEFAULT 1,
+                  movementSpeed INTEGER DEFAULT 1,
+                  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+              )
+          `);
+          console.log('Enemy table has been initialized');
+      } catch (err) {
+          console.error('Error initializing enemy table:', err);
+      }
   },
-  {
-    collection: 'enemy'
-  }
-);
+  getAllEnemies: async () => {
+      try {
+          const result: QueryResult = await pool.query('SELECT * FROM enemy');
+          return result.rows;
+      } catch (err) {
+          console.error('Error fetching enemies:', err);
+          return [];
+      }
+  },
+  getEnemyById: async function(id: number) {
+      try {
+          const result = await pool.query("SELECT * FROM enemy WHERE id = $1", [id]);
+          if (result.rows.length > 0) {
+            return result.rows[0];
+          } else {
+            console.log("Enemy not found");
+            return {};
+          }
+        } catch (err) {
+          console.log(err);
+          return {};
+      }
+  },
+  getEnemyByName: async function(name: String) {
+    try {
+      console.log(name);
+      const result = await pool.query("SELECT * FROM enemy WHERE name = $1", [name]);
+      if (result.rows.length > 0) {
+        console.log(result.rows);
+        return result.rows[0];
+      } else {
+        console.log("Enemy not found");
+        return {};
+      }
+    } catch (err) {
+      console.log(err);
+      return {};
+    }
+  },
+  createEnemy: async function(name: string, damage: number, hp: number, movementSpeed: number) {
+    try {
+      const result = await pool.query(
+        "INSERT INTO enemy(name, damage, hp, movementSpeed) VALUES ($1, $2, $3, $4) RETURNING id", [name, damage, hp, movementSpeed]
+      );
 
-const User = mongoose.model('Enemy', EnemySchema)
-export default User
+      console.log(result);
+      // if (result) {
+      //   const createdEnemy = pool.query("SELECT * FROM enemy WHERE id = $1");
+      // }
+
+    } catch (err) {
+      console.log(err);
+      return {};
+    }
+  },
+  deleteEnemy: async function(id: number) {
+    try {
+      await pool.query("DELETE FROM enemy WHERE id = $1", [id]);
+      return 1;
+    } catch (err) {
+      console.log(err);
+      return 0;
+    }
+  }
+};

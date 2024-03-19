@@ -67,6 +67,12 @@ app.post('/login', async (req, res) => {
 });
 
 
+import enemyRoutes from './routes/enemy'
+// import { playerRoutes } from './routes/player'
+
+app.use('/game', enemyRoutes);
+// app.use('/game', playerRoutes);
+
 
 // app.post('/', (req: Request, res: Response) => {
 //   res.status(200).send('Hello World?');
