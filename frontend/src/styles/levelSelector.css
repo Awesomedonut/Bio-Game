@@ -1,0 +1,69 @@
+.popup {
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: grid;
+    place-items: center;
+}
+
+.levelsPopupContainer {
+    width: 65%;
+    background-color: #FFFFFF;
+    padding: 2rem;
+    gap: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.levelsContainer {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(auto-fill, minmax(5rem, 1fr));
+    grid-template-rows: repeat(auto-fill, minmax(5rem, 1fr));
+    gap: 2rem;
+    place-items: center;
+    overflow-y: scroll;
+}
+
+.levelButton {
+    width: 5rem;
+    height: 5rem;
+    font-size: 1.25rem;
+    border: 1px solid black;
+    display: grid;
+    place-items: center;
+}
+
+.levelsHeader {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.unlocked {
+    background-color: blanchedalmond;
+}
+
+.unlocked:hover {
+    cursor: pointer;
+}
+
+.locked {
+    background-color: lightgrey;
+}
+
+.closeButton {
+    border: 1px solid black;
+    border-radius: 7px;
+    padding: 0.5rem 1rem;
+}
+
+.levelsHeading {
+    font-size: calc(2rem);
+}
