@@ -1,13 +1,11 @@
 import dotenv from 'dotenv';
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
-import mongoose from 'mongoose';
-import usersRouter from './routes/user'
-import playerRouter from './routes/player'
-import enemyRouter from './routes/enemy'
+import get_answer from './openai';
 
 // setup local environment variables from .env file
 dotenv.config();
+import { gamemodel } from './models/gamedb';
 
 // express app
 const app = express();
@@ -22,24 +20,67 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-app.get('/', (req: Request, res: Response) => {
-  res.status(200).send('Hello World?');
-})
+// app.get('/', (req: Request, res: Response) => {
+//   res.status(200).send('Hello World?');
+// })
+app.get('/', async (req, res) => {
+  try {
+    await gamemodel.init();
+    res.send('Database has been initialized');
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    res.status(500).json({ error: 'Failed to fetch data' });
+  } 
+});
+app.post('/register', async (req, res) => {
+  try {
+    await gamemodel.addUser(req.body.username, req.body.email, req.body.password);
+    res.json({ message: 'User has added successfully' });
+  }catch (error) {
+    console.error('Error fetching data:', error);
+    res.status(500).json({ error: 'Failed to fetch data' });
+  } 
+});
+app.get('/users', async (req, res) => {
+  try {
+    const allUsers = await gamemodel.getAllUsers();
+    res.json(allUsers);
+  }catch (error) {
+    console.error('Error fetching data:', error);
+    res.status(500).json({ error: 'Failed to fetch data' });
+  } 
+});
+
+app.post('/login', async (req, res) => {
+  try{
+    const status = await gamemodel.getUser(req.body.email, req.body.password);
+    if(status){
+      res.json("Success");
+    }
+    else{
+      res.status(500).json({ error: 'Incorrect user Password for login' });
+    }  
+  }catch (error) {
+    console.error('Error fetching data:', error);
+    res.status(500).json({ error: 'Failed to fetch data' });
+  } 
+});
+
+
+
+// app.post('/', (req: Request, res: Response) => {
+//   res.status(200).send('Hello World?');
+// })
+
+// app.post('/dialogue', async (req: Request, res: Response) => {
+// console.log(req.body);
+
+// const output = await get_answer(req.body.message);
+// res.status(200).send(output);
+// })
 
 // Start the server
 const port = process.env.PORT || 3000;
-
-mongoose.connect(process.env.MONGO_URI as string)
-  .then(() => {
-    console.log('Connected to MongoDB Atlas');
-  })
-  .catch((error) => {
-    console.error('Error connecting to MongoDB Atlas:', error);
-  })
-
-app.use('/routes/users', usersRouter);
-app.use('/routes/game', playerRouter);
-app.use('/routes/game', enemyRouter);
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

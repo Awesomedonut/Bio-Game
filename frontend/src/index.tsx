@@ -8,9 +8,13 @@ const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
-  <React.StrictMode>
+  // Commenting out for now because React.StrictMode rerenders the canvas twice which is annoying for debugging
+  // <React.StrictMode>
+  //   <App />
+  // </React.StrictMode>
+  <>
     <App />
-  </React.StrictMode>
+  </>
 );
 
 // If you want to start measuring performance in your app, pass a function
