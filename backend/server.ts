@@ -32,6 +32,16 @@ app.get('/', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch data' });
   } 
 });
+
+app.get('/test', async (req, res) => {
+  try {
+    res.send("test success");
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    res.status(500).json({ error: 'Failed to fetch data' });
+  } 
+});
+
 app.post('/register', async (req, res) => {
   try {
     await gamemodel.addUser(req.body.username, req.body.email, req.body.password);
@@ -72,12 +82,24 @@ app.post('/login', async (req, res) => {
 //   res.status(200).send('Hello World?');
 // })
 
-// app.post('/dialogue', async (req: Request, res: Response) => {
-// console.log(req.body);
+app.post('/dialogue', async (req: Request, res: Response) => {
+  console.log(req.body);
 
-// const output = await get_answer(req.body.message);
-// res.status(200).send(output);
-// })
+  try {
+    const output = await get_answer(req.body.prompt);
+    console.log(output);
+    // Ensure the response is in JSON format
+    res.status(200).json({ message: output });
+  } catch (error) {
+    console.error(error);
+    // Send a JSON error message if something goes wrong
+    res.status(500).json({ error: 'Failed to fetch the response' });
+  }
+
+})
+
+
+
 
 // Start the server
 const port = process.env.PORT || 3000;
