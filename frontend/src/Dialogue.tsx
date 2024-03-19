@@ -17,7 +17,7 @@ const Dialogue: React.FC = () => {
     setMessages((prevMessages) => [...prevMessages, newMessage]);
 
     try {
-      const response = await fetch('https://backend-dot-group-project372.uw.r.appspot.com/dialogue', {
+      const response = await fetch('localhost:4000/dialogue', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -23,12 +23,14 @@ const openai = new openai_1.default({
 //   });
 function get_answer(prompt) {
     return __awaiter(this, void 0, void 0, function* () {
+        console.log("get ans function");
+        console.log(prompt);
         const response = yield openai.chat.completions.create({
             model: 'gpt-3.5-turbo',
             messages: [
                 { role: 'system', content: `
-      you are a bacteria that has invaded the human body and you are talking to one of the body's white blood cells. 
-      i will provide what the cell says and you must respond` },
+      you are a white blood cell defending the human body. a bacteria has invaded.
+      i will provide what the bacteria says and you must respond` },
                 { role: 'user', content: prompt },
             ]
         });
