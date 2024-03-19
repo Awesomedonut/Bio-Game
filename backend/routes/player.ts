@@ -1,21 +1,41 @@
 import express from 'express';
 import { Request, Response } from 'express';
-import Player from '../models/player';
+import playerModel from '../models/player';
 
 const router = express.Router();
 
-router.post('/player', async (req: Request, res: Response) => {
-  const { username } = req.body;
+router.get("/player/init", async (req, res) => {
+  try {
+    const initRes = await playerModel.init();
+    if (initRes) {
+      return res.json({
+        "message": "Player table initialized in db"
+      })
+    } else {
+      return res.json({
+        "message": "Error occurred",
+        "error": "Player table not created"
+      })
+    }
+   
+  } catch (e) {
+    console.error(e);
+    return res.json({
+      "message": "Error occurred",
+      "error": e
+    })
+  }
+})
+
+router.get('/player/:id', async (req: Request, res: Response) => {
+  const userId = parseInt(req.params.id);
 
   try {
-    const player = await Player.findOne({
-      username: username
-    })
-
+    const player = await playerModel.getPlayerByUserId(userId);
     if (player) {
       return res.json({ player });
     } else {
-      return res.json({ "message": `Player with username ${username} not found` });
+      return res.json({ "message": `Player linked with user with id ${userId} not found` });
     }
   } catch (e) {
     console.error(e);
@@ -27,24 +47,19 @@ router.post('/player', async (req: Request, res: Response) => {
 });
 
 router.put('/player/update', async (req: Request, res: Response) => {
-  const { username, damage, hp, movementSpeed, projectiles, projectileSpeed } = req.body
+  const { id, damage, hp, movement_speed, projectile_number, projectile_speed, currency} = req.body
 
   try {
-    const updatedPlayer = await Player.findOneAndUpdate(
-      { username: username },
-      {
-        $set: {
-          damage: damage,
-          hp: hp,
-          movementSpeed: movementSpeed,
-          projectiles: projectiles,
-          projectileSpeed: projectileSpeed
-        }
-      },
-      { new: true }
-    );
-
-    return res.json({ updatedPlayer });
+    const updateRes = await playerModel.updatePlayer(id, damage, hp, movement_speed, projectile_number, projectile_speed, currency);
+    if (updateRes) {
+      const updatedPlayer = await playerModel.getPlayerByUserId(id);
+      return res.json({ updatedPlayer });
+    } else {
+      return res.json({
+        "message": "Error occured",
+        "error": "Error updating the player"
+      })
+    }
   } catch (e) {
     console.error(e);
     return res.json({
@@ -55,11 +70,10 @@ router.put('/player/update', async (req: Request, res: Response) => {
 });
 
 router.post('/player/create', async (req: Request, res: Response) => {
-  const { username, damage, hp, movementSpeed } = req.body
+  const { user_id } = req.body
 
   try {
-    const player = new Player({ username, damage, hp, movementSpeed });
-    const createdPlayer = await player.save();
+    const createdPlayer = await playerModel.createPlayer(user_id);
     return res.json({ createdPlayer });
   } catch (e) {
     console.error(e);

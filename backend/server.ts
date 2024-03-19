@@ -23,7 +23,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 // app.get('/', (req: Request, res: Response) => {
 //   res.status(200).send('Hello World?');
 // })
-app.get('/', async (req, res) => {
+app.get('/enemy/init', async (req, res) => {
   try {
     await gamemodel.init();
     res.send('Database has been initialized');
@@ -68,10 +68,10 @@ app.post('/login', async (req, res) => {
 
 
 import enemyRoutes from './routes/enemy'
-// import { playerRoutes } from './routes/player'
+import playerRoutes from './routes/player'
 
 app.use('/game', enemyRoutes);
-// app.use('/game', playerRoutes);
+app.use('/game', playerRoutes);
 
 
 // app.post('/', (req: Request, res: Response) => {

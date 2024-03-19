@@ -1,15 +1,22 @@
 import express from 'express';
 import { Request, Response } from 'express';
-import { enemyModel } from '../models/enemy';
+import enemyModel from '../models/enemy';
 
 const router = express.Router()
 
-router.get('/', async (req: Request, res: Response) => {
+router.get('/enemy/init', async (req: Request, res: Response) => {
   try {
-    await enemyModel.init();
-    return res.json({
-      "message": "Enemy table initialized in db"
-    })
+    const initRes = await enemyModel.init();
+    if (initRes) {
+      return res.json({
+        "message": "Enemy table initialized in db"
+      }) 
+    } else {
+      return res.json({
+        "message": "Error occurred",
+        "error": "Enemy table not created"
+      })
+    }
   } catch (e) {
     console.error(e);
     return res.json({
@@ -32,7 +39,7 @@ router.get('/enemy', async (req: Request, res: Response) => {
   }
 });
 
-router.post('/enemy', async (req: Request, res: Response) => {
+router.post('/enemy/create', async (req: Request, res: Response) => {
   const { name, damage, hp, movementSpeed } = req.body
 
   try {

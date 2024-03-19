@@ -8,7 +8,7 @@ const pool = new Pool({
   port: 5432
 });
 
-export const enemyModel = {
+const enemyModel = {
   init: async () => {
       try {
           await pool.query(`
@@ -19,16 +19,18 @@ export const enemyModel = {
                   hp INTEGER DEFAULT 1,
                   movementSpeed INTEGER DEFAULT 1,
                   createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-              )
+              );
           `);
           console.log('Enemy table has been initialized');
+          return 1
       } catch (err) {
           console.error('Error initializing enemy table:', err);
+          return {};
       }
   },
   getAllEnemies: async () => {
       try {
-          const result: QueryResult = await pool.query('SELECT * FROM enemy');
+          const result: QueryResult = await pool.query('SELECT * FROM enemy;');
           return result.rows;
       } catch (err) {
           console.error('Error fetching enemies:', err);
@@ -37,7 +39,7 @@ export const enemyModel = {
   },
   getEnemyById: async function(id: number) {
       try {
-          const result = await pool.query("SELECT * FROM enemy WHERE id = $1", [id]);
+          const result = await pool.query("SELECT * FROM enemy WHERE id = $1;", [id]);
           if (result.rows.length > 0) {
             return result.rows[0];
           } else {
@@ -52,7 +54,7 @@ export const enemyModel = {
   getEnemyByName: async function(name: String) {
     try {
       console.log(name);
-      const result = await pool.query("SELECT * FROM enemy WHERE name = $1", [name]);
+      const result = await pool.query("SELECT * FROM enemy WHERE name = $1;", [name]);
       if (result.rows.length > 0) {
         console.log(result.rows);
         return result.rows[0];
@@ -68,14 +70,17 @@ export const enemyModel = {
   createEnemy: async function(name: string, damage: number, hp: number, movementSpeed: number) {
     try {
       const result = await pool.query(
-        "INSERT INTO enemy(name, damage, hp, movementSpeed) VALUES ($1, $2, $3, $4) RETURNING id", [name, damage, hp, movementSpeed]
+        "INSERT INTO enemy(name, damage, hp, movementSpeed) VALUES ($1, $2, $3, $4) RETURNING id;", [name, damage, hp, movementSpeed]
       );
 
-      console.log(result);
-      // if (result) {
-      //   const createdEnemy = pool.query("SELECT * FROM enemy WHERE id = $1");
-      // }
+      const { id } = result.rows[0];
 
+      if (id) {
+        const createdEnemy = await pool.query("SELECT * FROM enemy WHERE id = $1", [id]);
+        return createdEnemy.rows[0];
+      } else {
+        return {}
+      }
     } catch (err) {
       console.log(err);
       return {};
@@ -83,11 +88,13 @@ export const enemyModel = {
   },
   deleteEnemy: async function(id: number) {
     try {
-      await pool.query("DELETE FROM enemy WHERE id = $1", [id]);
+      await pool.query("DELETE FROM enemy WHERE id = $1;", [id]);
       return 1;
     } catch (err) {
       console.log(err);
-      return 0;
+      return {};
     }
   }
 };
+
+export default enemyModel;
