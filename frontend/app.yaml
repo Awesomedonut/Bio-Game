@@ -1,0 +1,25 @@
+service: frontend
+runtime: nodejs20 # Specify the runtime
+
+env: standard # Use the standard environment
+
+instance_class: F1 # Choose an instance class (optional, based on your needs)
+
+automatic_scaling:
+  target_cpu_utilization: 0.6
+  min_instances: 1
+  max_instances: 5
+
+handlers:
+  # Serve all static files in the build folder
+  - url: /(.*\.(html|css|js|json|png|jpg|jpeg|gif|ico|svg))$
+    static_files: build/\1
+    upload: build/(.*\.(html|css|js|json|png|jpg|jpeg|gif|ico|svg))$
+    secure: always
+
+  # Single Page Application (SPA) catch-all handler
+  # This redirects all non-static file requests to index.html, allowing client-side routing to take over.
+  - url: /.*
+    static_files: build/index.html
+    upload: build/index.html
+    secure: always
