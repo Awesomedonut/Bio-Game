@@ -169,7 +169,7 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number, pla
                         enemies.splice(i, 1);
                         // console.log('Boom!');
                         CURRENCY += enemy.currency_drop;
-                        console.log(CURRENCY);
+                        console.log(`Currency: ${CURRENCY}`);
                     }
                     projectiles.splice(j, 1);
                 }
