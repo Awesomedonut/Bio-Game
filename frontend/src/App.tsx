@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 import LandingPage from './LandingPage';
 import HomePage from './components/HomePage';
 import Dialogue from './Dialogue';
+import Signup from './Signup';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/dialogue" element={<Dialogue />} />
+        <Route path="/signup" element={<Signup />} />
       </Routes>
     </Router>
   );
