@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-
 interface Message {
   role: string;
   content: string;
@@ -34,9 +33,6 @@ const Dialogue: React.FC = () => {
 
     setInputText('');
 };
-
-
-
 
   return (
     <div>
