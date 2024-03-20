@@ -34,7 +34,7 @@ const Signup: React.FC = () => {
             setUsername('');
             setEmail('');
             setPassword('');
-            window.location.href = '/home'; // Redirect on successful login
+            window.location.href = '/home'; // Redirect on successful register
         }
     }
 
