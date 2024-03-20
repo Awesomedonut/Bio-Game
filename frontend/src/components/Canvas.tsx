@@ -68,15 +68,17 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number, pla
     const SPEED = playerData.movement_speed;
     const SPEED_CHANGE_DIRECTION = 0.05;
     const FRICTION = 0.97;
-    const PROJECTILE_SPEED = playerData?.projectile_speed;
+    const NUM_PROJECTILES = playerData.projectile_number;
+    const PROJECTILE_SPEED = playerData.projectile_speed;
     const ENEMY_DAMAGE = 1;
+    const HP = playerData.hp;
 
     const projectiles: Projectile[] = [];
     const enemies: Enemy[] = [];
 
     // Create player
     let spawn: Position = {x: width/2, y: height/2};
-    const player = spawnPlayer(ctx, spawn, 1);
+    const player = spawnPlayer(ctx, spawn, HP);
 
     // Spawn an enemy every 3 seconds
     const interval = window.setInterval(() => {
@@ -107,6 +109,7 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number, pla
             let enemy = enemies[i];
             if (playerHit(enemy, player.getVertices())) {
                 player.hp -= ENEMY_DAMAGE;
+                console.log(player.hp);
                 if (player.hp <= 0) {
                     // console.log('GAME OVER');
 
@@ -160,7 +163,7 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number, pla
     animate();
 
     // Listen for Events
-    window.addEventListener('keydown', (event) => {
+    window.addEventListener('keydown', async (event) => {
         switch (event.code) {
             case 'KeyW':
                 player.velocity.x = 1;
@@ -173,18 +176,22 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number, pla
                 keys.d.pressed = true;
                 break;
             case 'Space':
-                projectiles.push(
-                    new Projectile({
-                        position: {
-                            x: player.position.x,
-                            y: player.position.y
-                        },
-                        velocity: {
-                            x: Math.cos(player.angle) * PROJECTILE_SPEED,
-                            y: Math.sin(player.angle) * PROJECTILE_SPEED
-                        }
-                    })
-                )
+                for (let i: number = 0; i < NUM_PROJECTILES; i++) {
+                    projectiles.push(
+                        new Projectile({
+                            position: {
+                                x: player.position.x,
+                                y: player.position.y
+                            },
+                            velocity: {
+                                x: Math.cos(player.angle) * PROJECTILE_SPEED,
+                                y: Math.sin(player.angle) * PROJECTILE_SPEED
+                            }
+                        })
+                    );
+
+                    await sleep(90);
+                }
                 // console.log(projectiles);
                 break;
             // case 'KeyP':    // Pause
@@ -324,6 +331,10 @@ function animateEnemies(ctx: CanvasRenderingContext2D, enemies: Enemy[], width: 
             enemies.splice(i, 1);
         }
     }
+}
+
+function sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 export default Canvas;
