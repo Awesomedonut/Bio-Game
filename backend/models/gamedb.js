@@ -75,10 +75,10 @@ exports.gamemodel = {
             return undefined;
         }
     }),
-    getUser: function (email, password) {
+    getUser: function (username, password) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const result = yield pool.query("SELECT * FROM users WHERE email = $1", [email,]);
+                const result = yield pool.query("SELECT * FROM users WHERE username = $1", [username,]);
                 if (result.rows.length > 0) {
                     const user = result.rows[0];
                     const storedPassword = user.password;
