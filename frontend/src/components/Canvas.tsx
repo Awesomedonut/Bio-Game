@@ -52,7 +52,7 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
         if (!loading && canvas && ctx) {
             start(ctx, width, height, playerData, enemiesData);
         }
-    }, [width, height, playerData]);
+    }, [width, height, playerData, enemiesData, loading]);
 
     return ( 
         <canvas ref={canvasRef} width={width} height={height}/>

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../styles/levelSelector.css';
 
 type LevelSelectorProps = {
@@ -10,9 +11,10 @@ type LevelObject = {
     unlocked: boolean
 }
 
+
 const LevelSelector: React.FC<LevelSelectorProps> = ({ closeLevelSelector }) => {
     // Implement endpoints to get this information per player
-    const maxLevel: number = 1;
+    const maxLevel: number = 0;
 
     const levels: Array<LevelObject> = []
 
@@ -36,6 +38,11 @@ const LevelSelector: React.FC<LevelSelectorProps> = ({ closeLevelSelector }) => 
     }
     levels.push(infiniteLevelObject);
 
+    const navigate = useNavigate();
+    const handleLevelSelected = () => {
+        navigate('/game');
+    }
+
     return (
         <div className="popup">
             <div className="levelsPopupContainer">
@@ -46,7 +53,7 @@ const LevelSelector: React.FC<LevelSelectorProps> = ({ closeLevelSelector }) => 
                 <div className="levelsContainer">
                     {
                         levels.map(levelObject => {
-                            return <div className={`levelButton ${levelObject.unlocked ? "unlocked" : "locked"}`}>{levelObject.level}</div>
+                            return <div className={`levelButton ${levelObject.unlocked ? "unlocked" : "locked"}`} onClick={levelObject.unlocked ? handleLevelSelected : () => {}}>{levelObject.level}</div>
                         })
                     }
                 </div>

@@ -1,15 +1,21 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
   onClose: () => void;
 }
 
+
 const LoginModal: React.FC<Props> = ({ onClose }) => {
+
+  const navigate = useNavigate();
+  
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
 
     onClose();
-    window.location.href = '/home'; 
+
+    navigate('/home'); 
   };
 
   return (
