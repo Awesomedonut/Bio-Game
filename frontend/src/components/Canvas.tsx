@@ -73,6 +73,8 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number, pla
     const ENEMY_DAMAGE = 1;
     const HP = playerData.hp;
 
+    const CHAIN_PROJECTILE_DELAY = 90;
+
     const projectiles: Projectile[] = [];
     const enemies: Enemy[] = [];
 
@@ -190,7 +192,7 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number, pla
                         })
                     );
 
-                    await sleep(90);
+                    await sleep(CHAIN_PROJECTILE_DELAY);
                 }
                 // console.log(projectiles);
                 break;
