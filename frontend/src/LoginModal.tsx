@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 interface Props {
   onClose: () => void;
@@ -32,6 +33,7 @@ const LoginModal: React.FC<Props> = ({ onClose }) => {
         <button type="submit">Login</button>
       </form>
       <button onClick={onClose}>Close</button>
+      <p>Don't have an account? <Link to="/signup"> Register</Link></p>
     </div>
   );
 };

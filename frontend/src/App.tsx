@@ -6,6 +6,7 @@ import HomePage from './components/HomePage';
 import Canvas from './components/Canvas';
 import Dialogue from './Dialogue';
 import { CanvasProps } from './interfaces/CanvasProps';
+import Signup from './Signup';
 
 function App() {
 
@@ -19,6 +20,7 @@ function App() {
         <Route path="/home" element={<HomePage />} />
         <Route path="/dialogue" element={<Dialogue />} />
         <Route path="/game" element={<Canvas width={width} height={height}/>} />
+        <Route path="/signup" element={<Signup />} />
       </Routes>
     </Router>
   );
