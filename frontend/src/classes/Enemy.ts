@@ -7,12 +7,16 @@ export class Enemy {
     velocity: Velocity;
     hp: number;
     radius: number;
+    damage: number;
+    currency_drop: number;
 
-    constructor({position, velocity, hp}: EnemyProps) {
+    constructor({position, velocity, hp, damage, currency_drop}: EnemyProps) {
         this.position = position;
         this.velocity = velocity;
         this.hp = hp;
         this.radius = hp;
+        this.damage = damage;
+        this.currency_drop = currency_drop
     }
 
     draw(ctx: CanvasRenderingContext2D):void {

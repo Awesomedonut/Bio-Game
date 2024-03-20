@@ -28,6 +28,7 @@ router.get('/enemy/init', async (req: Request, res: Response) => {
 
 router.get('/enemy', async (req: Request, res: Response) => {
   try {
+    // await enemyModel.updateTable();
     const enemies = await enemyModel.getAllEnemies();
     return res.json({ enemies });
   } catch (e) {
@@ -40,10 +41,10 @@ router.get('/enemy', async (req: Request, res: Response) => {
 });
 
 router.post('/enemy/create', async (req: Request, res: Response) => {
-  const { name, damage, hp, movementSpeed } = req.body
+  const { name, damage, hp, movement_speed, currency_drop } = req.body
 
   try {
-    const createdEnemy = await enemyModel.createEnemy(name, damage, hp, movementSpeed);
+    const createdEnemy = await enemyModel.createEnemy(name, damage, hp, movement_speed, currency_drop);
     return res.json({ createdEnemy });
   } catch (e) {
     console.error(e);

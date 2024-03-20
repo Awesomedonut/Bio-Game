@@ -8,6 +8,7 @@ import { Velocity } from '../interfaces/Velocity';
 import { circleCollision, playerHit } from '../utils/collision';
 
 import PlayerInterface from "../interfaces/Player";
+import { EnemyInterface } from '../interfaces/Enemy';
 import axios from 'axios';
 
 // Initialize Canvase
@@ -25,13 +26,17 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
         currency: 0
     }
 
-    const [player, setPlayer] = useState(defaultPlayer);
+    const [playerData, setPlayer] = useState<PlayerInterface>(defaultPlayer);
+    const [enemiesData, setEnemies] = useState<EnemyInterface[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchPlayer = async () => {
-            const res = await axios.get('http://localhost:8080/game/player/1');
-            setPlayer(res.data.player);
+            const playerRes = await axios.get('http://localhost:8080/game/player/1');
+            const enemyRes = await axios.get('http://localhost:8080/game/enemy');
+
+            setPlayer(playerRes.data.player);
+            setEnemies(enemyRes.data.enemies);
         }
 
         fetchPlayer();
@@ -42,10 +47,12 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
         const canvas = canvasRef.current;
         const ctx = canvas?.getContext('2d');
 
+        console.log(enemiesData);
+
         if (!loading && canvas && ctx) {
-            start(ctx, width, height, player);
+            start(ctx, width, height, playerData, enemiesData);
         }
-    }, [width, height, player]);
+    }, [width, height, playerData]);
 
     return ( 
         <canvas ref={canvasRef} width={width} height={height}/>
@@ -53,7 +60,7 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
 }
 
 // Animates the player/enemies/projectiles and detect collisions, and detect keyboard input
-function start(ctx: CanvasRenderingContext2D, width: number, height: number, playerData: PlayerInterface) {
+function start(ctx: CanvasRenderingContext2D, width: number, height: number, playerData: PlayerInterface, enemiesData: EnemyInterface[]) {
     // initialize constants
     let animationFrameID: number;
 
@@ -65,15 +72,16 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number, pla
         d: { pressed: false }
     }
 
-    const SPEED = playerData.movement_speed;
-    const SPEED_CHANGE_DIRECTION = 0.05;
-    const FRICTION = 0.97;
-    const NUM_PROJECTILES = playerData.projectile_number;
-    const PROJECTILE_SPEED = playerData.projectile_speed;
-    const ENEMY_DAMAGE = 1;
-    const HP = playerData.hp;
+    let PLAYER_DAMAGE = playerData.damage;
+    let PLAYER_SPEED = playerData.movement_speed;
+    let NUM_PROJECTILES = playerData.projectile_number;
+    let PROJECTILE_SPEED = playerData.projectile_speed;
+    let HP = playerData.hp;
+    let CURRENCY = playerData.currency;
 
     const CHAIN_PROJECTILE_DELAY = 90;
+    const SPEED_CHANGE_DIRECTION = 0.05;
+    const FRICTION = 0.97;
 
     const projectiles: Projectile[] = [];
     const enemies: Enemy[] = [];
@@ -83,8 +91,39 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number, pla
     const player = spawnPlayer(ctx, spawn, HP);
 
     // Spawn an enemy every 3 seconds
+
+    const defaultEnemy: EnemyInterface = {id: null, name: null, damage: 1, hp: 1, movement_speed: 1, currency_drop: 1};
     const interval = window.setInterval(() => {
-        let newEnemy:Enemy = spawnEnemy(width, height);
+        const randomNumber: number = Math.floor(Math.random() * 100);
+
+        let enemyIndex = 0;
+
+        switch (true) {
+            case (randomNumber < 25):
+                enemyIndex = 0;
+                break;
+            case (randomNumber < 50):
+                enemyIndex = 1;
+                break;
+            case (randomNumber < 75):
+                enemyIndex = 2;
+                break;
+            case (randomNumber < 90):
+                enemyIndex = 3;
+                break;
+            case (randomNumber <= 100):
+                enemyIndex = 4;
+                break;
+        }
+
+        let newEnemy: Enemy;
+
+        if (enemiesData[enemyIndex]) {
+            console.log(enemiesData[enemyIndex]);
+            newEnemy = spawnEnemy(width, height, enemiesData[enemyIndex]);
+        } else {
+            newEnemy = spawnEnemy(width, height, defaultEnemy);
+        }
         enemies.push(newEnemy);
         // console.log('Enemies: ', enemies);
     }, 3000);
@@ -110,8 +149,7 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number, pla
         for (let i = enemies.length - 1; i >= 0; i--) {
             let enemy = enemies[i];
             if (playerHit(enemy, player.getVertices())) {
-                player.hp -= ENEMY_DAMAGE;
-                console.log(player.hp);
+                player.hp -= enemy.damage;
                 if (player.hp <= 0) {
                     // console.log('GAME OVER');
 
@@ -134,10 +172,12 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number, pla
             for (let j = projectiles.length - 1; j >= 0; j--) {
                 let projectile = projectiles[j];
                 if (circleCollision(enemy, projectile)) {
-                    enemy.radius -= 10;
-                    if (enemy.radius <= 10) {
+                    enemy.radius -= PLAYER_DAMAGE;
+                    if (enemy.radius < 10) {
                         enemies.splice(i, 1);
                         // console.log('Boom!');
+                        CURRENCY += enemy.currency_drop;
+                        console.log(CURRENCY);
                     }
                     projectiles.splice(j, 1);
                 }
@@ -147,8 +187,8 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number, pla
         // update the player's velocity
         player.velocity.x = 0;
         if (keys.w.pressed) {
-            player.velocity.x = Math.cos(player.angle) * SPEED;
-            player.velocity.y = Math.sin(player.angle) * SPEED;
+            player.velocity.x = Math.cos(player.angle) * PLAYER_SPEED;
+            player.velocity.y = Math.sin(player.angle) * PLAYER_SPEED;
         } else {
             player.velocity.x *= FRICTION;
             player.velocity.y *= FRICTION;
@@ -233,7 +273,7 @@ function spawnPlayer(ctx: CanvasRenderingContext2D, spawn: Position, hp: number)
 }
 
 // helper function to spawn enemies
-function spawnEnemy(width: number, height: number): Enemy {
+function spawnEnemy(width: number, height: number, enemyData: EnemyInterface): Enemy {
     // initialize some variables
     enum SpawnLocation {
         Top,
@@ -245,7 +285,10 @@ function spawnEnemy(width: number, height: number): Enemy {
 
     let position: Position;
     let velocity: Velocity;
-    let hp: number = 90 * Math.random() + 10;   // sets radius randomly between 10 or 100
+    // let hp: number = 90 * Math.random() + 10;   // sets radius randomly between 10 or 100
+    const hp = enemyData.hp;
+    const damage = enemyData.damage;
+    const currency_drop = enemyData.currency_drop;
 
     // Set Position and Velocity based on the randomly chosen spawn location
     switch(location) {
@@ -256,7 +299,7 @@ function spawnEnemy(width: number, height: number): Enemy {
             }
             velocity = {
                 x: 0,
-                y: 1
+                y: enemyData.movement_speed
             }
             break;
         case SpawnLocation.Bottom:
@@ -266,7 +309,7 @@ function spawnEnemy(width: number, height: number): Enemy {
             }
             velocity = {
                 x: 0,
-                y: -1
+                y: -enemyData.movement_speed
             }
             break;
         case SpawnLocation.Left:
@@ -275,7 +318,7 @@ function spawnEnemy(width: number, height: number): Enemy {
                 y: Math.random() * height
             }
             velocity = {
-                x: 1,
+                x: enemyData.movement_speed,
                 y: 0
             }
             break;
@@ -285,14 +328,14 @@ function spawnEnemy(width: number, height: number): Enemy {
                 y: Math.random() * height
             }
             velocity = {
-                x: -1,
+                x: -enemyData.movement_speed,
                 y: 0
             }
             break;
     }
 
     // return the newly created enemy
-    return new Enemy({position, velocity, hp});
+    return new Enemy({position, velocity, hp, damage, currency_drop});
 }
 
 // helper function to animate th projectiles
