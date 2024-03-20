@@ -44,7 +44,6 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
         console.log(enemiesData);
 
         if (playerData != null && enemiesData.length > 0 && canvas && ctx && !gameStarted) {
-            console.log("YEET");
             console.log(playerData);
             console.log(enemiesData);
             start(ctx, width, height, playerData, enemiesData, handleGameOver);
