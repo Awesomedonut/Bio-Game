@@ -1,5 +1,5 @@
 import { ChangeEvent, FormEvent, useState } from "react";
-// import { useNavigate } from 'react-router-dom';
+
 
 const Signup: React.FC = () => {
     const [username, setUsername] = useState('');
@@ -8,7 +8,7 @@ const Signup: React.FC = () => {
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // const navigate = useNavigate();
+        
 
         const newUser = {
             username: username,
@@ -34,8 +34,7 @@ const Signup: React.FC = () => {
             setUsername('');
             setEmail('');
             setPassword('');
-           // navigate('/home');
-            
+            window.location.href = '/home'; // Redirect on successful login
         }
     }
 
