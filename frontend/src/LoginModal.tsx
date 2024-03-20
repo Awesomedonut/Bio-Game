@@ -46,34 +46,40 @@ const Login: React.FC<Props> = ({ onClose }) => {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Username:
+    <div className='flexbox'>
+      <div className="wrapper">
+        <form onSubmit={handleSubmit}>
+          <h1>Welcome Back!
+            <span className="material-symbols-outlined" onClick={onClose}>
+              close
+            </span>
+          </h1>
+          <div className="input-box">
+            <input
+                type="text"
+                placeholder='Username'
+                name="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
+          </div>
+          <div className="input-box">
           <input
-            type="text"
-            name="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-        </label>
-        <label>
-          Password:
-          <input
-            type="password"
-            name="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </label>
-        {error && <div style={{ color: 'red' }}>{error}</div>}
-        <button type="submit">Login</button>
-      </form>
-      <button onClick={onClose}>Close</button>
-      <p>Don't have an account? <Link to="/signup">Register</Link></p>
+              type="password"
+              placeholder='Password'
+              name="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          {error && <p className='error'>{ error }</p>}
+          <p className='register-link'>Don't have an account? <Link to="/signup">Register</Link></p>
+          <button type='submit' className='btn'>Log In</button>
+        </form>
+
+      </div>
     </div>
   );
 };

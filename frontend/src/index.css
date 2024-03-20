@@ -136,3 +136,9 @@ canvas {
   font-size: 16px;
   text-align: center;
 }
+
+h1 span {
+  position: relative;
+  left: 20px;
+  font-size: 20px;
+}
