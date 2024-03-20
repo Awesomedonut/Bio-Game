@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import { CanvasProps } from '../interfaces/CanvasProps';
 import { Player } from '../classes/Player';
 import { Position } from '../interfaces/Position';
@@ -10,6 +10,7 @@ import { circleCollision, playerHit } from '../utils/collision';
 import PlayerInterface from "../interfaces/Player";
 import { EnemyInterface } from '../interfaces/Enemy';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 // Initialize Canvase
 const Canvas: React.FC<CanvasProps> = ({width, height}) => {
@@ -29,6 +30,11 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
     const [playerData, setPlayer] = useState<PlayerInterface>(defaultPlayer);
     const [enemiesData, setEnemies] = useState<EnemyInterface[]>([]);
     const [loading, setLoading] = useState(true);
+
+    const navigate = useNavigate();
+    const handleGameOver = useCallback(() => {
+        navigate('/home');
+    }, [navigate]);
 
     useEffect(() => {
         const fetchPlayer = async () => {
@@ -50,9 +56,9 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
         console.log(enemiesData);
 
         if (!loading && canvas && ctx) {
-            start(ctx, width, height, playerData, enemiesData);
+            start(ctx, width, height, playerData, enemiesData, handleGameOver);
         }
-    }, [width, height, playerData, enemiesData, loading]);
+    }, [width, height, playerData, enemiesData, loading, handleGameOver]);
 
     return ( 
         <canvas ref={canvasRef} width={width} height={height}/>
@@ -60,7 +66,7 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
 }
 
 // Animates the player/enemies/projectiles and detect collisions, and detect keyboard input
-function start(ctx: CanvasRenderingContext2D, width: number, height: number, playerData: PlayerInterface, enemiesData: EnemyInterface[]) {
+function start(ctx: CanvasRenderingContext2D, width: number, height: number, playerData: PlayerInterface, enemiesData: EnemyInterface[], handleGameOver: () => void) {
     // initialize constants
     let animationFrameID: number;
 
@@ -161,6 +167,7 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number, pla
 
                     window.cancelAnimationFrame(animationFrameID);
                     clearInterval(interval);
+                    return 0;
                 }
             }
         }
@@ -184,14 +191,24 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number, pla
             }
         }
 
+        const PLAYER_WIDTH = 30
+        const PLAYER_EDGE_OFFSET = PLAYER_WIDTH + 1;
         // update the player's velocity
-        player.velocity.x = 0;
-        if (keys.w.pressed) {
-            player.velocity.x = Math.cos(player.angle) * PLAYER_SPEED;
-            player.velocity.y = Math.sin(player.angle) * PLAYER_SPEED;
+        if (player.position.x > width - PLAYER_WIDTH || player.position.x < 0 + PLAYER_WIDTH) {
+            player.velocity.x = 0;
+            player.position.x = (player.position.x > (width - PLAYER_WIDTH)) ? (width - PLAYER_EDGE_OFFSET) : (0 + PLAYER_EDGE_OFFSET);
+        } else if (player.position.y > height - PLAYER_WIDTH || player.position.y < 0 + PLAYER_WIDTH) {
+            player.velocity.y = 0;
+            player.position.y = (player.position.y > (height - PLAYER_WIDTH)) ? (height - PLAYER_EDGE_OFFSET) : (0 + PLAYER_EDGE_OFFSET);
         } else {
-            player.velocity.x *= FRICTION;
-            player.velocity.y *= FRICTION;
+            player.velocity.x = 0;
+            if (keys.w.pressed) {
+                player.velocity.x = Math.cos(player.angle) * PLAYER_SPEED;
+                player.velocity.y = Math.sin(player.angle) * PLAYER_SPEED;
+            } else {
+                player.velocity.x *= FRICTION;
+                player.velocity.y *= FRICTION;
+            }
         }
 
         if (keys.d.pressed) {
