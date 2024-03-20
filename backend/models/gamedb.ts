@@ -61,9 +61,9 @@ export const gamemodel = {
             return undefined;
         }
     },
-    getUser: async function(email: string, password: string) {
+    getUser: async function(username: string, password: string) {
         try {
-            const result = await pool.query("SELECT * FROM users WHERE email = $1", [email,]);
+            const result = await pool.query("SELECT * FROM users WHERE username = $1", [username,]);
             if (result.rows.length > 0) {
               const user = result.rows[0];
               const storedPassword = user.password;

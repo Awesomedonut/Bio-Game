@@ -63,7 +63,7 @@ app.get('/users', async (req, res) => {
 
 app.post('/login', async (req, res) => {
   try{
-    const status = await gamemodel.getUser(req.body.email, req.body.password);
+    const status = await gamemodel.getUser(req.body.username, req.body.password);
     if(status){
       res.json("Success");
     }
