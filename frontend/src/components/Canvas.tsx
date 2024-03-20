@@ -16,20 +16,9 @@ import { useNavigate } from 'react-router-dom';
 const Canvas: React.FC<CanvasProps> = ({width, height}) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    const defaultPlayer: PlayerInterface = {
-        id: null,
-        user_id: null,
-        damage: 1,
-        projectile_number: 1,
-        projectile_speed: 1,
-        movement_speed: 1,
-        hp: 1,
-        currency: 0
-    }
-
-    const [playerData, setPlayer] = useState<PlayerInterface>(defaultPlayer);
+    const [playerData, setPlayer] = useState<PlayerInterface | null>(null);
     const [enemiesData, setEnemies] = useState<EnemyInterface[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [gameStarted, setGameStarted] = useState(false);
 
     const navigate = useNavigate();
     const handleGameOver = useCallback(() => {
@@ -46,7 +35,6 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
         }
 
         fetchPlayer();
-        setLoading(false);
     }, [])
 
     useEffect(() => {
@@ -55,10 +43,14 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
 
         console.log(enemiesData);
 
-        if (!loading && canvas && ctx) {
+        if (playerData != null && enemiesData.length > 0 && canvas && ctx && !gameStarted) {
+            console.log("YEET");
+            console.log(playerData);
+            console.log(enemiesData);
             start(ctx, width, height, playerData, enemiesData, handleGameOver);
+            setGameStarted(true);
         }
-    }, [width, height, playerData, enemiesData, loading, handleGameOver]);
+    }, [width, height, playerData, enemiesData, handleGameOver]);
 
     return ( 
         <canvas ref={canvasRef} width={width} height={height}/>
@@ -69,8 +61,6 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
 function start(ctx: CanvasRenderingContext2D, width: number, height: number, playerData: PlayerInterface, enemiesData: EnemyInterface[], handleGameOver: () => void) {
     // initialize constants
     let animationFrameID: number;
-
-    console.log(playerData);
     
     const keys = {
         w: { pressed: false },
@@ -97,13 +87,12 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number, pla
     const player = spawnPlayer(ctx, spawn, HP);
 
     // Spawn an enemy every 3 seconds
-
-    const defaultEnemy: EnemyInterface = {id: null, name: null, damage: 1, hp: 1, movement_speed: 1, currency_drop: 1};
     const interval = window.setInterval(() => {
         const randomNumber: number = Math.floor(Math.random() * 100);
 
         let enemyIndex = 0;
 
+        // TODO: Make this better for future, temporarily here to make this work for checkpoint.
         switch (true) {
             case (randomNumber < 25):
                 enemyIndex = 0;
@@ -122,14 +111,7 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number, pla
                 break;
         }
 
-        let newEnemy: Enemy;
-
-        if (enemiesData[enemyIndex]) {
-            console.log(enemiesData[enemyIndex]);
-            newEnemy = spawnEnemy(width, height, enemiesData[enemyIndex]);
-        } else {
-            newEnemy = spawnEnemy(width, height, defaultEnemy);
-        }
+        let newEnemy: Enemy = spawnEnemy(width, height, enemiesData[enemyIndex]);
         enemies.push(newEnemy);
         // console.log('Enemies: ', enemies);
     }, 3000);
@@ -155,8 +137,8 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number, pla
         for (let i = enemies.length - 1; i >= 0; i--) {
             let enemy = enemies[i];
             if (playerHit(enemy, player.getVertices())) {
-                player.hp -= enemy.damage;
-                if (player.hp <= 0) {
+                HP -= enemy.damage;
+                if (HP <= 0) {
                     // console.log('GAME OVER');
 
                     // Print Game Over On Screen
@@ -167,7 +149,11 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number, pla
 
                     window.cancelAnimationFrame(animationFrameID);
                     clearInterval(interval);
-                    return 0;
+
+                    // Redirect to homescreen after 3 seconds
+                    setTimeout(() => {
+                        handleGameOver();
+                    }, 3000);
                 }
             }
         }
@@ -219,8 +205,6 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number, pla
 
     }
 
-    animate();
-
     // Listen for Events
     window.addEventListener('keydown', async (event) => {
         switch (event.code) {
@@ -253,13 +237,14 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number, pla
                 }
                 // console.log(projectiles);
                 break;
-            // case 'KeyP':    // Pause
-            //     console.log('Pause');
-            //     window.cancelAnimationFrame(animationFrameID);
-            //     break;
+            case 'KeyP':    // Pause
+                console.log('Pause');
+                window.cancelAnimationFrame(animationFrameID);
+                break;
 
         }
     })
+
     window.addEventListener('keyup', (event) => {
         switch (event.code) {
             case 'KeyW':
@@ -271,11 +256,14 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number, pla
             case 'KeyD':
                 keys.d.pressed = false;
                 break;
-            // case 'KeyP':    // Unpause
-            //     animationFrameID = requestAnimationFrame(animate);
-            //     break;
+            case 'KeyP':    // Unpause
+                animationFrameID = requestAnimationFrame(animate);
+                break;
         }
     })
+
+    animate();
+
 }
 
 // helper function to spawn the player in the middle
