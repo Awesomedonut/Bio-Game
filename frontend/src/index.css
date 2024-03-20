@@ -112,19 +112,27 @@ canvas {
 }
 
 
-.flexbox .wrapper .register-link {
+.flexbox .wrapper .register-link, .login-link {
   font-size: 14.5px;
   text-align: center;
   margin: 20px 0 15px;
 
 }
 
-.flexbox .wrapper .register-link p a {
+.flexbox .wrapper p a {
   color: white;
   text-decoration: none;
   font-weight: bold;
 }
 
-.flexbox .wrapper .register-link p a:hover {
+.flexbox .wrapper p a:hover {
   text-decoration: underline;
+}
+
+.error {
+  margin: 20px 0 15px;
+  color: red;
+  font-weight: bold;
+  font-size: 16px;
+  text-align: center;
 }
