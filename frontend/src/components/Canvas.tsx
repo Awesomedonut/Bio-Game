@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import { CanvasProps } from '../interfaces/CanvasProps';
 import { Player } from '../classes/Player';
 import { Position } from '../interfaces/Position';
@@ -7,18 +7,49 @@ import { Enemy } from '../classes/Enemy';
 import { Velocity } from '../interfaces/Velocity';
 import { circleCollision, playerHit } from '../utils/collision';
 
+import PlayerInterface from "../interfaces/Player";
+import { EnemyInterface } from '../interfaces/Enemy';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
 // Initialize Canvase
 const Canvas: React.FC<CanvasProps> = ({width, height}) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+
+    const [playerData, setPlayer] = useState<PlayerInterface | null>(null);
+    const [enemiesData, setEnemies] = useState<EnemyInterface[]>([]);
+    const [gameStarted, setGameStarted] = useState(false);
+
+    const navigate = useNavigate();
+    const handleGameOver = useCallback(() => {
+        navigate('/home');
+    }, [navigate]);
+
+    useEffect(() => {
+        const fetchPlayer = async () => {
+            const playerRes = await axios.get('http://localhost:8080/game/player/1');
+            const enemyRes = await axios.get('http://localhost:8080/game/enemy');
+
+            setPlayer(playerRes.data.player);
+            setEnemies(enemyRes.data.enemies);
+        }
+
+        fetchPlayer();
+    }, [])
 
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas?.getContext('2d');
 
-        if (canvas && ctx) {
-            start(ctx, width, height);
+        console.log(enemiesData);
+
+        if (playerData != null && enemiesData.length > 0 && canvas && ctx && !gameStarted) {
+            console.log(playerData);
+            console.log(enemiesData);
+            start(ctx, width, height, playerData, enemiesData, handleGameOver);
+            setGameStarted(true);
         }
-    }, [width, height]);
+    }, [width, height, playerData, enemiesData, handleGameOver]);
 
     return ( 
         <canvas ref={canvasRef} width={width} height={height}/>
@@ -26,7 +57,7 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
 }
 
 // Animates the player/enemies/projectiles and detect collisions, and detect keyboard input
-function start(ctx: CanvasRenderingContext2D, width: number, height: number) {
+function start(ctx: CanvasRenderingContext2D, width: number, height: number, playerData: PlayerInterface, enemiesData: EnemyInterface[], handleGameOver: () => void) {
     // initialize constants
     let animationFrameID: number;
     
@@ -36,22 +67,50 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number) {
         d: { pressed: false }
     }
 
-    const SPEED = 3;
+    let PLAYER_DAMAGE = playerData.damage;
+    let PLAYER_SPEED = playerData.movement_speed;
+    let NUM_PROJECTILES = playerData.projectile_number;
+    let PROJECTILE_SPEED = playerData.projectile_speed;
+    let HP = playerData.hp;
+    let CURRENCY = playerData.currency;
+
+    const CHAIN_PROJECTILE_DELAY = 90;
     const SPEED_CHANGE_DIRECTION = 0.05;
     const FRICTION = 0.97;
-    const PROJECTILE_SPEED = 10;
-    const ENEMY_DAMAGE = 1;
 
     const projectiles: Projectile[] = [];
     const enemies: Enemy[] = [];
 
     // Create player
     let spawn: Position = {x: width/2, y: height/2};
-    const player = spawnPlayer(ctx, spawn, 1);
+    const player = spawnPlayer(ctx, spawn, HP);
 
     // Spawn an enemy every 3 seconds
     const interval = window.setInterval(() => {
-        let newEnemy:Enemy = spawnEnemy(width, height);
+        const randomNumber: number = Math.floor(Math.random() * 100);
+
+        let enemyIndex = 0;
+
+        // TODO: Make this better for future, temporarily here to make this work for checkpoint.
+        switch (true) {
+            case (randomNumber < 25):
+                enemyIndex = 0;
+                break;
+            case (randomNumber < 50):
+                enemyIndex = 1;
+                break;
+            case (randomNumber < 75):
+                enemyIndex = 2;
+                break;
+            case (randomNumber < 90):
+                enemyIndex = 3;
+                break;
+            case (randomNumber <= 100):
+                enemyIndex = 4;
+                break;
+        }
+
+        let newEnemy: Enemy = spawnEnemy(width, height, enemiesData[enemyIndex]);
         enemies.push(newEnemy);
         // console.log('Enemies: ', enemies);
     }, 3000);
@@ -77,8 +136,8 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number) {
         for (let i = enemies.length - 1; i >= 0; i--) {
             let enemy = enemies[i];
             if (playerHit(enemy, player.getVertices())) {
-                player.hp -= ENEMY_DAMAGE;
-                if (player.hp <= 0) {
+                HP -= enemy.damage;
+                if (HP <= 0) {
                     // console.log('GAME OVER');
 
                     // Print Game Over On Screen
@@ -89,6 +148,11 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number) {
 
                     window.cancelAnimationFrame(animationFrameID);
                     clearInterval(interval);
+
+                    // Redirect to homescreen after 3 seconds
+                    setTimeout(() => {
+                        handleGameOver();
+                    }, 3000);
                 }
             }
         }
@@ -100,24 +164,36 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number) {
             for (let j = projectiles.length - 1; j >= 0; j--) {
                 let projectile = projectiles[j];
                 if (circleCollision(enemy, projectile)) {
-                    enemy.radius -= 10;
-                    if (enemy.radius <= 10) {
+                    enemy.radius -= PLAYER_DAMAGE;
+                    if (enemy.radius < 10) {
                         enemies.splice(i, 1);
                         // console.log('Boom!');
+                        CURRENCY += enemy.currency_drop;
+                        console.log(`Currency: ${CURRENCY}`);
                     }
                     projectiles.splice(j, 1);
                 }
             }
         }
 
+        const PLAYER_WIDTH = 30
+        const PLAYER_EDGE_OFFSET = PLAYER_WIDTH + 1;
         // update the player's velocity
-        player.velocity.x = 0;
-        if (keys.w.pressed) {
-            player.velocity.x = Math.cos(player.angle) * SPEED;
-            player.velocity.y = Math.sin(player.angle) * SPEED;
+        if (player.position.x > width - PLAYER_WIDTH || player.position.x < 0 + PLAYER_WIDTH) {
+            player.velocity.x = 0;
+            player.position.x = (player.position.x > (width - PLAYER_WIDTH)) ? (width - PLAYER_EDGE_OFFSET) : (0 + PLAYER_EDGE_OFFSET);
+        } else if (player.position.y > height - PLAYER_WIDTH || player.position.y < 0 + PLAYER_WIDTH) {
+            player.velocity.y = 0;
+            player.position.y = (player.position.y > (height - PLAYER_WIDTH)) ? (height - PLAYER_EDGE_OFFSET) : (0 + PLAYER_EDGE_OFFSET);
         } else {
-            player.velocity.x *= FRICTION;
-            player.velocity.y *= FRICTION;
+            player.velocity.x = 0;
+            if (keys.w.pressed) {
+                player.velocity.x = Math.cos(player.angle) * PLAYER_SPEED;
+                player.velocity.y = Math.sin(player.angle) * PLAYER_SPEED;
+            } else {
+                player.velocity.x *= FRICTION;
+                player.velocity.y *= FRICTION;
+            }
         }
 
         if (keys.d.pressed) {
@@ -128,10 +204,8 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number) {
 
     }
 
-    animate();
-
     // Listen for Events
-    window.addEventListener('keydown', (event) => {
+    window.addEventListener('keydown', async (event) => {
         switch (event.code) {
             case 'KeyW':
                 player.velocity.x = 1;
@@ -144,27 +218,32 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number) {
                 keys.d.pressed = true;
                 break;
             case 'Space':
-                projectiles.push(
-                    new Projectile({
-                        position: {
-                            x: player.position.x,
-                            y: player.position.y
-                        },
-                        velocity: {
-                            x: Math.cos(player.angle) * PROJECTILE_SPEED,
-                            y: Math.sin(player.angle) * PROJECTILE_SPEED
-                        }
-                    })
-                )
+                for (let i: number = 0; i < NUM_PROJECTILES; i++) {
+                    projectiles.push(
+                        new Projectile({
+                            position: {
+                                x: player.position.x,
+                                y: player.position.y
+                            },
+                            velocity: {
+                                x: Math.cos(player.angle) * PROJECTILE_SPEED,
+                                y: Math.sin(player.angle) * PROJECTILE_SPEED
+                            }
+                        })
+                    );
+
+                    await sleep(CHAIN_PROJECTILE_DELAY);
+                }
                 // console.log(projectiles);
                 break;
-            // case 'KeyP':    // Pause
-            //     console.log('Pause');
-            //     window.cancelAnimationFrame(animationFrameID);
-            //     break;
+            case 'KeyP':    // Pause
+                console.log('Pause');
+                window.cancelAnimationFrame(animationFrameID);
+                break;
 
         }
     })
+
     window.addEventListener('keyup', (event) => {
         switch (event.code) {
             case 'KeyW':
@@ -176,11 +255,14 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number) {
             case 'KeyD':
                 keys.d.pressed = false;
                 break;
-            // case 'KeyP':    // Unpause
-            //     animationFrameID = requestAnimationFrame(animate);
-            //     break;
+            case 'KeyP':    // Unpause
+                animationFrameID = requestAnimationFrame(animate);
+                break;
         }
     })
+
+    animate();
+
 }
 
 // helper function to spawn the player in the middle
@@ -195,7 +277,7 @@ function spawnPlayer(ctx: CanvasRenderingContext2D, spawn: Position, hp: number)
 }
 
 // helper function to spawn enemies
-function spawnEnemy(width: number, height: number): Enemy {
+function spawnEnemy(width: number, height: number, enemyData: EnemyInterface): Enemy {
     // initialize some variables
     enum SpawnLocation {
         Top,
@@ -207,7 +289,10 @@ function spawnEnemy(width: number, height: number): Enemy {
 
     let position: Position;
     let velocity: Velocity;
-    let hp: number = 90 * Math.random() + 10;   // sets radius randomly between 10 or 100
+    // let hp: number = 90 * Math.random() + 10;   // sets radius randomly between 10 or 100
+    const hp = enemyData.hp;
+    const damage = enemyData.damage;
+    const currency_drop = enemyData.currency_drop;
 
     // Set Position and Velocity based on the randomly chosen spawn location
     switch(location) {
@@ -218,7 +303,7 @@ function spawnEnemy(width: number, height: number): Enemy {
             }
             velocity = {
                 x: 0,
-                y: 1
+                y: enemyData.movement_speed
             }
             break;
         case SpawnLocation.Bottom:
@@ -228,7 +313,7 @@ function spawnEnemy(width: number, height: number): Enemy {
             }
             velocity = {
                 x: 0,
-                y: -1
+                y: -enemyData.movement_speed
             }
             break;
         case SpawnLocation.Left:
@@ -237,7 +322,7 @@ function spawnEnemy(width: number, height: number): Enemy {
                 y: Math.random() * height
             }
             velocity = {
-                x: 1,
+                x: enemyData.movement_speed,
                 y: 0
             }
             break;
@@ -247,14 +332,14 @@ function spawnEnemy(width: number, height: number): Enemy {
                 y: Math.random() * height
             }
             velocity = {
-                x: -1,
+                x: -enemyData.movement_speed,
                 y: 0
             }
             break;
     }
 
     // return the newly created enemy
-    return new Enemy({position, velocity, hp});
+    return new Enemy({position, velocity, hp, damage, currency_drop});
 }
 
 // helper function to animate th projectiles
@@ -295,6 +380,10 @@ function animateEnemies(ctx: CanvasRenderingContext2D, enemies: Enemy[], width: 
             enemies.splice(i, 1);
         }
     }
+}
+
+function sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 export default Canvas;

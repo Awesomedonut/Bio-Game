@@ -17,7 +17,7 @@ const enemyModel = {
                   name VARCHAR(255) UNIQUE NOT NULL,
                   damage INTEGER DEFAULT 1,
                   hp INTEGER DEFAULT 1,
-                  movementSpeed INTEGER DEFAULT 1,
+                  movement_speed INTEGER DEFAULT 1,
                   createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
               );
           `);
@@ -27,6 +27,14 @@ const enemyModel = {
           console.error('Error initializing enemy table:', err);
           return {};
       }
+  },
+  updateTable: async () => {
+    try {
+      // await pool.query("ALTER TABLE enemy ADD currency_drop INTEGER DEFAULT 1");
+      // await pool.query("ALTER TABLE enemy RENAME COLUMN movementSpeed TO movement_speed;");
+    } catch (err) {
+      return {}
+    }
   },
   getAllEnemies: async () => {
       try {
@@ -67,10 +75,11 @@ const enemyModel = {
       return {};
     }
   },
-  createEnemy: async function(name: string, damage: number, hp: number, movementSpeed: number) {
+  createEnemy: async function(name: string, damage: number, hp: number, movement_speed: number, currency_drop: number) {
     try {
       const result = await pool.query(
-        "INSERT INTO enemy(name, damage, hp, movementSpeed) VALUES ($1, $2, $3, $4) RETURNING id;", [name, damage, hp, movementSpeed]
+        "INSERT INTO enemy(name, damage, hp, movement_speed, currency_drop) VALUES ($1, $2, $3, $4, $5) RETURNING id;",
+        [name, damage, hp, movement_speed, currency_drop]
       );
 
       const { id } = result.rows[0];

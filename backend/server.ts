@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
-import get_answer from './openai';
+// import get_answer from './openai';
 
 // setup local environment variables from .env file
 dotenv.config();
@@ -88,21 +88,21 @@ app.use('/game', playerRoutes);
 //   res.status(200).send('Hello World?');
 // })
 
-app.post('/dialogue', async (req: Request, res: Response) => {
-  console.log(req.body);
+// app.post('/dialogue', async (req: Request, res: Response) => {
+//   console.log(req.body);
 
-  try {
-    const output = await get_answer(req.body.prompt);
-    console.log(output);
-    // Ensure the response is in JSON format
-    res.status(200).json({ message: output });
-  } catch (error) {
-    console.error(error);
-    // Send a JSON error message if something goes wrong
-    res.status(500).json({ error: 'Failed to fetch the response' });
-  }
+//   try {
+//     const output = await get_answer(req.body.prompt);
+//     console.log(output);
+//     // Ensure the response is in JSON format
+//     res.status(200).json({ message: output });
+//   } catch (error) {
+//     console.error(error);
+//     // Send a JSON error message if something goes wrong
+//     res.status(500).json({ error: 'Failed to fetch the response' });
+//   }
 
-})
+// })
 
 
 

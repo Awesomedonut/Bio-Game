@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import React, { useState, FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -5,11 +6,13 @@ interface Props {
   onClose: () => void;
 }
 
+
 const Login: React.FC<Props> = ({ onClose }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
+  const navigate = useNavigate();
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -35,7 +38,7 @@ const Login: React.FC<Props> = ({ onClose }) => {
         setUsername('');
         setPassword('');
         setError('');
-        window.location.href = '/home'; // Redirect on successful login
+        navigate('/home');  // Redirect on successful login
       }
     } catch (error) {
       console.error('Error during login:', error);
