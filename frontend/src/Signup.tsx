@@ -1,5 +1,6 @@
 import { ChangeEvent, FormEvent, useState } from "react";
 
+
 const Signup: React.FC = () => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
@@ -7,6 +8,7 @@ const Signup: React.FC = () => {
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        
 
         const newUser = {
             username: username,
@@ -32,8 +34,10 @@ const Signup: React.FC = () => {
             setUsername('');
             setEmail('');
             setPassword('');
+            window.location.href = '/home'; // Redirect on successful register
         }
     }
+
 
     return (
         <div className="flexbox">

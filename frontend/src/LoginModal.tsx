@@ -1,35 +1,78 @@
-import React from 'react';
+import React, { useState, FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 
 interface Props {
   onClose: () => void;
 }
 
-const LoginModal: React.FC<Props> = ({ onClose }) => {
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
+const Login: React.FC<Props> = ({ onClose }) => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-    onClose();
-    window.location.href = '/home'; 
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const newUser = {
+      username: username,
+      password: password
+    };
+
+    try {
+      const response = await fetch('http://localhost:4000/login', {
+        method: 'POST',
+        body: JSON.stringify(newUser),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error);
+      } else {
+        setUsername('');
+        setPassword('');
+        setError('');
+        window.location.href = '/home'; // Redirect on successful login
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+    }
   };
 
   return (
     <div>
+      <h2>Login</h2>
       <form onSubmit={handleSubmit}>
         <label>
           Username:
-          <input type="text" name="username" required />
+          <input
+            type="text"
+            name="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
         </label>
         <label>
           Password:
-          <input type="password" name="password" required />
+          <input
+            type="password"
+            name="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
         </label>
+        {error && <div style={{ color: 'red' }}>{error}</div>}
         <button type="submit">Login</button>
       </form>
       <button onClick={onClose}>Close</button>
-      <p>Don't have an account? <Link to="/signup"> Register</Link></p>
+      <p>Don't have an account? <Link to="/signup">Register</Link></p>
     </div>
   );
 };
 
-export default LoginModal;
+export default Login;
