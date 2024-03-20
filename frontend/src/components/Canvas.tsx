@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { CanvasProps } from '../interfaces/CanvasProps';
 import { Player } from '../classes/Player';
 import { Position } from '../interfaces/Position';
@@ -7,18 +7,45 @@ import { Enemy } from '../classes/Enemy';
 import { Velocity } from '../interfaces/Velocity';
 import { circleCollision, playerHit } from '../utils/collision';
 
+import PlayerInterface from "../interfaces/Player";
+import axios from 'axios';
+
 // Initialize Canvase
 const Canvas: React.FC<CanvasProps> = ({width, height}) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+
+    const defaultPlayer: PlayerInterface = {
+        id: null,
+        user_id: null,
+        damage: 1,
+        projectile_number: 1,
+        projectile_speed: 1,
+        movement_speed: 1,
+        hp: 1,
+        currency: 0
+    }
+
+    const [player, setPlayer] = useState(defaultPlayer);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchPlayer = async () => {
+            const res = await axios.get('http://localhost:8080/game/player/1');
+            setPlayer(res.data.player);
+        }
+
+        fetchPlayer();
+        setLoading(false);
+    }, [])
 
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas?.getContext('2d');
 
-        if (canvas && ctx) {
-            start(ctx, width, height);
+        if (!loading && canvas && ctx) {
+            start(ctx, width, height, player);
         }
-    }, [width, height]);
+    }, [width, height, player]);
 
     return ( 
         <canvas ref={canvasRef} width={width} height={height}/>
@@ -26,9 +53,11 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
 }
 
 // Animates the player/enemies/projectiles and detect collisions, and detect keyboard input
-function start(ctx: CanvasRenderingContext2D, width: number, height: number) {
+function start(ctx: CanvasRenderingContext2D, width: number, height: number, playerData: PlayerInterface) {
     // initialize constants
     let animationFrameID: number;
+
+    console.log(playerData);
     
     const keys = {
         w: { pressed: false },
@@ -36,10 +65,10 @@ function start(ctx: CanvasRenderingContext2D, width: number, height: number) {
         d: { pressed: false }
     }
 
-    const SPEED = 3;
+    const SPEED = playerData.movement_speed;
     const SPEED_CHANGE_DIRECTION = 0.05;
     const FRICTION = 0.97;
-    const PROJECTILE_SPEED = 10;
+    const PROJECTILE_SPEED = playerData?.projectile_speed;
     const ENEMY_DAMAGE = 1;
 
     const projectiles: Projectile[] = [];

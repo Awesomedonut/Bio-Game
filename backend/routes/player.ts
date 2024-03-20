@@ -25,10 +25,29 @@ router.get("/player/init", async (req, res) => {
       "error": e
     })
   }
-})
+});
 
 router.get('/player/:id', async (req: Request, res: Response) => {
-  const userId = parseInt(req.params.id);
+  const id = parseInt(req.params.id);
+
+  try {
+    const player = await playerModel.getPlayerById(id);
+    if (player) {
+      return res.json({ player });
+    } else {
+      return res.json({ "message": `Player linked with user with id ${id} not found` });
+    }
+  } catch (e) {
+    console.error(e);
+    return res.json({
+      "message": "Error Occured",
+      "error": e
+    });
+  }
+});
+
+router.get('/players/:userId', async (req: Request, res: Response) => {
+  const userId = parseInt(req.params.userId);
 
   try {
     const player = await playerModel.getPlayerByUserId(userId);
@@ -47,12 +66,13 @@ router.get('/player/:id', async (req: Request, res: Response) => {
 });
 
 router.put('/player/update', async (req: Request, res: Response) => {
-  const { id, damage, hp, movement_speed, projectile_number, projectile_speed, currency} = req.body
+  const { id, damage, hp, movement_speed, projectile_number, projectile_speed, currency } = req.body;
 
   try {
     const updateRes = await playerModel.updatePlayer(id, damage, hp, movement_speed, projectile_number, projectile_speed, currency);
+    console.log(updateRes);
     if (updateRes) {
-      const updatedPlayer = await playerModel.getPlayerByUserId(id);
+      const updatedPlayer = await playerModel.getPlayerById(id);
       return res.json({ updatedPlayer });
     } else {
       return res.json({

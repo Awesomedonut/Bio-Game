@@ -33,6 +33,20 @@ const playerModel = {
           return {};
       }
   },
+  getPlayerById: async function(id: number) {
+    try {
+      const result = await pool.query("SELECT * FROM player WHERE id = $1;", [id]);
+      if (result.rows.length > 0) {
+        return result.rows[0];
+      } else {
+        console.log(`Player with id ${id} not found`);
+        return {};
+      }
+    } catch (err) {
+      console.log(err);
+      return {};
+  }
+  },
   getPlayerByUserId: async function(id: number) {
       try {
           const result = await pool.query("SELECT * FROM player WHERE user_id = $1;", [id]);
@@ -83,7 +97,7 @@ const playerModel = {
         hp = $2, \
         movement_speed = $3, \
         projectile_number = $4, \
-        projectile_speed = $5 \
+        projectile_speed = $5, \
         currency = $6 \
       WHERE id = ($7);\
     ";
