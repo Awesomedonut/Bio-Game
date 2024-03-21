@@ -8,7 +8,8 @@ const LandingPage: React.FC = () => {
     <div>
       { !showLogin &&       
         <div>
-          <h1>Welcome to the Game</h1>
+          <h1>Welcome to the Game!</h1>
+          <p>Created by Group 2 for CMPT 372! We hope you enjoy! :D</p>
           <button onClick={() => setShowLogin(true)}>Login to Play</button>
         </div>
       }
