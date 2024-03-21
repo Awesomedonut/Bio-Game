@@ -40,7 +40,7 @@ const LevelSelector: React.FC<LevelSelectorProps> = ({ closeLevelSelector }) => 
 
     const navigate = useNavigate();
     const handleLevelSelected = () => {
-        navigate('/game');
+        navigate('/dialogue');
     }
 
     return (
