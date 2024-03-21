@@ -1,0 +1,21 @@
+.homepage {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    background-image: url("../bg.jpg");
+    background-size: cover;
+    filter: opacity(0.75);
+    width: 100vw;
+    height: 100vh;
+}
+
+.biogameHeader {
+    font-size: 8rem;
+}
+
+.button {
+    padding: 1rem 10rem;
+    border-radius: 7px;
+}
