@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import './styles/dialogue.css';
 
 interface Message {
   role: string;
@@ -8,6 +10,11 @@ interface Message {
 const Dialogue: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
+
+  const navigate = useNavigate();
+  const handleStartGame = () => {
+    navigate('/game');
+  }
 
   const sendMessage = async () => {
     if (inputText.trim() === '') return;
@@ -35,7 +42,7 @@ const Dialogue: React.FC = () => {
 };
 
   return (
-    <div>
+    <div className="dialogueContainer">
       <div id="chatbox">
         {messages.map((message, index) => (
           <div key={index} className={message.role}>
@@ -44,13 +51,18 @@ const Dialogue: React.FC = () => {
           </div>
         ))}
       </div>
-      <input
-        type="text"
-        value={inputText}
-        onChange={(e) => setInputText(e.target.value)}
-        onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-      />
-      <button onClick={sendMessage}>Send</button>
+      <div className="dialogueInputBar">
+        <input
+          id="dialogueInput"
+          type="text"
+          value={inputText}
+          placeholder="Enter text here..."
+          onChange={(e) => setInputText(e.target.value)}
+          onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+        />
+        <button className="dialogueButton" onClick={sendMessage}>Send</button>
+        <button className="dialogueButton start" onClick={handleStartGame}>Start Game</button>
+      </div>
     </div>
   );
 };
