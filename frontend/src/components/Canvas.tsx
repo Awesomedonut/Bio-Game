@@ -67,8 +67,8 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
 
     useEffect(() => {
         const fetchPlayer = async () => {
-            const playerRes = await axios.get('http://localhost:4000/game/player/1');
-            const enemyRes = await axios.get('http://localhost:4000/game/enemy');
+            const playerRes = await axios.get(backendUri + '/game/player/1');
+            const enemyRes = await axios.get(backendUri + '/game/enemy');
 
             setPlayer(playerRes.data.player);
             setEnemies(enemyRes.data.enemies);
