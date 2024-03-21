@@ -14,6 +14,8 @@ import { useNavigate } from 'react-router-dom';
 
 import Shop from '../components/Shop';
 
+const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com/";
+
 // Initialize Canvase
 const Canvas: React.FC<CanvasProps> = ({width, height}) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);

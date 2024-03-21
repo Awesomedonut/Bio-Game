@@ -6,6 +6,7 @@ interface Props {
   onClose: () => void;
 }
 
+const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com"
 
 const Login: React.FC<Props> = ({ onClose }) => {
   const [username, setUsername] = useState('');
@@ -22,7 +23,7 @@ const Login: React.FC<Props> = ({ onClose }) => {
     };
 
     try {
-      const response = await fetch('http://localhost:4000/login', {
+      const response = await fetch(backendUri + '/login', {
         method: 'POST',
         body: JSON.stringify(newUser),
         headers: {

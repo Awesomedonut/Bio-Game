@@ -1,6 +1,8 @@
 import { ChangeEvent, FormEvent, useState } from "react";
 import { Link } from 'react-router-dom';
 
+const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com";
+
 const Signup: React.FC = () => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
@@ -20,7 +22,7 @@ const Signup: React.FC = () => {
                 password: password
             }
     
-            const response = await fetch('http://localhost:4000/register', {
+            const response = await fetch(backendUri + '/register', {
                method: 'POST',
                body: JSON.stringify(newUser),
                headers: {
