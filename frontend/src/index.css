@@ -142,3 +142,24 @@ h1 span {
   left: 20px;
   
 }
+
+.welcome {
+  color: white;
+  text-align: center;
+}
+
+.welcome h1 {
+  font-size: 100px;
+}
+
+.welcome p {
+  font-size: 40px;
+}
+
+.welcome button {
+  margin-top: 10px;
+  padding: 1rem 10rem;
+  border-radius: 7px;
+  font-size: 20px;
+}
+

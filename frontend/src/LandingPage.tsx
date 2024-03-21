@@ -6,12 +6,13 @@ const LandingPage: React.FC = () => {
 
   return (
     <div>
-      { !showLogin &&       
-        <div>
-          <h1>Welcome to the Game!</h1>
-          <p>Created by Group 2 for CMPT 372! We hope you enjoy! :D</p>
-          <button onClick={() => setShowLogin(true)}>Login to Play</button>
-        </div>
+      { !showLogin && <div className="flexbox">
+        <div className='welcome'>
+            <h1>Welcome to the Game!</h1>
+            <p>Created by Group 2 for CMPT 372! We hope you enjoy! :D</p>
+            <button onClick={() => setShowLogin(true)}>Login to Play</button>
+          </div>
+      </div>      
       }
       {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}
     </div>
