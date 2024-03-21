@@ -184,9 +184,9 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
                         clearInterval(interval);
 
                         // Redirect to homescreen after 3 seconds
-                        setTimeout(() => {
-                            handleGameOver();
-                        }, 3000);
+                        // setTimeout(() => {
+                        //     handleGameOver();
+                        // }, 3000);
                     }
                 }
             }
