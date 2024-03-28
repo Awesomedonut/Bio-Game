@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 import LandingPage from './LandingPage';
 import HomePage from './components/HomePage';
 import Canvas from './components/Canvas';
+import Flappy from './components/Flappy';
 import Dialogue from './Dialogue';
 import { CanvasProps } from './interfaces/CanvasProps';
 import Signup from './Signup';
@@ -21,6 +22,8 @@ function App() {
         <Route path="/dialogue" element={<Dialogue />} />
         <Route path="/game" element={<Canvas width={width} height={height}/>} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/flappy" element={<Flappy width={width} height={height} />} />
+
       </Routes>
     </Router>
   );
