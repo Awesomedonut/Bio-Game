@@ -24,5 +24,3 @@ https://medium.com/@pdx.lucasm/canvas-with-react-js-32e133c05258
 https://youtube.com/playlist?list=PL4cUxeGkcC9iO8ai6LU0s6aHAaWP4RAkF&si=qcAn71rY80FRE85c
 
 https://youtu.be/HXquxWtE5vA?si=DIdVNAyCNqZIgLyq
-
-https://medium.com/@pdx.lucasm/canvas-with-react-js-32e133c05258
