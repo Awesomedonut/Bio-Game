@@ -51,6 +51,7 @@ app.post('/register', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch data' });
   } 
 });
+
 app.get('/users', async (req, res) => {
   try {
     const allUsers = await gamemodel.getAllUsers();
