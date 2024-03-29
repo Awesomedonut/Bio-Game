@@ -6,7 +6,6 @@ import HomePage from './components/HomePage';
 import Canvas from './components/Canvas';
 import Flappy from './components/Flappy';
 import Dialogue from './Dialogue';
-import { CanvasProps } from './interfaces/CanvasProps';
 import Signup from './Signup';
 import Pac from './components/Pac';
 
