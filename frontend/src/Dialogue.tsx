@@ -13,15 +13,19 @@ const Dialogue: React.FC = () => {
     navigate('/game');
   }
 
-  const appendNewMessage = (inputText: string)=>{
-    const newMessage: Message = { role: 'player', content: inputText };
+  const appendNewBotMessage = (inputText: string) => {
+    appendNewMessage(inputText, "bot");
+  }
+
+  const appendNewMessage = (inputText: string, role: string) => {
+    const newMessage: Message = { role: role, content: inputText };
     setMessages((prevMessages) => [...prevMessages, newMessage]);
   }
 
   const sendMessage = async () => {
     if (inputText.trim() === '') return;
-    
-    callApi(inputText, appendNewMessage);
+    appendNewMessage(inputText, "player");
+    callApi(inputText, appendNewBotMessage);
     setInputText('');
 };
 
