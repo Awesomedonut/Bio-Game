@@ -8,6 +8,7 @@ import Flappy from './components/Flappy';
 import Dialogue from './Dialogue';
 import { CanvasProps } from './interfaces/CanvasProps';
 import Signup from './Signup';
+import Pac from './components/Pac';
 
 function App() {
 
@@ -23,6 +24,7 @@ function App() {
         <Route path="/game" element={<Canvas width={width} height={height}/>} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/flappy" element={<Flappy width={width} height={height} />} />
+        <Route path="/pac" element={<Pac />} />
 
       </Routes>
     </Router>
