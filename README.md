@@ -18,3 +18,9 @@ To create the front end gameplay, the following links were referenced:
 https://gist.github.com/Pro496951/a7537d2f313fbc6ebad1f74b83f84244
 
 https://github.com/kubowania/pac-man
+
+https://medium.com/@pdx.lucasm/canvas-with-react-js-32e133c05258
+
+https://youtube.com/playlist?list=PL4cUxeGkcC9iO8ai6LU0s6aHAaWP4RAkF&si=qcAn71rY80FRE85c
+
+https://youtu.be/HXquxWtE5vA?si=DIdVNAyCNqZIgLyq
