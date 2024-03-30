@@ -6,9 +6,9 @@ import HomePage from './components/HomePage';
 import Canvas from './components/Canvas';
 import Flappy from './components/Flappy';
 import Dialogue from './Dialogue';
-import { CanvasProps } from './interfaces/CanvasProps';
 import Signup from './Signup';
 import MultiplayerCanvas from './components/MultiplayerCanvas';
+import Pac from './components/Pac';
 
 function App() {
 
@@ -25,6 +25,9 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path='/multiplayer' element={<MultiplayerCanvas width={width} height={height}/>}/>
         <Route path="/flappy" element={<Flappy width={width} height={height} />} />
+        <Route path="/pac" element={<Pac />} />
+
+
       </Routes>
     </Router>
   );
