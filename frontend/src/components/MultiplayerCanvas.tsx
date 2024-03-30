@@ -21,6 +21,10 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
             console.log('Connected to server');
         })
 
+        socket.on('updatePlayers', (players) => {
+            console.log(players);
+        })
+
         return () => {
             socket.disconnect();
             console.log('Disconnected from server');

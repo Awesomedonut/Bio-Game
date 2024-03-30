@@ -20,11 +20,17 @@ export function initializeSocketIO(server: HttpServer):void {
         createPlayer(socket.id);
         console.log(players);
 
+        // Tell frontend about changes
+        io.emit('updatePlayers', players);
+
         // Removes player from the array when disconnected
         socket.on('disconnect', () => {
             console.log(`User with ID ${socket.id} disconnected`);
             deletePlayer(socket.id);
             console.log(players);
+            
+            // Tell fronend about changes
+            io.emit('updatePlayers', players);
         })
     })
 
