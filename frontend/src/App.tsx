@@ -7,6 +7,7 @@ import Canvas from './components/Canvas';
 import Dialogue from './Dialogue';
 import { CanvasProps } from './interfaces/CanvasProps';
 import Signup from './Signup';
+import MultiplayerCanvas from './components/MultiplayerCanvas';
 
 function App() {
 
@@ -21,6 +22,7 @@ function App() {
         <Route path="/dialogue" element={<Dialogue />} />
         <Route path="/game" element={<Canvas width={width} height={height}/>} />
         <Route path="/signup" element={<Signup />} />
+        <Route path='/multiplayer' element={<MultiplayerCanvas width={width} height={height}/>}/>
       </Routes>
     </Router>
   );

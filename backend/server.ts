@@ -2,6 +2,8 @@ import dotenv from 'dotenv';
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import get_answer from './openai';
+const http = require('http');
+const { Server } = require('socket.io');
 
 // setup local environment variables from .env file
 dotenv.config();
@@ -9,6 +11,15 @@ import { gamemodel } from './models/gamedb';
 
 // express app
 const app = express();
+
+// Setup Socket.io
+const server = http.createServer(app);  // wrap the express application
+const io = new Server(server, {
+  cors: {
+    origin: 'http://localhost:3000',
+    methods: ["GET", "POST", "Delete", "UPDATE"],
+  }
+})
 
 // middleware
 app.use(cors());
@@ -79,6 +90,7 @@ app.post('/login', async (req, res) => {
 
 import enemyRoutes from './routes/enemy'
 import playerRoutes from './routes/player'
+import { Socket } from 'socket.io';
 
 app.use('/game', enemyRoutes);
 app.use('/game', playerRoutes);
@@ -104,12 +116,14 @@ app.post('/dialogue', async (req: Request, res: Response) => {
 
 })
 
-
+io.on('connection', (socket: Socket) => {
+  console.log(`A user connected with ID: ${socket.id}`);
+})
 
 
 // Start the server
 const port = process.env.PORT || 3000;
-
-app.listen(port, () => {
+//Existing routes defined by app.get(), app.post(), etc should still work as expected
+server.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
