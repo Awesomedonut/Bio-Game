@@ -1,11 +1,13 @@
 import dotenv from 'dotenv';
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
-import get_answer from './openai';
+import get_answer from './services/openai';
+import enemyRoutes from './routes/enemy'
+import playerRoutes from './routes/player'
+import { gamemodel } from './models/gamedb';
 
 // setup local environment variables from .env file
 dotenv.config();
-import { gamemodel } from './models/gamedb';
 
 // express app
 const app = express();
@@ -76,17 +78,8 @@ app.post('/login', async (req, res) => {
   } 
 });
 
-
-import enemyRoutes from './routes/enemy'
-import playerRoutes from './routes/player'
-
 app.use('/game', enemyRoutes);
 app.use('/game', playerRoutes);
-
-
-// app.post('/', (req: Request, res: Response) => {
-//   res.status(200).send('Hello World?');
-// })
 
 app.post('/dialogue', async (req: Request, res: Response) => {
   console.log(req.body);
@@ -103,9 +96,6 @@ app.post('/dialogue', async (req: Request, res: Response) => {
   }
 
 })
-
-
-
 
 // Start the server
 const port = process.env.PORT || 3000;
