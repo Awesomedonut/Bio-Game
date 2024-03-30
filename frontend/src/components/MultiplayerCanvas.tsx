@@ -20,6 +20,11 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
         socket.on('connect', () => {
             console.log('Connected to server');
         })
+
+        return () => {
+            socket.disconnect();
+            console.log('Disconnected from server');
+        }
     }, [socket])
 
     function start(ctx: CanvasRenderingContext2D, width: number, height: number) {
