@@ -1,9 +1,12 @@
 import dotenv from 'dotenv';
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
-import get_answer from './services/openai';
+
+import { createServer } from 'http';
+import { initializeSocketIO } from './socketLogic';
 import enemyRoutes from './routes/enemy'
 import playerRoutes from './routes/player'
+import get_answer from './services/openai';
 import { gamemodel } from './models/gamedb';
 
 // setup local environment variables from .env file
@@ -15,6 +18,10 @@ const app = express();
 // middleware
 app.use(cors());
 app.use(express.json());
+
+// Setup Socket.io
+const server = createServer(app);
+initializeSocketIO(server);
 
 // for debugging
 app.use((req: Request, res: Response, next: NextFunction) => {
@@ -99,7 +106,7 @@ app.post('/dialogue', async (req: Request, res: Response) => {
 
 // Start the server
 const port = process.env.PORT || 3000;
-
-app.listen(port, () => {
+//Existing routes defined by app.get(), app.post(), etc should still work as expected
+server.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
