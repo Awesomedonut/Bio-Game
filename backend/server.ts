@@ -4,6 +4,8 @@ import cors from 'cors';
 import get_answer from './openai';
 import { createServer } from 'http';
 import { initializeSocketIO } from './socketLogic';
+import enemyRoutes from './routes/enemy'
+import playerRoutes from './routes/player'
 
 // setup local environment variables from .env file
 dotenv.config();
@@ -81,11 +83,6 @@ app.post('/login', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch data' });
   } 
 });
-
-
-import enemyRoutes from './routes/enemy'
-import playerRoutes from './routes/player'
-
 
 app.use('/game', enemyRoutes);
 app.use('/game', playerRoutes);

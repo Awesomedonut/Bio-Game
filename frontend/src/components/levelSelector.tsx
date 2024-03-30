@@ -4,44 +4,36 @@ import '../styles/levelSelector.css';
 
 type LevelSelectorProps = {
     closeLevelSelector: () => void,
-}
+};
 
 type LevelObject = {
     level: number,
-    unlocked: boolean
-}
-
+    unlocked: boolean,
+};
 
 const LevelSelector: React.FC<LevelSelectorProps> = ({ closeLevelSelector }) => {
-    // Implement endpoints to get this information per player
-    const maxLevel: number = 0;
+    const maxLevel: number = 3; // adjust based on player's progress
 
-    const levels: Array<LevelObject> = []
-
-    // Discuss how many levels is realistically implementable for the future
-    const MAX_LEVELS: number = 25
+    const levels: Array<LevelObject> = [];
+    const MAX_LEVELS: number = 4; // Total number of levels
     for (let i: number = 1; i <= MAX_LEVELS; i++) {
-        let unlocked: boolean = false;
-        if (i <= maxLevel) {
-            unlocked = true;
-        }
-        const levelsObject: LevelObject = {
-            level: i,
-            unlocked: unlocked
-        }
-        levels.push(levelsObject);
+        let unlocked: boolean = i <= maxLevel;
+        levels.push({ level: i, unlocked: unlocked });
     }
-
-    const infiniteLevelObject: LevelObject = {
-        level: Infinity,
-        unlocked: true
-    }
-    levels.push(infiniteLevelObject);
 
     const navigate = useNavigate();
-    const handleLevelSelected = () => {
-        navigate('/dialogue');
-    }
+
+    const handleLevelSelected = (levelObject: LevelObject) => {
+        // Navigate to the Flappy level if level 1 is selected
+        if (levelObject.level === 1) {
+            navigate('/flappy');
+        } else {
+            // Placeholder for navigating to other levels
+
+            console.log(`Navigate to level ${levelObject.level}`);
+            navigate('/dialogue'); 
+        }
+    };
 
     return (
         <div className="popup">
@@ -51,15 +43,19 @@ const LevelSelector: React.FC<LevelSelectorProps> = ({ closeLevelSelector }) => 
                     <div className="closeButton" onClick={closeLevelSelector}>Close</div>
                 </div>
                 <div className="levelsContainer">
-                    {
-                        levels.map(levelObject => {
-                            return <div className={`levelButton ${levelObject.unlocked ? "unlocked" : "locked"}`} onClick={levelObject.unlocked ? handleLevelSelected : () => {}}>{levelObject.level}</div>
-                        })
-                    }
+                    {levels.map((levelObject, index) => (
+                        <div
+                            key={index}
+                            className={`levelButton ${levelObject.unlocked ? "unlocked" : "locked"}`}
+                            onClick={() => levelObject.unlocked ? handleLevelSelected(levelObject) : undefined}
+                        >
+                            {levelObject.level === Infinity ? "Infinite" : levelObject.level}
+                        </div>
+                    ))}
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default LevelSelector;

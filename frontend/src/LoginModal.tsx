@@ -6,7 +6,7 @@ interface Props {
   onClose: () => void;
 }
 
-const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com"
+const backendUri = "http://localhost:4000"
 
 const Login: React.FC<Props> = ({ onClose }) => {
   const [username, setUsername] = useState('');
