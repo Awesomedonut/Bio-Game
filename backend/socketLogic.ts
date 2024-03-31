@@ -11,7 +11,9 @@ export function initializeSocketIO(server: HttpServer):void {
         cors: {
             origin: 'http://localhost:3000',
             methods: ["GET", "POST", "DELETE", "UPDATE"]
-        }
+        },
+        pingInterval: 2000,
+        pingTimeout: 5000
     });
 
     io.on('connection', (socket: Socket) => {
@@ -24,8 +26,8 @@ export function initializeSocketIO(server: HttpServer):void {
         io.emit('updatePlayers', players);
 
         // Removes player from the array when disconnected
-        socket.on('disconnect', () => {
-            console.log(`User with ID ${socket.id} disconnected`);
+        socket.on('disconnect', (reason) => {
+            console.log(`User with ID ${socket.id} disconnected due to: ${reason}`);
             deletePlayer(socket.id);
             console.log(players);
             io.emit('updatePlayers', players);
