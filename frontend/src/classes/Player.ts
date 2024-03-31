@@ -3,12 +3,14 @@ import { Position } from "../interfaces/Position";
 import { Velocity } from "../interfaces/Velocity";
 
 export class Player {
+    id?: string
     position: Position;
     velocity: Velocity;
     angle: number;  // radians
     hp: number;
 
     constructor({position, velocity, hp}: PlayerProps) {
+        this.id = ''; 
         this.position = position;
         this.velocity = velocity;
         this.angle = 0;

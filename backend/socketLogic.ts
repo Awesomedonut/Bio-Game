@@ -28,8 +28,6 @@ export function initializeSocketIO(server: HttpServer):void {
             console.log(`User with ID ${socket.id} disconnected`);
             deletePlayer(socket.id);
             console.log(players);
-            
-            // Tell fronend about changes
             io.emit('updatePlayers', players);
         })
     })
@@ -38,7 +36,10 @@ export function initializeSocketIO(server: HttpServer):void {
     function createPlayer(id: string) {
         let player = new Player({
             id: id,
-            position: {x: 100, y: 100},
+            position: {
+                x: 500 * Math.random(),
+                y: 500 * Math.random(),
+            },
             velocity: {x: 0, y: 0},
             hp: 1
         })
