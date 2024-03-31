@@ -67,7 +67,12 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
                 velocity: {x: backendPlayers[i].velocity.x, y: backendPlayers[i].velocity.y},
                 hp: backendPlayers[i].hp
             });
-            
+
+            player.id = backendPlayers[i].id
+            if (backendPlayers[i].id == socket.id) {
+                player.color = 'lime';
+            }
+
             // temp.push(player);
             frontendPlayers.push(player);
         }

@@ -8,6 +8,7 @@ export class Player {
     velocity: Velocity;
     angle: number;  // radians
     hp: number;
+    color: string;
 
     constructor({position, velocity, hp}: PlayerProps) {
         this.id = ''; 
@@ -15,6 +16,7 @@ export class Player {
         this.velocity = velocity;
         this.angle = 0;
         this.hp = hp;
+        this.color = 'green';
     }
 
     // Draw the player based on it's current position, velocity
@@ -33,7 +35,7 @@ export class Player {
         ctx.lineTo(this.position.x - 10, this.position.y + 10);
         ctx.closePath();
 
-        ctx.strokeStyle = 'green';
+        ctx.strokeStyle = this.color;
         ctx.stroke();
 
         ctx.restore();
