@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import get_answer from './openai';
-
+import session from 'express-session';
 // setup local environment variables from .env file
 dotenv.config();
 import { gamemodel } from './models/gamedb';
@@ -13,6 +13,14 @@ const app = express();
 // middleware
 app.use(cors());
 app.use(express.json());
+app.use(session({
+  secret: 'your_session_secret_key', // Change this to a secure random string
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 1000*60*60 // Session expires in 1 hour
+  }
+}));
 
 // for debugging
 app.use((req: Request, res: Response, next: NextFunction) => {
@@ -23,6 +31,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 // app.get('/', (req: Request, res: Response) => {
 //   res.status(200).send('Hello World?');
 // })
+
 app.get('/enemy/init', async (req, res) => {
   try {
     await gamemodel.init();
@@ -45,6 +54,7 @@ app.get('/test', async (req, res) => {
 app.post('/register', async (req, res) => {
   try {
     await gamemodel.addUser(req.body.username, req.body.email, req.body.password);
+    (req.session as any).isLoggedIn = true;
     res.json({ message: 'User has added successfully' });
   }catch (error) {
     console.error('Error fetching data:', error);
@@ -52,9 +62,11 @@ app.post('/register', async (req, res) => {
   } 
 });
 
+
 app.get('/users', async (req, res) => {
   try {
     const allUsers = await gamemodel.getAllUsers();
+    (req.session as any).isLoggedIn = true;
     res.json(allUsers);
   }catch (error) {
     console.error('Error fetching data:', error);
@@ -64,25 +76,33 @@ app.get('/users', async (req, res) => {
 
 app.post('/login', async (req, res) => {
   try{
-    const status = await gamemodel.getUser(req.body.username, req.body.password);
-    if(status){
-      res.json("Success");
-    }
-    else{
-      res.status(500).json({ error: 'Incorrect user Password for login' });
-    }  
-  }catch (error) {
-    console.error('Error fetching data:', error);
-    res.status(500).json({ error: 'Failed to fetch data' });
-  } 
+      const { username, password } = req.body;
+      await gamemodel.getUser(username, password);
+      (req.session as any).isLoggedIn = true;
+      console.log("Logged In in /login post:" + (req.session as any).isLoggedIn)
+      res.json({ message: 'User logged in successfully' }); 
+    }catch (error) {
+      console.error('Error fetching data:', error);
+      res.status(500).json({ error: 'Failed to fetch data' });
+    } 
 });
 
+function requireLogin(req: Request, res: Response, next: NextFunction) {
+  //const sessionData: any = req.session;
+  if ((req.session as any).isLoggedIn)  {
+    console.log("session logged in info:", (req.session as any).isLoggedIn)
+    next(); 
+  } else {
+    console.log("Unauthorized", (req.session as any).isLoggedIn);
+    res.status(401).json({ error: 'Unauthorized' });
+  }
+}
 
 import enemyRoutes from './routes/enemy'
 import playerRoutes from './routes/player'
 
-app.use('/game', enemyRoutes);
-app.use('/game', playerRoutes);
+app.use('/game', requireLogin, enemyRoutes);
+app.use('/game', requireLogin, playerRoutes);
 
 
 // app.post('/', (req: Request, res: Response) => {
