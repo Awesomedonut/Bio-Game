@@ -1,11 +1,14 @@
 import dotenv from 'dotenv';
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
-import get_answer from './openai';
+// import get_answer from './openai';
+import enemyRoutes from './routes/enemy'
+import playerRoutes from './routes/player'
 import session from 'express-session';
+import { gamemodel } from './models/gamedb';
+import get_answer from './services/openai';
 // setup local environment variables from .env file
 dotenv.config();
-import { gamemodel } from './models/gamedb';
 
 // express app
 const app = express();
@@ -98,16 +101,10 @@ function requireLogin(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-import enemyRoutes from './routes/enemy'
-import playerRoutes from './routes/player'
+
 
 app.use('/game', requireLogin, enemyRoutes);
 app.use('/game', requireLogin, playerRoutes);
-
-
-// app.post('/', (req: Request, res: Response) => {
-//   res.status(200).send('Hello World?');
-// })
 
 app.post('/dialogue', async (req: Request, res: Response) => {
   console.log(req.body);
@@ -125,12 +122,9 @@ app.post('/dialogue', async (req: Request, res: Response) => {
 
 })
 
-
-
-
 // Start the server
 const port = process.env.PORT || 3000;
-
+//Existing routes defined by app.get(), app.post(), etc should still work as expected
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });

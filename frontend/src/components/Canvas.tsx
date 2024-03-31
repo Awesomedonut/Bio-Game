@@ -17,13 +17,11 @@ import Shop from '../components/Shop';
 // const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com/";
 const backendUri ="http://localhost:4000"
 // Initialize Canvase
-const Canvas: React.FC<CanvasProps> = ({width, height}) => {
+const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-
     const [playerData, setPlayer] = useState<PlayerInterface | null>(null);
     const [enemiesData, setEnemies] = useState<EnemyInterface[]>([]);
     const [gameStarted, setGameStarted] = useState(false);
-
     const [showShop, setShowShop] = useState(false);
 
     // Can't use React state for the game as react never rerenders past the initial useEffects
@@ -52,7 +50,6 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
     const upgradeProjectileSpeed = () => {
         PLAYER_PROJECTILE_SPEED.current += 1;
         console.log(`Player damage upgraded to ${PLAYER_PROJECTILE_SPEED.current}`);
-
     }
 
     const upgradeHp = () => {
@@ -99,11 +96,11 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
         }
     }, [width, height, playerData, enemiesData]);
 
-        // Animates the player/enemies/projectiles and detect collisions, and detect keyboard input
+    // Animates the player/enemies/projectiles and detect collisions, and detect keyboard input
     function start(ctx: CanvasRenderingContext2D, width: number, height: number) {
         // initialize constants
         let animationFrameID: number;
-        
+
         const keys = {
             w: { pressed: false },
             a: { pressed: false },
@@ -118,7 +115,7 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
         const enemies: Enemy[] = [];
 
         // Create player
-        let spawn: Position = {x: width/2, y: height/2};
+        let spawn: Position = { x: width / 2, y: height / 2 };
         const player = spawnPlayer(ctx, spawn, PLAYER_HP.current);
 
         // Spawn an enemy every 3 seconds
@@ -154,7 +151,7 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
         function animate() {
             // Create animation loop
             animationFrameID = window.requestAnimationFrame(animate);
-            
+
             // Clear the background in frame
             ctx.fillStyle = "rgb(255, 131, 122)";
             ctx.fillRect(0, 0, width, height);
@@ -180,7 +177,7 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
                         ctx.font = "60px Arial";
                         ctx.fillStyle = "white";
                         ctx.textAlign = "center";
-                        ctx.fillText("GAME OVER", width/2, height/2);
+                        ctx.fillText("GAME OVER", width / 2, height / 2);
 
                         window.cancelAnimationFrame(animationFrameID);
                         clearInterval(interval);
@@ -306,8 +303,8 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
     // helper function to spawn the player in the middle
     function spawnPlayer(ctx: CanvasRenderingContext2D, spawn: Position, hp: number): Player {
         let player = new Player({
-            position: {x: spawn.x, y: spawn.y},
-            velocity: {x: 0, y: 0},
+            position: { x: spawn.x, y: spawn.y },
+            velocity: { x: 0, y: 0 },
             hp: hp   // placeholder for now
         });
         player.draw(ctx);
@@ -323,7 +320,7 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
             Left,
             Right
         }
-        const location:SpawnLocation = Math.floor(Math.random() * 3);
+        const location: SpawnLocation = Math.floor(Math.random() * 3);
 
         let position: Position;
         let velocity: Velocity;
@@ -333,10 +330,10 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
         const currency_drop = enemyData.currency_drop;
 
         // Set Position and Velocity based on the randomly chosen spawn location
-        switch(location) {
+        switch (location) {
             case SpawnLocation.Top:
                 position = {
-                    x: Math.random() * width, 
+                    x: Math.random() * width,
                     y: 0 - hp
                 }
                 velocity = {
@@ -377,13 +374,13 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
         }
 
         // return the newly created enemy
-        return new Enemy({position, velocity, hp, damage, currency_drop});
+        return new Enemy({ position, velocity, hp, damage, currency_drop });
     }
 
     // helper function to animate th projectiles
     function animateProjectiles(ctx: CanvasRenderingContext2D, projectiles: Projectile[], width: number, height: number) {
         let is_offscreen_left: boolean, is_offscreen_right: boolean, is_offscreen_top: boolean, is_offscreen_bot: boolean;
-        
+
         for (let i = projectiles.length - 1; i >= 0; i--) {
             let projectile = projectiles[i];
             projectile.update(ctx);
@@ -394,7 +391,7 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
             is_offscreen_top = projectile.position.y - projectile.radius > height;
             is_offscreen_bot = projectile.position.y + projectile.radius < 0;
 
-            if ( is_offscreen_left || is_offscreen_right || is_offscreen_top || is_offscreen_bot ) {
+            if (is_offscreen_left || is_offscreen_right || is_offscreen_top || is_offscreen_bot) {
                 projectiles.splice(i, 1);
             }
         }
@@ -403,18 +400,18 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
     // helper function to animate enemies
     function animateEnemies(ctx: CanvasRenderingContext2D, enemies: Enemy[], width: number, height: number) {
         let is_offscreen_left: boolean, is_offscreen_right: boolean, is_offscreen_top: boolean, is_offscreen_bot: boolean;
-        
+
         for (let i = enemies.length - 1; i >= 0; i--) {
             let enemy = enemies[i];
             enemy.update(ctx);
-            
+
             // Check if each enemy is offscreen and remove if it is
             is_offscreen_left = enemy.position.x + enemy.radius < 0;
             is_offscreen_right = enemy.position.x - enemy.radius > width;
             is_offscreen_top = enemy.position.y - enemy.radius > height;
             is_offscreen_bot = enemy.position.y + enemy.radius < 0;
 
-            if ( is_offscreen_left || is_offscreen_right || is_offscreen_top || is_offscreen_bot ) {
+            if (is_offscreen_left || is_offscreen_right || is_offscreen_top || is_offscreen_bot) {
                 enemies.splice(i, 1);
             }
         }
@@ -424,14 +421,14 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    return ( 
+    return (
         <>
-            <canvas ref={canvasRef} width={width} height={height}/>
-            { showShop &&
+            <canvas ref={canvasRef} width={width} height={height} />
+            {showShop &&
                 <Shop upgradeDamage={upgradeDamage} upgradeHp={upgradeHp} upgradeProjectileCount={upgradeProjectileCount}
-                    upgradeProjectileSpeed={upgradeProjectileSpeed} upgradeSpeed={upgradeSpeed} />            }
+                    upgradeProjectileSpeed={upgradeProjectileSpeed} upgradeSpeed={upgradeSpeed} />}
         </>
-     );
+    );
 }
 
 export default Canvas;
