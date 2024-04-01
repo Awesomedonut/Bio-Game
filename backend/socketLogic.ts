@@ -5,7 +5,12 @@ import { Position } from './interfaces/Position';
 import { Velocity } from './interfaces/Velocity';
 
 export function initializeSocketIO(server: HttpServer):void {
-    const players: Player[] = [];
+    const SPEED = 3
+    const ROTATIONAL_SPEED = 0.05
+    const FRICTION = 0.97
+    const PROJECTILE_SPEED = 3
+
+    const backendPlayers: Player[] = [];
 
     const io = new Server(server, {
         cors: {
@@ -20,19 +25,48 @@ export function initializeSocketIO(server: HttpServer):void {
         // Add player to the array upon connection
         console.log(`A user connected with ID: ${socket.id}`);
         createPlayer(socket.id);
-        console.log(players);
+        console.log(backendPlayers);
 
         // Tell frontend about changes
-        io.emit('updatePlayers', players);
+        io.emit('updatePlayers', backendPlayers);
 
         // Removes player from the array when disconnected
         socket.on('disconnect', (reason) => {
             console.log(`User with ID ${socket.id} disconnected due to: ${reason}`);
             deletePlayer(socket.id);
-            console.log(players);
-            io.emit('updatePlayers', players);
+            console.log(backendPlayers);
+            io.emit('updatePlayers', backendPlayers);
+        })
+
+        // Respond to player movement
+        socket.on('keydown', (keycode)  => {
+            let index = backendPlayers.findIndex(player => player.id === socket.id);
+            let player = backendPlayers[index];
+            switch (keycode) {
+                case 'KeyW':
+                    console.log(`Player ${socket.id} pressed W`)
+                    player.velocity.x = Math.cos(player.angle) * SPEED;
+                    player.velocity.y = Math.sin(player.angle) * SPEED;
+                    // player.position.x += player.velocity.x;
+                    // player.position.x += player.velocity.y;
+                    break;
+                case 'KeyA':
+                    console.log(`Player ${socket.id} pressed A`)
+                    player.angle += ROTATIONAL_SPEED;
+                    break;
+                case 'KeyD':
+                    console.log(`Player ${socket.id} pressed D`)
+                    player.angle -= ROTATIONAL_SPEED;
+                    break;
+            }
+            console.log(backendPlayers);
         })
     })
+    
+    // backend tic rate to give us 66fps
+    // setInterval(() => {
+    //     io.emit('updatePlayers', backendPlayers);
+    // }, 15);
 
     // helper function to create a player and add it to the players array
     function createPlayer(id: string) {
@@ -45,14 +79,14 @@ export function initializeSocketIO(server: HttpServer):void {
             velocity: {x: 0, y: 0},
             hp: 1
         })
-        players.push(player);
+        backendPlayers.push(player);
     }
 
     // helper function to delete a player from the players array
     function deletePlayer(id: string) {
-        let index = players.findIndex(player => player.id === id);
+        let index = backendPlayers.findIndex(player => player.id === id);
         if (index !== -1) {
-            players.splice(index, 1);
+            backendPlayers.splice(index, 1);
         }
     }
 }

@@ -13,6 +13,23 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const frontendPlayers:Player[] = [];
 
+    const SPEED = 3
+    const ROTATIONAL_SPEED = 0.05
+    const FRICTION = 0.97
+    const PROJECTILE_SPEED = 3
+
+    const keys = {
+        w: {
+            pressed: false,
+        },
+        a: {
+            pressed: false,
+        },
+        d: {
+            pressed: false,
+        },
+    }
+
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas?.getContext('2d');
@@ -47,19 +64,108 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
 
             // Draw the players
             frontendPlayers.forEach(player => {
-                player.draw(ctx);
+                player.update(ctx);
             });
 
+
+            // movement
+            // let index = frontendPlayers.findIndex(player => player.id === socket.id);
+            // if (index != -1) {
+            //     let player = frontendPlayers[index];
+            //     if (keys.w.pressed) {
+            //         player.velocity.x = Math.cos(player.angle) * SPEED;
+            //         player.velocity.y = Math.sin(player.angle) * SPEED;
+            //     } else {
+            //         player.velocity.x *= FRICTION;
+            //         player.velocity.y *= FRICTION;
+            //     }
+    
+            //     if (keys.d.pressed) {
+            //         player.angle += ROTATIONAL_SPEED;  
+            //     }
+            //     if (keys.a.pressed) {
+            //         player.angle -= ROTATIONAL_SPEED;
+            //     }
+            // }
+            
             // Create an animation loop by requesting next frame
             animationFrameID = window.requestAnimationFrame(animate);
         }
+
+        // movement
+        setInterval(() => {
+            let index = frontendPlayers.findIndex(player => player.id === socket.id);
+            if (index != -1) {
+                let yourPlayer = frontendPlayers[index];
+                if (keys.w.pressed) {
+                    yourPlayer.velocity.x = Math.cos(yourPlayer.angle) * SPEED;
+                    yourPlayer.velocity.y = Math.sin(yourPlayer.angle) * SPEED;
+                } else {
+                    yourPlayer.velocity.x *= FRICTION;
+                    yourPlayer.velocity.y *= FRICTION;
+                }
+    
+                if (keys.d.pressed) {
+                    yourPlayer.angle += ROTATIONAL_SPEED;  
+                }
+                if (keys.a.pressed) {
+                    yourPlayer.angle -= ROTATIONAL_SPEED;
+                }
+            }
+        }, 15)
+
+        // Listen for Events
+        window.addEventListener('keydown', async (event) => {
+            // check if player exists
+            // let index = frontendPlayers.findIndex(player => player.id === socket.id);
+            // if (index == -1) return;
+
+            // let player = frontendPlayers[index];
+            switch (event.code) {
+                case 'KeyW':
+                    // console.log('W was pressed!');
+                    // socket.emit('keydown', 'KeyW');
+                    keys.w.pressed = true;
+                    // player.velocity.x = Math.cos(player.angle) * 3;
+                    // player.velocity.y = Math.sin(player.angle) * 3;
+                    break;
+                case 'KeyA':
+                    keys.a.pressed = true;
+                    // console.log('A was pressed!');
+                    // socket.emit('keydown', 'KeyA');
+                    // player.angle += 0.05;   
+                    break;
+                case 'KeyD':
+                    keys.d.pressed = true;
+                    // console.log('D was pressed!');   
+                    // socket.emit('keydown', 'KeyD');
+                    // player.angle -= 0.05;
+                    break;
+            }
+
+            // console.log('frontendPlayers: ', frontendPlayers);
+        })
+
+        window.addEventListener('keyup', async (event) => {
+            switch (event.code) {
+              case 'KeyW':
+                keys.w.pressed = false
+                break
+              case 'KeyA':
+                keys.a.pressed = false
+                break
+              case 'KeyD':
+                keys.d.pressed = false
+                break
+            }
+          })
 
         // Start animation loop
         animate();
     }
 
+    // Update frontend data with backend data
     function syncData(backendPlayers: any[]) {
-        // let temp: Player[] = [];
         frontendPlayers.splice(0, frontendPlayers.length);  // empty array
         for (let i=0; i<backendPlayers.length; i++) {
             let player = new Player({
@@ -73,11 +179,10 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
                 player.color = 'lime';
             }
 
-            // temp.push(player);
+
             frontendPlayers.push(player);
         }
-        // console.log('temp', temp);
-        console.log('frontendPlayers',frontendPlayers);
+        // console.log('frontendPlayers',frontendPlayers);
     }
 
     return ( 
