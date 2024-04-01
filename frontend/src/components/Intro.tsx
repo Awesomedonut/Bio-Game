@@ -49,7 +49,7 @@ const Intro: React.FC = () => {
 
   return (
     <div>
-      <h1>Welcome to the Game</h1>
+      {/* <h1>Welcome to the Game</h1>
       <p>This is the intro of the game where we explain what's going on.</p>
       <button onClick={() => navigate('/game')}>Start Game</button>
       <div>
@@ -61,8 +61,9 @@ const Intro: React.FC = () => {
           onChange={(e) => setUserQuestion(e.target.value)} // Update state on input change
         />
         <button onClick={handleSubmitQuestion}>Submit</button>
-      </div>
-      <h1>Game Introduction</h1>
+      </div> */}
+      <h1>Welcome!</h1>
+      <h2>Press spacebar to continue</h2>
       <p style={{ whiteSpace: 'pre-wrap' }}>{textSections[currentSection]}</p>
       {currentSection === textSections.length - 1 && (
         <button onClick={() => navigate('/flappy')}>Start Game</button>
