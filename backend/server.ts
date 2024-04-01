@@ -1,29 +1,32 @@
 import dotenv from 'dotenv';
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
-// import get_answer from './openai';
 import enemyRoutes from './routes/enemy'
 import playerRoutes from './routes/player'
-import session from 'express-session';
 import { gamemodel } from './models/gamedb';
 import get_answer from './services/openai';
+import session, { SessionOptions } from 'express-session';
+import cookieParser from 'cookie-parser';
 // setup local environment variables from .env file
 dotenv.config();
 
-// express app
-const app = express();
+const app = express()
 
-// middleware
-app.use(cors());
 app.use(express.json());
+app.use(cors());
+
+app.use(cookieParser());
+app.use(express.urlencoded({extended: true}))
+
 app.use(session({
-  secret: 'your_session_secret_key', // Change this to a secure random string
+  name: 'nsession',
+  secret: 'session_secret_key',
   resave: false,
   saveUninitialized: false,
   cookie: {
     maxAge: 1000*60*60 // Session expires in 1 hour
   }
-}));
+}))
 
 // for debugging
 app.use((req: Request, res: Response, next: NextFunction) => {
@@ -65,7 +68,6 @@ app.post('/register', async (req, res) => {
   } 
 });
 
-
 app.get('/users', async (req, res) => {
   try {
     const allUsers = await gamemodel.getAllUsers();
@@ -90,8 +92,10 @@ app.post('/login', async (req, res) => {
     } 
 });
 
+app.use('/game', requireLogin, enemyRoutes);
+app.use('/game', requireLogin, playerRoutes);
+
 function requireLogin(req: Request, res: Response, next: NextFunction) {
-  //const sessionData: any = req.session;
   if ((req.session as any).isLoggedIn)  {
     console.log("session logged in info:", (req.session as any).isLoggedIn)
     next(); 
@@ -101,14 +105,8 @@ function requireLogin(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-
-
-app.use('/game', requireLogin, enemyRoutes);
-app.use('/game', requireLogin, playerRoutes);
-
 app.post('/dialogue', async (req: Request, res: Response) => {
   console.log(req.body);
-
   try {
     const output = await get_answer(req.body.prompt);
     console.log(output);
@@ -122,9 +120,21 @@ app.post('/dialogue', async (req: Request, res: Response) => {
 
 })
 
+app.get('/logout', (req: Request, res: Response) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error('Error logging out:', err);
+      res.status(500).json({ error: 'Failed to log out' });
+      return;
+    }
+    res.json({ message: 'User logged out successfully' });
+  });
+});
+
 // Start the server
 const port = process.env.PORT || 3000;
 //Existing routes defined by app.get(), app.post(), etc should still work as expected
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
+
