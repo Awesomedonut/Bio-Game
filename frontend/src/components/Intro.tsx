@@ -16,21 +16,6 @@ const Intro: React.FC = () => {
 
   const [currentSection, setCurrentSection] = useState(0);
 
-  // State to hold the user's question
-  const [userQuestion, setUserQuestion] = useState('');
-
-  // Function to handle the submission of questions
-  const handleSubmitQuestion = async () => {
-    if (!userQuestion.trim()) {
-      alert("Please enter a question.");
-      return;
-    }
-    console.log(`Submitting question: ${userQuestion}`);
-    // Implement the API call to /dialogue endpoint with the question
-    // Reset the question input after submission
-    setUserQuestion('');
-  };
-
   useEffect(() => {
     const handleSpaceBar = (event: KeyboardEvent) => {
       // Allow incrementing currentSection to textSections.length + 1
@@ -59,13 +44,7 @@ const Intro: React.FC = () => {
       ) : (
         <div>
           <h2>Do you still have any questions?</h2>
-          <input
-            type="text"
-            placeholder="Ask your question here..."
-            value={userQuestion}
-            onChange={(e) => setUserQuestion(e.target.value)}
-          />
-          <button onClick={handleSubmitQuestion}>Submit</button>
+          <button onClick={() => navigate('/dialogue')}>Ask questions!</button>
           <button onClick={() => navigate('/flappy')}>Start Game</button>
         </div>
       )}
