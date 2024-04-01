@@ -30,7 +30,7 @@ const Dialogue: React.FC = () => {
     // const backendUri ="http://localhost:4000/dialogue";
     // const back = "https://backend-dot-group-project372.uw.r.appspot.com/dialogue";
     try {
-      const response = await fetch('http://localhost:4000/dialogue', {
+      const response = await fetch('https://backend-dot-group-project372.uw.r.appspot.com/dialogue', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
