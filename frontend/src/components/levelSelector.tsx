@@ -24,9 +24,10 @@ const LevelSelector: React.FC<LevelSelectorProps> = ({ closeLevelSelector }) => 
     const navigate = useNavigate();
 
     const handleLevelSelected = (levelObject: LevelObject) => {
-        // Navigate to the Flappy level if level 1 is selected
         if (levelObject.level === 1) {
-            navigate('/flappy');
+            navigate('/intro');
+        } else if (levelObject.level === 2) {
+            navigate('/game')
         } else {
             // Placeholder for navigating to other levels
 

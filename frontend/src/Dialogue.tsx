@@ -10,7 +10,7 @@ const Dialogue: React.FC = () => {
 
   const navigate = useNavigate();
   const handleStartGame = () => {
-    navigate('/game');
+    navigate('/flappy');
   }
 
   const appendNewBotMessage = (inputText: string) => {
