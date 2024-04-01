@@ -33,7 +33,8 @@ const Intro: React.FC = () => {
 
   useEffect(() => {
     const handleSpaceBar = (event: KeyboardEvent) => {
-      if (event.code === 'Space' && currentSection < textSections.length - 1) {
+      // Allow incrementing currentSection to textSections.length + 1
+      if (event.code === 'Space' && currentSection <= textSections.length) {
         event.preventDefault(); // Prevent the default action to avoid scrolling the page
         setCurrentSection(currentSection + 1);
       }
@@ -49,27 +50,28 @@ const Intro: React.FC = () => {
 
   return (
     <div>
-      {/* <h1>Welcome to the Game</h1>
-      <p>This is the intro of the game where we explain what's going on.</p>
-      <button onClick={() => navigate('/game')}>Start Game</button>
-      <div>
-        <h2>Have a Question?</h2>
-        <input 
-          type="text" 
-          placeholder="Ask your question here..." 
-          value={userQuestion} // Bind the input value to userQuestion state
-          onChange={(e) => setUserQuestion(e.target.value)} // Update state on input change
-        />
-        <button onClick={handleSubmitQuestion}>Submit</button>
-      </div> */}
       <h1>Welcome!</h1>
-      <h2>Press spacebar to continue</h2>
-      <p style={{ whiteSpace: 'pre-wrap' }}>{textSections[currentSection]}</p>
-      {currentSection === textSections.length - 1 && (
-        <button onClick={() => navigate('/flappy')}>Start Game</button>
+      {currentSection <= textSections.length ? (
+        <div>
+          <h2>Press spacebar to continue</h2>
+          <p style={{ whiteSpace: 'pre-wrap' }}>{textSections[currentSection - 1]}</p>
+        </div>
+      ) : (
+        <div>
+          <h2>Do you still have any questions?</h2>
+          <input
+            type="text"
+            placeholder="Ask your question here..."
+            value={userQuestion}
+            onChange={(e) => setUserQuestion(e.target.value)}
+          />
+          <button onClick={handleSubmitQuestion}>Submit</button>
+          <button onClick={() => navigate('/flappy')}>Start Game</button>
+        </div>
       )}
     </div>
   );
+  
 };
 
 export default Intro;
