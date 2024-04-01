@@ -1,15 +1,22 @@
 // Intro.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Intro: React.FC = () => {
   const navigate = useNavigate();
+  // State to hold the user's question
+  const [userQuestion, setUserQuestion] = useState('');
 
   // Function to handle the submission of questions
-  const handleSubmitQuestion = async (question: string) => {
+  const handleSubmitQuestion = async () => {
+    if (!userQuestion.trim()) {
+      alert("Please enter a question.");
+      return;
+    }
+    console.log(`Submitting question: ${userQuestion}`);
     // Implement the API call to /dialogue endpoint with the question
-    console.log(`Submitting question: ${question}`);
-    // For now, just log the question. You'll replace this with your API call.
+    // Reset the question input after submission
+    setUserQuestion('');
   };
 
   return (
@@ -19,8 +26,13 @@ const Intro: React.FC = () => {
       <button onClick={() => navigate('/game')}>Start Game</button>
       <div>
         <h2>Have a Question?</h2>
-        <input type="text" placeholder="Ask your question here..." />
-        <button onClick={() => handleSubmitQuestion('Your question here')}>Submit</button>
+        <input 
+          type="text" 
+          placeholder="Ask your question here..." 
+          value={userQuestion} // Bind the input value to userQuestion state
+          onChange={(e) => setUserQuestion(e.target.value)} // Update state on input change
+        />
+        <button onClick={handleSubmitQuestion}>Submit</button>
       </div>
     </div>
   );
