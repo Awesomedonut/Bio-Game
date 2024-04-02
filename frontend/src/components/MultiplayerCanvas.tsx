@@ -46,7 +46,8 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
 
         socket.on('updatePlayers', (backendPlayers: {[id: string]: Player}) => {
             syncData(backendPlayers);
-            console.log('frontendPlayers: ',frontendPlayers);
+            // console.log('frontendPlayers: ',frontendPlayers);
+            console.log('Updated!');
         })
 
         return () => {
@@ -74,26 +75,26 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
 
         // Client side prediction (immediately move player)
         setInterval(() => {
-            let yourPlayer: Player = frontendPlayers[socket.id as string];
-            if (yourPlayer) {
-                if (keys.w.pressed) {
-                    yourPlayer.velocity.x = Math.cos(yourPlayer.angle) * SPEED;
-                    yourPlayer.velocity.y = Math.sin(yourPlayer.angle) * SPEED;
-                } else {
-                    yourPlayer.velocity.x *= FRICTION;
-                    yourPlayer.velocity.y *= FRICTION;
-                }
+            // let yourPlayer: Player = frontendPlayers[socket.id as string];
+            // if (yourPlayer) {
+            //     if (keys.w.pressed) {
+            //         yourPlayer.velocity.x = Math.cos(yourPlayer.angle) * SPEED;
+            //         yourPlayer.velocity.y = Math.sin(yourPlayer.angle) * SPEED;
+            //     } else {
+            //         yourPlayer.velocity.x *= FRICTION;
+            //         yourPlayer.velocity.y *= FRICTION;
+            //     }
     
-                if (keys.d.pressed) {
-                    yourPlayer.angle += ROTATIONAL_SPEED;  
-                }
+            //     if (keys.d.pressed) {
+            //         yourPlayer.angle += ROTATIONAL_SPEED;  
+            //     }
     
-                if (keys.a.pressed) {
-                    yourPlayer.angle -= ROTATIONAL_SPEED;
-                }
-            }
+            //     if (keys.a.pressed) {
+            //         yourPlayer.angle -= ROTATIONAL_SPEED;
+            //     }
+            // }
         }, 15)
-        // console.log('yourPlayer',frontendPlayers[socket.id as string]);
+
 
         // Listen for Events
         window.addEventListener('keydown', async (event) => {
@@ -105,21 +106,17 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
                 case 'KeyW':
                     keys.w.pressed = true;
                     // console.log('W was pressed!');
-                    // socket.emit('keydown', 'KeyW');
-                    // player.velocity.x = Math.cos(player.angle) * 3;
-                    // player.velocity.y = Math.sin(player.angle) * 3;
+                    socket.emit('keydown', 'KeyW');
                     break;
                 case 'KeyA':
                     keys.a.pressed = true;
                     // console.log('A was pressed!');
-                    // socket.emit('keydown', 'KeyA');
-                    // player.angle += 0.05;   
+                    socket.emit('keydown', 'KeyA');
                     break;
                 case 'KeyD':
                     keys.d.pressed = true;
                     // console.log('D was pressed!');   
-                    // socket.emit('keydown', 'KeyD');
-                    // player.angle -= 0.05;
+                    socket.emit('keydown', 'KeyD');
                     break;
             }
 
@@ -169,6 +166,7 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
                 frontendPlayers[id].position = {x: backEndPlayer.position.x, y: backEndPlayer.position.y};
                 frontendPlayers[id].velocity = {x: backEndPlayer.velocity.x, y: backEndPlayer.velocity.y};
                 frontendPlayers[id].hp = backEndPlayer.hp;
+                frontendPlayers[id].angle = backEndPlayer.angle;
             }
 
             // Indicate which player is the user

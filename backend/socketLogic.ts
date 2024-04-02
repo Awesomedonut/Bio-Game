@@ -60,14 +60,14 @@ export function initializeSocketIO(server: HttpServer):void {
                     player.angle -= ROTATIONAL_SPEED;
                     break;
             }
-            console.log(backendPlayers);
+            // console.log(backendPlayers);
         })
     })
     
     // backend tic rate to give us 66fps
-    // setInterval(() => {
-    //     io.emit('updatePlayers', backendPlayers);
-    // }, 15);
+    setInterval(() => {
+        io.emit('updatePlayers', backendPlayers);
+    }, 15);
 
     // helper function to create a player and add it to the players array
     function createPlayer(id: string) {
