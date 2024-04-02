@@ -5,7 +5,7 @@ import LandingPage from './LandingPage';
 import HomePage from './components/HomePage';
 import Canvas from './components/Canvas';
 import Flappy from './components/Flappy';
-import Dialogue from './Dialogue';
+import Dialogue from './components/Dialogue';
 import Signup from './Signup';
 import MultiplayerCanvas from './components/MultiplayerCanvas';
 import Pac from './components/Pac';

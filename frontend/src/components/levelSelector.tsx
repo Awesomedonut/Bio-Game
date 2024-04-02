@@ -3,36 +3,36 @@ import { useNavigate } from 'react-router-dom';
 import '../styles/levelSelector.css';
 
 type LevelSelectorProps = {
-    closeLevelSelector: () => void,
+    closeLevelSelector: () => void;
 };
 
 type LevelObject = {
-    level: number,
-    unlocked: boolean,
+    level: number;
+    unlocked: boolean;
 };
 
 const LevelSelector: React.FC<LevelSelectorProps> = ({ closeLevelSelector }) => {
-    const maxLevel: number = 3; // adjust based on player's progress
+    const maxLevel = 3; // adjust based on player's progress
 
-    const levels: Array<LevelObject> = [];
-    const MAX_LEVELS: number = 4; // Total number of levels
-    for (let i: number = 1; i <= MAX_LEVELS; i++) {
-        let unlocked: boolean = i <= maxLevel;
-        levels.push({ level: i, unlocked: unlocked });
-    }
+    const levels: LevelObject[] = Array.from({ length: 4 }, (_, index) => ({
+        level: index + 1,
+        unlocked: index + 1 <= maxLevel,
+    }));
 
     const navigate = useNavigate();
 
-    const handleLevelSelected = (levelObject: LevelObject) => {
-        if (levelObject.level === 1) {
-            navigate('/intro');
-        } else if (levelObject.level === 2) {
-            navigate('/game')
-        } else {
-            // Placeholder for navigating to other levels
-
-            console.log(`Navigate to level ${levelObject.level}`);
-            navigate('/dialogue'); 
+    const handleLevelSelected = (level: number) => {
+        switch (level) {
+            case 1:
+                navigate('/intro');
+                break;
+            case 2:
+                navigate('/game');
+                break;
+            default:
+                console.log(`Navigate to level ${level}`);
+                navigate('/dialogue');
+                break;
         }
     };
 
@@ -41,16 +41,18 @@ const LevelSelector: React.FC<LevelSelectorProps> = ({ closeLevelSelector }) => 
             <div className="levelsPopupContainer">
                 <div className="levelsHeader">
                     <div className="levelsHeading">Select Level</div>
-                    <div className="closeButton" onClick={closeLevelSelector}>Close</div>
+                    <div className="closeButton" onClick={closeLevelSelector}>
+                        Close
+                    </div>
                 </div>
                 <div className="levelsContainer">
-                    {levels.map((levelObject, index) => (
+                    {levels.map((levelObject) => (
                         <div
-                            key={index}
-                            className={`levelButton ${levelObject.unlocked ? "unlocked" : "locked"}`}
-                            onClick={() => levelObject.unlocked ? handleLevelSelected(levelObject) : undefined}
+                            key={levelObject.level}
+                            className={`levelButton ${levelObject.unlocked ? 'unlocked' : 'locked'}`}
+                            onClick={() => levelObject.unlocked && handleLevelSelected(levelObject.level)}
                         >
-                            {levelObject.level === Infinity ? "Infinite" : levelObject.level}
+                            {levelObject.level === Infinity ? 'Infinite' : levelObject.level}
                         </div>
                     ))}
                 </div>
