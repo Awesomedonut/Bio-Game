@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
+import InstructionsPopup from './InstructionsPopup'; 
 
 interface CanvasProps {
   width: number;
@@ -8,6 +9,8 @@ interface CanvasProps {
 const Flappy: React.FC<CanvasProps> = ({ width, height }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [isGameOver, setIsGameOver] = useState(false);
+    const [showInstructions, setShowInstructions] = useState(true); // State to manage instructions popup visibility
+
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -120,7 +123,16 @@ const Flappy: React.FC<CanvasProps> = ({ width, height }) => {
         };
     }, [height, width, isGameOver]);
 
-    return <canvas ref={canvasRef} width={width.toString()} height={height.toString()} />;
+    const closeInstructions = () => {
+        setShowInstructions(false); // Function to hide the instructions popup
+    };
+
+    return (
+        <>
+            {showInstructions && <InstructionsPopup onClose={closeInstructions} />}
+            <canvas ref={canvasRef} width={width.toString()} height={height.toString()} />
+        </>
+    );
 };
 
 export default Flappy;

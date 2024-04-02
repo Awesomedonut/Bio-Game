@@ -26,7 +26,7 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path='/multiplayer' element={<MultiplayerCanvas width={width} height={height}/>}/>
         <Route path="/flappy" element={<Flappy width={width} height={height} />} />
-        <Route path="/pac" element={<Pac />} />
+        {/* <Route path="/pac" element={<Pac />} /> */}
         <Route path="/intro" element={<Intro />} />
       </Routes>
     </Router>
