@@ -1,6 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
 import InstructionsPopup from './InstructionsPopup'; 
 
+// game logic referenced from https://gist.github.com/Pro496951/a7537d2f313fbc6ebad1f74b83f84244
+
 interface CanvasProps {
   width: number;
   height: number;
