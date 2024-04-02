@@ -74,25 +74,26 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
 
         // Client side prediction (immediately move player)
         setInterval(() => {
-            // let index = frontendPlayers.findIndex(player => player.id === socket.id);
-            // if (index != -1) {
-            //     let yourPlayer = frontendPlayers[index];
-            //     if (keys.w.pressed) {
-            //         yourPlayer.velocity.x = Math.cos(yourPlayer.angle) * SPEED;
-            //         yourPlayer.velocity.y = Math.sin(yourPlayer.angle) * SPEED;
-            //     } else {
-            //         yourPlayer.velocity.x *= FRICTION;
-            //         yourPlayer.velocity.y *= FRICTION;
-            //     }
+            let yourPlayer: Player = frontendPlayers[socket.id as string];
+            if (yourPlayer) {
+                if (keys.w.pressed) {
+                    yourPlayer.velocity.x = Math.cos(yourPlayer.angle) * SPEED;
+                    yourPlayer.velocity.y = Math.sin(yourPlayer.angle) * SPEED;
+                } else {
+                    yourPlayer.velocity.x *= FRICTION;
+                    yourPlayer.velocity.y *= FRICTION;
+                }
     
-            //     if (keys.d.pressed) {
-            //         yourPlayer.angle += ROTATIONAL_SPEED;  
-            //     }
-            //     if (keys.a.pressed) {
-            //         yourPlayer.angle -= ROTATIONAL_SPEED;
-            //     }
-            // }
+                if (keys.d.pressed) {
+                    yourPlayer.angle += ROTATIONAL_SPEED;  
+                }
+    
+                if (keys.a.pressed) {
+                    yourPlayer.angle -= ROTATIONAL_SPEED;
+                }
+            }
         }, 15)
+        // console.log('yourPlayer',frontendPlayers[socket.id as string]);
 
         // Listen for Events
         window.addEventListener('keydown', async (event) => {
@@ -103,21 +104,21 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
             switch (event.code) {
                 case 'KeyW':
                     keys.w.pressed = true;
-                    console.log('W was pressed!');
-                    socket.emit('keydown', 'KeyW');
+                    // console.log('W was pressed!');
+                    // socket.emit('keydown', 'KeyW');
                     // player.velocity.x = Math.cos(player.angle) * 3;
                     // player.velocity.y = Math.sin(player.angle) * 3;
                     break;
                 case 'KeyA':
                     keys.a.pressed = true;
                     // console.log('A was pressed!');
-                    socket.emit('keydown', 'KeyA');
+                    // socket.emit('keydown', 'KeyA');
                     // player.angle += 0.05;   
                     break;
                 case 'KeyD':
                     keys.d.pressed = true;
                     // console.log('D was pressed!');   
-                    socket.emit('keydown', 'KeyD');
+                    // socket.emit('keydown', 'KeyD');
                     // player.angle -= 0.05;
                     break;
             }
