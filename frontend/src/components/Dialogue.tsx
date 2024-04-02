@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './styles/dialogue.css';
-import callApi from './api/Dialogue';
-import { Message } from "./models/Message";
+import '../styles/dialogue.css';
+import callApi from '../api/Dialogue';
+import { Message } from "../models/Message";
 
 const Dialogue: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
