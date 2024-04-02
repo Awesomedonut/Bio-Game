@@ -5,13 +5,14 @@ import { Player } from '../classes/Player';
 import { Position } from '../interfaces/Position';
 import { Velocity } from '../interfaces/Velocity';
 import { playerHit } from '../utils/collision';
+import { posix } from 'path';
 
 // establish WebSocket connection to server
 const socket = io('http://localhost:4000');
 
 const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const frontendPlayers:Player[] = [];
+    const frontendPlayers: {[id: string]: Player} = {};
 
     const SPEED = 3
     const ROTATIONAL_SPEED = 0.05
@@ -43,9 +44,9 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
             console.log('Connected to server');
         })
 
-        socket.on('updatePlayers', (backendPlayers) => {
+        socket.on('updatePlayers', (backendPlayers: {[id: string]: Player}) => {
             syncData(backendPlayers);
-            // console.log('frontendPlayers: ',frontendPlayers);
+            console.log('frontendPlayers: ',frontendPlayers);
         })
 
         return () => {
@@ -63,82 +64,60 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
             ctx.fillRect(0, 0, width, height);
 
             // Draw the players
-            frontendPlayers.forEach(player => {
-                player.update(ctx);
-            });
-
-
-            // movement
-            // let index = frontendPlayers.findIndex(player => player.id === socket.id);
-            // if (index != -1) {
-            //     let player = frontendPlayers[index];
-            //     if (keys.w.pressed) {
-            //         player.velocity.x = Math.cos(player.angle) * SPEED;
-            //         player.velocity.y = Math.sin(player.angle) * SPEED;
-            //     } else {
-            //         player.velocity.x *= FRICTION;
-            //         player.velocity.y *= FRICTION;
-            //     }
-    
-            //     if (keys.d.pressed) {
-            //         player.angle += ROTATIONAL_SPEED;  
-            //     }
-            //     if (keys.a.pressed) {
-            //         player.angle -= ROTATIONAL_SPEED;
-            //     }
-            // }
+            for (const id in frontendPlayers) {
+                frontendPlayers[id].update(ctx);
+            }
             
             // Create an animation loop by requesting next frame
             animationFrameID = window.requestAnimationFrame(animate);
         }
 
-        // movement
+        // Client side prediction (immediately move player)
         setInterval(() => {
-            let index = frontendPlayers.findIndex(player => player.id === socket.id);
-            if (index != -1) {
-                let yourPlayer = frontendPlayers[index];
-                if (keys.w.pressed) {
-                    yourPlayer.velocity.x = Math.cos(yourPlayer.angle) * SPEED;
-                    yourPlayer.velocity.y = Math.sin(yourPlayer.angle) * SPEED;
-                } else {
-                    yourPlayer.velocity.x *= FRICTION;
-                    yourPlayer.velocity.y *= FRICTION;
-                }
+            // let index = frontendPlayers.findIndex(player => player.id === socket.id);
+            // if (index != -1) {
+            //     let yourPlayer = frontendPlayers[index];
+            //     if (keys.w.pressed) {
+            //         yourPlayer.velocity.x = Math.cos(yourPlayer.angle) * SPEED;
+            //         yourPlayer.velocity.y = Math.sin(yourPlayer.angle) * SPEED;
+            //     } else {
+            //         yourPlayer.velocity.x *= FRICTION;
+            //         yourPlayer.velocity.y *= FRICTION;
+            //     }
     
-                if (keys.d.pressed) {
-                    yourPlayer.angle += ROTATIONAL_SPEED;  
-                }
-                if (keys.a.pressed) {
-                    yourPlayer.angle -= ROTATIONAL_SPEED;
-                }
-            }
+            //     if (keys.d.pressed) {
+            //         yourPlayer.angle += ROTATIONAL_SPEED;  
+            //     }
+            //     if (keys.a.pressed) {
+            //         yourPlayer.angle -= ROTATIONAL_SPEED;
+            //     }
+            // }
         }, 15)
 
         // Listen for Events
         window.addEventListener('keydown', async (event) => {
             // check if player exists
-            // let index = frontendPlayers.findIndex(player => player.id === socket.id);
-            // if (index == -1) return;
+        if (!frontendPlayers.hasOwnProperty(socket.id as string)) return;
 
             // let player = frontendPlayers[index];
             switch (event.code) {
                 case 'KeyW':
-                    // console.log('W was pressed!');
-                    // socket.emit('keydown', 'KeyW');
                     keys.w.pressed = true;
+                    console.log('W was pressed!');
+                    socket.emit('keydown', 'KeyW');
                     // player.velocity.x = Math.cos(player.angle) * 3;
                     // player.velocity.y = Math.sin(player.angle) * 3;
                     break;
                 case 'KeyA':
                     keys.a.pressed = true;
                     // console.log('A was pressed!');
-                    // socket.emit('keydown', 'KeyA');
+                    socket.emit('keydown', 'KeyA');
                     // player.angle += 0.05;   
                     break;
                 case 'KeyD':
                     keys.d.pressed = true;
                     // console.log('D was pressed!');   
-                    // socket.emit('keydown', 'KeyD');
+                    socket.emit('keydown', 'KeyD');
                     // player.angle -= 0.05;
                     break;
             }
@@ -165,24 +144,37 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
     }
 
     // Update frontend data with backend data
-    function syncData(backendPlayers: any[]) {
-        frontendPlayers.splice(0, frontendPlayers.length);  // empty array
-        for (let i=0; i<backendPlayers.length; i++) {
-            let player = new Player({
-                position: {x: backendPlayers[i].position.x, y: backendPlayers[i].position.y},
-                velocity: {x: backendPlayers[i].velocity.x, y: backendPlayers[i].velocity.y},
-                hp: backendPlayers[i].hp
-            });
+    function syncData(backendPlayers: {[id: string]: Player}) {
+        // iterate over frontendPlayers and remove players not in the backend
+        for (const id in frontendPlayers ) {
+            if (!(id in backendPlayers)) {
+                delete frontendPlayers[id];
+            }
+        }
 
-            player.id = backendPlayers[i].id
-            if (backendPlayers[i].id == socket.id) {
-                player.color = 'lime';
+        // iterate over backendPlayers and update/add players in frontend
+        for ( const id in backendPlayers ) {
+            let backEndPlayer = backendPlayers[id];
+
+            // Add player if not in frontend or update it
+            if (!frontendPlayers[id]) {
+                frontendPlayers[id] = new Player({
+                    position: {x: backEndPlayer.position.x, y: backEndPlayer.position.y},
+                    velocity: {x: backEndPlayer.velocity.x, y: backEndPlayer.velocity.y},
+                    hp: backEndPlayer.hp
+                });
+                frontendPlayers[id].id = backEndPlayer.id;
+            } else {
+                frontendPlayers[id].position = {x: backEndPlayer.position.x, y: backEndPlayer.position.y};
+                frontendPlayers[id].velocity = {x: backEndPlayer.velocity.x, y: backEndPlayer.velocity.y};
+                frontendPlayers[id].hp = backEndPlayer.hp;
             }
 
-
-            frontendPlayers.push(player);
+            // Indicate which player is the user
+            if (frontendPlayers[id].id === socket.id) {
+                frontendPlayers[id].color = 'lime';
+            }
         }
-        // console.log('frontendPlayers',frontendPlayers);
     }
 
     return ( 

@@ -14,7 +14,7 @@ import { useNavigate } from 'react-router-dom';
 
 import Shop from '../components/Shop';
 
-const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com/";
+const backendUri = "http://localhost:4000";
 
 // Initialize Canvase
 const Canvas: React.FC<CanvasProps> = ({width, height}) => {
@@ -92,8 +92,8 @@ const Canvas: React.FC<CanvasProps> = ({width, height}) => {
             PLAYER_HP.current = playerData.hp;
             PLAYER_CURRENCY.current = playerData.currency;
 
-            console.log(playerData);
-            console.log(enemiesData);
+            console.log('playerData', playerData);
+            console.log('enemiesData', enemiesData);
             start(ctx, width, height);
             setGameStarted(true);
         }

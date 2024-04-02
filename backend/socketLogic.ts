@@ -10,7 +10,7 @@ export function initializeSocketIO(server: HttpServer):void {
     const FRICTION = 0.97
     const PROJECTILE_SPEED = 3
 
-    const backendPlayers: Player[] = [];
+    const backendPlayers: {[id: string]: Player} = {};
 
     const io = new Server(server, {
         cors: {
@@ -40,22 +40,23 @@ export function initializeSocketIO(server: HttpServer):void {
 
         // Respond to player movement
         socket.on('keydown', (keycode)  => {
-            let index = backendPlayers.findIndex(player => player.id === socket.id);
-            let player = backendPlayers[index];
+            let player = backendPlayers[socket.id]
+            if (!backendPlayers[socket.id]) return
+
             switch (keycode) {
                 case 'KeyW':
-                    console.log(`Player ${socket.id} pressed W`)
+                    // console.log(`Player ${socket.id} pressed W`)
                     player.velocity.x = Math.cos(player.angle) * SPEED;
                     player.velocity.y = Math.sin(player.angle) * SPEED;
-                    // player.position.x += player.velocity.x;
-                    // player.position.x += player.velocity.y;
+                    player.position.x += player.velocity.x;
+                    player.position.x += player.velocity.y;
                     break;
                 case 'KeyA':
-                    console.log(`Player ${socket.id} pressed A`)
+                    // console.log(`Player ${socket.id} pressed A`)
                     player.angle += ROTATIONAL_SPEED;
                     break;
                 case 'KeyD':
-                    console.log(`Player ${socket.id} pressed D`)
+                //     console.log(`Player ${socket.id} pressed D`)
                     player.angle -= ROTATIONAL_SPEED;
                     break;
             }
@@ -79,14 +80,11 @@ export function initializeSocketIO(server: HttpServer):void {
             velocity: {x: 0, y: 0},
             hp: 1
         })
-        backendPlayers.push(player);
+        backendPlayers[id] = player;
     }
 
     // helper function to delete a player from the players array
     function deletePlayer(id: string) {
-        let index = backendPlayers.findIndex(player => player.id === id);
-        if (index !== -1) {
-            backendPlayers.splice(index, 1);
-        }
+        delete backendPlayers[id];
     }
 }
