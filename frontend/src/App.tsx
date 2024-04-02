@@ -10,6 +10,7 @@ import Signup from './Signup';
 import MultiplayerCanvas from './components/MultiplayerCanvas';
 import Pac from './components/Pac';
 import Intro from './components/Intro';
+import HarderCanvas from './components/HarderCanvas';
 
 function App() {
 
@@ -28,6 +29,7 @@ function App() {
         <Route path="/flappy" element={<Flappy width={width} height={height} />} />
         <Route path="/pac" element={<Pac />} />
         <Route path="/intro" element={<Intro />} />
+        <Route path="/game2" element={<HarderCanvas width={width} height={height}/>} />
       </Routes>
     </Router>
   );
