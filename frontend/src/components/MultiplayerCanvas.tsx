@@ -14,7 +14,7 @@ const socket = io('http://localhost:4000');
 const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const frontendPlayers: {[id: string]: Player2} = {};
-    const playerInputs: {sequenceNumber: number, dx: number, dy: number}[] = [];
+    const playerInputs: {sequenceNumber: number, velocity: Velocity}[] = [];
     let sequenceNumber = 0;
 
     const SPEED = 5
@@ -84,19 +84,16 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
             let yourPlayer: Player2 = frontendPlayers[socket.id as string];
             if (yourPlayer) {
                 if (keys.w.pressed) {
+                    sequenceNumber++;
+                    playerInputs.push({
+                        sequenceNumber,
+                        velocity: {
+                            x: 0,
+                            y: -SPEED
+                        }
+                    });
                     yourPlayer.position.y -= SPEED;
-                }
-
-                if (keys.a.pressed) {
-                    yourPlayer.position.x -= SPEED;
-                }
-
-                if (keys.s.pressed) {
-                    yourPlayer.position.y += SPEED;
-                }
-
-                if (keys.d.pressed) {
-                    yourPlayer.position.x += SPEED;
+                    socket.emit('keydown', { keycode: 'KeyW', sequenceNumber});
                 }
                 // if (keys.w.pressed) {
                 //     sequenceNumber++;
@@ -113,6 +110,17 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
                 //     // yourPlayer.velocity.y *= FRICTION;
                 // }
 
+                if (keys.a.pressed) {
+                    playerInputs.push({
+                        sequenceNumber,
+                        velocity: {
+                            x: -SPEED,
+                            y: 0
+                        }
+                    });
+                    yourPlayer.position.x -= SPEED;
+                    socket.emit('keydown', { keycode: 'KeyA', sequenceNumber});
+                }
                 // if (keys.a.pressed) {
                 //     sequenceNumber++;
                 //     playerInputs.push({
@@ -124,6 +132,29 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
                 //     socket.emit('keydown', { keycode: 'KeyA', sequenceNumber });  
                 // }
 
+                if (keys.s.pressed) {
+                    playerInputs.push({
+                        sequenceNumber,
+                        velocity: {
+                            x: 0,
+                            y: SPEED
+                        }
+                    });
+                    yourPlayer.position.y += SPEED;
+                    socket.emit('keydown', { keycode: 'KeyS', sequenceNumber});
+                }
+
+                if (keys.d.pressed) {
+                    playerInputs.push({
+                        sequenceNumber,
+                        velocity: {
+                            x: SPEED,
+                            y: 0
+                        }
+                    });
+                    yourPlayer.position.x += SPEED;
+                    socket.emit('keydown', { keycode: 'KeyD', sequenceNumber});
+                }
                 // if (keys.d.pressed) {
                 //     sequenceNumber++;
                 //     playerInputs.push({
@@ -148,21 +179,21 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
                 case 'KeyW':
                     keys.w.pressed = true;
                     // console.log('W was pressed!');
-                    socket.emit('keydown', 'KeyW');
+                    // socket.emit('keydown', 'KeyW');
                     break;
                 case 'KeyA':
                     keys.a.pressed = true;
                     // console.log('A was pressed!');
-                    socket.emit('keydown', 'KeyA');
+                    // socket.emit('keydown', 'KeyA');
                     break;
                 case 'KeyS':
                     keys.s.pressed = true;
-                    socket.emit('keydown', 'KeyS');
+                    // socket.emit('keydown', 'KeyS');
                     break;
                 case 'KeyD':
                     keys.d.pressed = true;
                     // console.log('D was pressed!');   
-                    socket.emit('keydown', 'KeyD');
+                    // socket.emit('keydown', 'KeyD');
                     break;
             }
 
@@ -214,7 +245,6 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
                 // Update a player based on backend data
                 frontendPlayer.position = { ...backendPlayer.position};
 
-
                 // Update player based on backend data
                 // frontendPlayer.position = { ...backendPlayer.position };
                 // frontendPlayer.velocity = { ...backendPlayer.velocity };
@@ -222,6 +252,21 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
                 // frontendPlayer.angle = backendPlayer.angle;
     
                 // Perform server reconciliation for the client's player
+                if (id === socket.id) {
+                    const lastBackendInputIndex = playerInputs.findIndex(input => {
+                        return backendPlayer.sequenceNumber === input.sequenceNumber;
+                    })
+
+                    if (lastBackendInputIndex > -1) {
+                        playerInputs.splice(0, lastBackendInputIndex + 1);
+                    }
+
+                    playerInputs.forEach((input) => {
+                        frontendPlayer.position.x += input.velocity.x;
+                        frontendPlayer.position.y += input.velocity.y;
+                    })
+                }
+
                 // if (id === socket.id) {
                 //     const lastBackendInputIndex = playerInputs.findIndex(input => {
                 //         return backendPlayer.sequenceNumber === input.sequenceNumber;

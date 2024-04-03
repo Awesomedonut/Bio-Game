@@ -40,7 +40,11 @@ export function initializeSocketIO(server: HttpServer):void {
         })
 
         // Respond to player movement
-        socket.on('keydown', (keycode) => {
+        socket.on('keydown', ({keycode, sequenceNumber}) => {
+            let player = backendPlayers[socket.id];
+            if (!player) return;
+            
+            player.sequenceNumber = sequenceNumber;
             switch(keycode) {
                 case 'KeyW':
                     backendPlayers[socket.id].position.y -= SPEED;
@@ -56,28 +60,28 @@ export function initializeSocketIO(server: HttpServer):void {
             }
         })
         // socket.on('keydown', ( keycode, sequenceNumber )  => {
-        //     // let player = backendPlayers[socket.id];
-        //     // if (!player) return;
+            // let player = backendPlayers[socket.id];
+            // if (!player) return;
             
-        //     // player.sequenceNumber = sequenceNumber;
-        //     // switch (keycode) {
-        //     //     case 'KeyW':
-        //     //         // console.log(`Player ${socket.id} pressed W`)
-        //     //         player.velocity.x = Math.cos(player.angle) * SPEED;
-        //     //         player.velocity.y = Math.sin(player.angle) * SPEED;
-        //     //         player.position.x += player.velocity.x;
-        //     //         player.position.y += player.velocity.y;
-        //     //         break;
-        //     //     case 'KeyA':
-        //     //         // console.log(`Player ${socket.id} pressed A`)
-        //     //         player.angle += ROTATIONAL_SPEED;
-        //     //         break;
-        //     //     case 'KeyD':
-        //     //     //     console.log(`Player ${socket.id} pressed D`)
-        //     //         player.angle -= ROTATIONAL_SPEED;
-        //     //         break;
-        //     // }
-        //     // // console.log(backendPlayers);
+            // player.sequenceNumber = sequenceNumber;
+            // switch (keycode) {
+            //     case 'KeyW':
+            //         // console.log(`Player ${socket.id} pressed W`)
+            //         player.velocity.x = Math.cos(player.angle) * SPEED;
+            //         player.velocity.y = Math.sin(player.angle) * SPEED;
+            //         player.position.x += player.velocity.x;
+            //         player.position.y += player.velocity.y;
+            //         break;
+            //     case 'KeyA':
+            //         // console.log(`Player ${socket.id} pressed A`)
+            //         player.angle += ROTATIONAL_SPEED;
+            //         break;
+            //     case 'KeyD':
+            //     //     console.log(`Player ${socket.id} pressed D`)
+            //         player.angle -= ROTATIONAL_SPEED;
+            //         break;
+            // }
+            // // console.log(backendPlayers);
         // })
     })
     
