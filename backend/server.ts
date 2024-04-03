@@ -5,6 +5,7 @@ import enemyRoutes from './routes/enemy'
 import playerRoutes from './routes/player'
 import { gamemodel } from './models/gamedb';
 import get_answer from './services/openai';
+import jwt from 'jsonwebtoken';
 
 // setup local environment variables from .env file
 dotenv.config();
@@ -61,14 +62,19 @@ app.get('/users', async (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
-  try{
-      const { username, password } = req.body;
-      await gamemodel.getUser(username, password);
-      res.json({ message: 'User logged in successfully' }); 
-    }catch (error) {
-      console.error('Error fetching data:', error);
-      res.status(500).json({ error: 'Failed to fetch data' });
-    } 
+  try {
+    const { username, password } = req.body;
+    const user = await gamemodel.getUser(username, password);
+    if (user) {
+      const token = jwt.sign(user, 'secret_key', { expiresIn: '1h' });
+      res.json({ success: true, token });
+    } else {
+      res.status(401).json({ error: 'Incorrect username or password' });
+    }
+  } catch (error) {
+    console.error('Error during login:', error);
+    res.status(500).json({ error: 'Failed to login' });
+  }
 });
 
 app.use('/game', enemyRoutes);
