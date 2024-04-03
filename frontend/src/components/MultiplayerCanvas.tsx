@@ -3,10 +3,10 @@ import io from 'socket.io-client';
 import { CanvasProps } from "../interfaces/CanvasProps";
 
 // establish WebSocket connection to server
-const socket = io('http://localhost:4000');
+//const socket = io('http://localhost:4000');
 
 const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
-    const canvasRef = useRef<HTMLCanvasElement>(null);
+   /* const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -44,10 +44,11 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
         }
 
         animate();
-    }
+    }*/
 
     return ( 
-        <canvas ref={canvasRef} width={width} height={height}/>
+    //    <canvas ref={canvasRef} width={width} height={height}/>
+    <h1>123</h1>
     );
 }
  

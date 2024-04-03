@@ -1,0 +1,19 @@
+/* Intro.css */
+
+/* Add your CSS rules here to match the styling of other pages */
+body {
+    background-color: #f2f2f2;
+    font-family: Arial, sans-serif;
+}
+
+h1 {
+    color: #333;
+    font-size: 24px;
+}
+
+p {
+    color: #666;
+    font-size: 16px;
+}
+
+/* Add more CSS rules as needed */

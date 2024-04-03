@@ -143,7 +143,10 @@ app.post('/dialogue', async (req: Request, res: Response) => {
 // Start the server
 const port = process.env.PORT || 3000;
 //Existing routes defined by app.get(), app.post(), etc should still work as expected
+// server.listen(port, () => {
+//   console.log(`Server is running on http://localhost:${port}`);
+// });
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log("Server is running on http://localhost:${port}");
 });
 

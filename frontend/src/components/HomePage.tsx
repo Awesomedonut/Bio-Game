@@ -11,7 +11,7 @@ const HomePage: React.FC = () => {
   
     return (
       <div className='homepage'>
-        <h1 className="biogameHeader">Bio-Game</h1>
+        <h1 className="biogameHeader">Anatomy Adventure</h1>
         <button className="button" onClick={() => setShowLevelSelector(true)}>Play!</button>
         {showLevelSelector && <LevelSelector closeLevelSelector={closeLevelSelector}></LevelSelector>}
       </div>

@@ -1,4 +1,4 @@
-import { Server, Socket } from 'socket.io';
+//import { Server, Socket } from 'socket.io';
 import { Server as HttpServer } from 'http';
 import { Player } from './classes/Player';
 import { Position } from './interfaces/Position';
@@ -7,7 +7,7 @@ import { Velocity } from './interfaces/Velocity';
 export function initializeSocketIO(server: HttpServer):void {
     const players: Player[] = [];
 
-    const io = new Server(server, {
+   /* const io = new Server(server, {
         cors: {
             origin: 'http://localhost:3000',
             methods: ["GET", "POST", "DELETE", "UPDATE"]
@@ -51,5 +51,5 @@ export function initializeSocketIO(server: HttpServer):void {
         if (index !== -1) {
             players.splice(index, 1);
         }
-    }
+    }*/
 }
