@@ -7,6 +7,11 @@ import { Position } from '../interfaces/Position';
 import { Velocity } from '../interfaces/Velocity';
 import { playerHit } from '../utils/collision';
 import { posix } from 'path';
+import gsap from 'gsap';
+
+
+// Register AttrPlugin to allow GSAP to animate custom properties
+// gsap.registerPlugin(AttrPlugin);
 
 // establish WebSocket connection to server
 const socket = io('http://localhost:4000');
@@ -264,6 +269,15 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
                     playerInputs.forEach((input) => {
                         frontendPlayer.position.x += input.velocity.x;
                         frontendPlayer.position.y += input.velocity.y;
+                    })
+                } else {
+                    // Apply Player Interpolation for other players
+                    let backendTicRate = 0.015;
+                    gsap.to(frontendPlayer, {
+                        x: backendPlayer.position.x,
+                        y: backendPlayer.position.y,
+                        duration: backendTicRate,
+                        ease: 'linear'
                     })
                 }
 

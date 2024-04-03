@@ -88,7 +88,7 @@ export function initializeSocketIO(server: HttpServer):void {
     // backend tic rate to give us 66fps
     setInterval(() => {
         io.emit('updatePlayers', backendPlayers);
-    }, 15);
+    }, 1500);
 
     // helper function to create a player and add it to the players array
     function createPlayer(socketID: string) {
