@@ -80,62 +80,62 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
         }
 
         // Client side prediction (immediately move player)
-        // setInterval(() => {
-        //     let yourPlayer: Player2 = frontendPlayers[socket.id as string];
-        //     if (yourPlayer) {
-        //         if (keys.w.pressed) {
-        //             yourPlayer.position.y -= SPEED;
-        //         }
+        setInterval(() => {
+            let yourPlayer: Player2 = frontendPlayers[socket.id as string];
+            if (yourPlayer) {
+                if (keys.w.pressed) {
+                    yourPlayer.position.y -= SPEED;
+                }
 
-        //         if (keys.a.pressed) {
-        //             yourPlayer.position.x -= SPEED;
-        //         }
+                if (keys.a.pressed) {
+                    yourPlayer.position.x -= SPEED;
+                }
 
-        //         if (keys.s.pressed) {
-        //             yourPlayer.position.y += SPEED;
-        //         }
+                if (keys.s.pressed) {
+                    yourPlayer.position.y += SPEED;
+                }
 
-        //         if (keys.d.pressed) {
-        //             yourPlayer.position.x += SPEED;
-        //         }
-        //         // if (keys.w.pressed) {
-        //         //     sequenceNumber++;
-        //         //     playerInputs.push({
-        //         //         sequenceNumber, 
-        //         //         dx: Math.cos(yourPlayer.angle) * SPEED,
-        //         //         dy: Math.sin(yourPlayer.angle) * SPEED
-        //         //     });
-        //         //     yourPlayer.velocity.x = Math.cos(yourPlayer.angle) * SPEED;
-        //         //     yourPlayer.velocity.y = Math.sin(yourPlayer.angle) * SPEED;
-        //         //     socket.emit('keydown', { keycode: 'KeyW', sequenceNumber });
-        //         // } else {
-        //         //     // yourPlayer.velocity.x *= FRICTION;
-        //         //     // yourPlayer.velocity.y *= FRICTION;
-        //         // }
+                if (keys.d.pressed) {
+                    yourPlayer.position.x += SPEED;
+                }
+                // if (keys.w.pressed) {
+                //     sequenceNumber++;
+                //     playerInputs.push({
+                //         sequenceNumber, 
+                //         dx: Math.cos(yourPlayer.angle) * SPEED,
+                //         dy: Math.sin(yourPlayer.angle) * SPEED
+                //     });
+                //     yourPlayer.velocity.x = Math.cos(yourPlayer.angle) * SPEED;
+                //     yourPlayer.velocity.y = Math.sin(yourPlayer.angle) * SPEED;
+                //     socket.emit('keydown', { keycode: 'KeyW', sequenceNumber });
+                // } else {
+                //     // yourPlayer.velocity.x *= FRICTION;
+                //     // yourPlayer.velocity.y *= FRICTION;
+                // }
 
-        //         // if (keys.a.pressed) {
-        //         //     sequenceNumber++;
-        //         //     playerInputs.push({
-        //         //         sequenceNumber, 
-        //         //         dx: 0,
-        //         //         dy: 0,
-        //         //     });
-        //         //     yourPlayer.angle -= ROTATIONAL_SPEED;
-        //         //     socket.emit('keydown', { keycode: 'KeyA', sequenceNumber });  
-        //         // }
+                // if (keys.a.pressed) {
+                //     sequenceNumber++;
+                //     playerInputs.push({
+                //         sequenceNumber, 
+                //         dx: 0,
+                //         dy: 0,
+                //     });
+                //     yourPlayer.angle -= ROTATIONAL_SPEED;
+                //     socket.emit('keydown', { keycode: 'KeyA', sequenceNumber });  
+                // }
 
-        //         // if (keys.d.pressed) {
-        //         //     sequenceNumber++;
-        //         //     playerInputs.push({
-        //         //         sequenceNumber, 
-        //         //         dx: 0,
-        //         //         dy: 0,
-        //         //     });
-        //         //     yourPlayer.angle += ROTATIONAL_SPEED;
-        //         //     socket.emit('keydown', { keycode: 'KeyD', sequenceNumber });
-        //         // }
-        //     }
-        // }, 15)
+                // if (keys.d.pressed) {
+                //     sequenceNumber++;
+                //     playerInputs.push({
+                //         sequenceNumber, 
+                //         dx: 0,
+                //         dy: 0,
+                //     });
+                //     yourPlayer.angle += ROTATIONAL_SPEED;
+                //     socket.emit('keydown', { keycode: 'KeyD', sequenceNumber });
+                // }
+            }
+        }, 15)
 
 
         // Listen for Events
