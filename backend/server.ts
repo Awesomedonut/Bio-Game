@@ -1,4 +1,7 @@
 import dotenv from 'dotenv';
+
+dotenv.config();
+
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import enemyRoutes from './routes/enemy'
@@ -8,8 +11,6 @@ import get_answer from './services/openai';
 import jwt from 'jsonwebtoken';
 
 // setup local environment variables from .env file
-dotenv.config();
-
 const app = express()
 
 app.use(express.json());
@@ -114,6 +115,6 @@ const port = process.env.PORT || 3000;
 //   console.log(`Server is running on http://localhost:${port}`);
 // });
 app.listen(port, () => {
-  console.log("Server is running on http://localhost:${port}");
+  console.log(`Server is running on http://localhost:${port}`);
 });
 
