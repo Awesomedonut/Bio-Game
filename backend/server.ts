@@ -5,8 +5,7 @@ import enemyRoutes from './routes/enemy'
 import playerRoutes from './routes/player'
 import { gamemodel } from './models/gamedb';
 import get_answer from './services/openai';
-import session, { SessionOptions } from 'express-session';
-import cookieParser from 'cookie-parser';
+
 // setup local environment variables from .env file
 dotenv.config();
 
@@ -15,18 +14,6 @@ const app = express()
 app.use(express.json());
 app.use(cors());
 
-// app.use(cookieParser());
-// app.use(express.urlencoded({extended: true}))
-
-// app.use(session({
-//   name: 'nsession',
-//   secret: 'session_secret_key',
-//   resave: false,
-//   saveUninitialized: false,
-//   cookie: {
-//     maxAge: 1000*60*60 // Session expires in 1 hour
-//   }
-// }))
 
 // for debugging
 app.use((req: Request, res: Response, next: NextFunction) => {

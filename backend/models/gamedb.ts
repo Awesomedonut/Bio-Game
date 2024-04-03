@@ -61,27 +61,29 @@ export const gamemodel = {
             return undefined;
         }
     },
-    getUser: async function(username: string, password: string) {
+    getUser: async function getUser(username: string, password: string) {
         try {
-            const result = await pool.query("SELECT * FROM users WHERE username = $1", [username,]);
-            if (result.rows.length > 0) {
-              const user = result.rows[0];
-              const storedPassword = user.password;
-              const valid = await bcrypt.compare(password, storedPassword);
-              if (valid) {
-                console.log("Success");
-                return 1;
-              } else {
-                console.log("Incorrect Password");
-                return 0;
-              }
+          const result = await pool.query("SELECT * FROM users WHERE username = $1", [username]);
+          
+          if (result.rows.length > 0) {
+            const user = result.rows[0];
+            const storedPassword = user.password;
+            const valid = await bcrypt.compare(password, storedPassword);
+            
+            if (valid) {
+              console.log("Successful password match for user:", user.username);
+              return user;
             } else {
-                console.log("User not found");
-                return 0;
+              console.log("Incorrect Password for user:", user.username);
+              return null;
             }
-          } catch (err) {
-            console.log(err);
-            return 0;
+          } else {
+            console.log("User not found:", username);
+            return null;
+          }
+        } catch (err) {
+          console.error('Error in getUser:', err);
+          throw err; 
         }
     }
 };
