@@ -1,12 +1,14 @@
 import { useNavigate } from 'react-router-dom';
 import React, { useState, FormEvent } from 'react';
 import { Link } from 'react-router-dom';
+import { jwtDecode } from "jwt-decode"
 
 interface Props {
   onClose: () => void;
 }
-const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com"
-// const backendUri ="http://localhost:4000"
+//const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com"
+const backendUri ="http://localhost:4000"
+
 const Login: React.FC<Props> = ({ onClose }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -35,10 +37,20 @@ const Login: React.FC<Props> = ({ onClose }) => {
       if (!response.ok) {
         setError(data.error);
       } else {
+
+        localStorage.setItem('token', data.token);
+        const decodedToken: any = jwtDecode(data.token);
+
+        const { id, username, email } = decodedToken;
+        console.log('User ID:', id);
+        console.log('Username:', username);
+        console.log('Email:', email);
+
         setUsername('');
         setPassword('');
         setError('');
-        navigate('/home');  // Redirect on successful login
+        // console.log("Token", data.token);
+        navigate('/home');  
       }
     } catch (error) {
       console.error('Error during login:', error);
