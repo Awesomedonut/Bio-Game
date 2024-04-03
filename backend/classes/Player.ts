@@ -8,6 +8,7 @@ export class Player {
     velocity: Velocity;
     angle: number;  // radians
     hp: number;
+    sequenceNumber: number;
 
     constructor({ id, position, velocity, hp}: PlayerProps) {
         this.id = id;
@@ -15,6 +16,7 @@ export class Player {
         this.velocity = velocity;
         this.angle = 0;
         this.hp = hp;
+        this.sequenceNumber = 0;
     }
 
     getVertices(): Position[] {

@@ -9,6 +9,7 @@ export class Player {
     angle: number;  // radians
     hp: number;
     color: string;
+    sequenceNumber: number;
 
     constructor({position, velocity, hp}: PlayerProps) {
         this.id = ''; 
@@ -17,6 +18,7 @@ export class Player {
         this.angle = 0;
         this.hp = hp;
         this.color = 'green';
+        this.sequenceNumber = 0;
     }
 
     // Draw the player based on it's current position, velocity
