@@ -24,6 +24,27 @@ const Dialogue: React.FC = () => {
 
   const sendMessage = async () => {
     if (inputText.trim() === '') return;
+
+    const newMessage: Message = { role: 'player', content: inputText };
+    setMessages((prevMessages) => [...prevMessages, newMessage]);
+    // const backendUri ="http://localhost:4000/dialogue";
+    // const back = "https://backend-dot-group-project372.uw.r.appspot.com/dialogue";
+    try {
+      const response = await fetch('https://backend-dot-group-project372.uw.r.appspot.com/dialogue', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ prompt: inputText }),
+      });
+      const data = await response.json();
+      console.log("data is " + data);
+      const apiResponse: Message = { role: 'white blood cell', content: data.message };
+      setMessages((prevMessages) => [...prevMessages, apiResponse]);
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+
     appendNewMessage(inputText, "player");
     callApi(inputText, appendNewBotMessage);
     setInputText('');
