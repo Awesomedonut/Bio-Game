@@ -97,16 +97,6 @@ app.post('/dialogue', async (req: Request, res: Response) => {
 
 })
 
-// app.get('/logout', (req: Request, res: Response) => {
-//   req.session.destroy((err) => {
-//     if (err) {
-//       console.error('Error logging out:', err);
-//       res.status(500).json({ error: 'Failed to log out' });
-//       return;
-//     }
-//     res.json({ message: 'User logged out successfully' });
-//   });
-// });
 
 // Start the server
 const port = process.env.PORT || 3000;
