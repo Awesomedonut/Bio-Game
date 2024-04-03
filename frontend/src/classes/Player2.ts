@@ -10,7 +10,7 @@ export class Player2 {
     constructor({id, position}: {id: string, position: Position}) {
         this.id = id;
         this.position = position;
-        this.radius = 10;
+        this.radius = 20;
         this.color = 'green';
         this.sequenceNumber = 0;
     }

@@ -6,7 +6,7 @@ import { Position } from './interfaces/Position';
 import { Velocity } from './interfaces/Velocity';
 
 export function initializeSocketIO(server: HttpServer):void {
-    const SPEED = 5
+    const SPEED = 3;
     // const ROTATIONAL_SPEED = 0.05
     // const FRICTION = 0.97
     // const PROJECTILE_SPEED = 3
@@ -88,7 +88,7 @@ export function initializeSocketIO(server: HttpServer):void {
     // backend tic rate to give us 66fps
     setInterval(() => {
         io.emit('updatePlayers', backendPlayers);
-    }, 1500);
+    }, 15);
 
     // helper function to create a player and add it to the players array
     function createPlayer(socketID: string) {
