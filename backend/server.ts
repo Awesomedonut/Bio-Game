@@ -34,19 +34,6 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-// app.get('/', (req: Request, res: Response) => {
-//   res.status(200).send('Hello World?');
-// })
-
-// app.get('/enemy/init', async (req, res) => {
-//   try {
-//     await gamemodel.init();
-//     res.send('Database has been initialized');
-//   } catch (error) {
-//     console.error('Error fetching data:', error);
-//     res.status(500).json({ error: 'Failed to fetch data' });
-//   } 
-// });
 app.get('/', async (req, res) => {
   try {
     await gamemodel.init();
@@ -69,7 +56,6 @@ app.get('/test', async (req, res) => {
 app.post('/register', async (req, res) => {
   try {
     await gamemodel.addUser(req.body.username, req.body.email, req.body.password);
-    //(req.session as any).isLoggedIn = true;
     res.json({ message: 'User has added successfully' });
   }catch (error) {
     console.error('Error fetching data:', error);
@@ -80,7 +66,6 @@ app.post('/register', async (req, res) => {
 app.get('/users', async (req, res) => {
   try {
     const allUsers = await gamemodel.getAllUsers();
-    //(req.session as any).isLoggedIn = true;
     res.json(allUsers);
   }catch (error) {
     console.error('Error fetching data:', error);
@@ -92,8 +77,6 @@ app.post('/login', async (req, res) => {
   try{
       const { username, password } = req.body;
       await gamemodel.getUser(username, password);
-      // (req.session as any).isLoggedIn = true;
-      // console.log("Logged In in /login post:" + (req.session as any).isLoggedIn)
       res.json({ message: 'User logged in successfully' }); 
     }catch (error) {
       console.error('Error fetching data:', error);
@@ -104,15 +87,6 @@ app.post('/login', async (req, res) => {
 app.use('/game', enemyRoutes);
 app.use('/game', playerRoutes);
 
-// function requireLogin(req: Request, res: Response, next: NextFunction) {
-//   if ((req.session as any).isLoggedIn)  {
-//     console.log("session logged in info:", (req.session as any).isLoggedIn)
-//     next(); 
-//   } else {
-//     console.log("Unauthorized", (req.session as any).isLoggedIn);
-//     res.status(401).json({ error: 'Unauthorized' });
-//   }
-// }
 
 app.post('/dialogue', async (req: Request, res: Response) => {
   console.log(req.body);
