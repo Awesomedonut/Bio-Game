@@ -1,8 +1,7 @@
 import { useRef, useEffect, useState } from 'react';
 import io from 'socket.io-client';
 import { CanvasProps } from "../interfaces/CanvasProps";
-// import { Player } from '../classes/Player';
-import { Player2 } from '../classes/Player2';
+import { MultiplayerPlayer } from '../classes/MultiplayerPlayer';
 import { Position } from '../interfaces/Position';
 import { Velocity } from '../interfaces/Velocity';
 import { playerHit } from '../utils/collision';
@@ -18,14 +17,11 @@ const socket = io('http://localhost:4000');
 
 const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const frontendPlayers: {[id: string]: Player2} = {};
+    const frontendPlayers: {[id: string]: MultiplayerPlayer} = {};
     const playerInputs: {sequenceNumber: number, velocity: Velocity}[] = [];
     let sequenceNumber = 0;
 
     const SPEED = 3;
-    // const ROTATIONAL_SPEED = 0.05
-    // const FRICTION = 0.97
-    // const PROJECTILE_SPEED = 3
 
     const keys = {
         w: {
@@ -55,10 +51,8 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
             console.log('Connected to server');
         })
 
-        socket.on('updatePlayers', (backendPlayers: {[id: string]: Player2}) => {
+        socket.on('updatePlayers', (backendPlayers: {[id: string]: MultiplayerPlayer}) => {
             syncData(backendPlayers);
-            // console.log('frontendPlayers: ',frontendPlayers);
-            console.log('Updated!');
         })
 
         return () => {
@@ -86,7 +80,7 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
 
         // Client side prediction (immediately move player)
         setInterval(() => {
-            let yourPlayer: Player2 = frontendPlayers[socket.id as string];
+            let yourPlayer: MultiplayerPlayer = frontendPlayers[socket.id as string];
             if (yourPlayer) {
                 if (keys.w.pressed) {
                     sequenceNumber++;
@@ -100,20 +94,6 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
                     yourPlayer.position.y -= SPEED;
                     socket.emit('keydown', { keycode: 'KeyW', sequenceNumber});
                 }
-                // if (keys.w.pressed) {
-                //     sequenceNumber++;
-                //     playerInputs.push({
-                //         sequenceNumber, 
-                //         dx: Math.cos(yourPlayer.angle) * SPEED,
-                //         dy: Math.sin(yourPlayer.angle) * SPEED
-                //     });
-                //     yourPlayer.velocity.x = Math.cos(yourPlayer.angle) * SPEED;
-                //     yourPlayer.velocity.y = Math.sin(yourPlayer.angle) * SPEED;
-                //     socket.emit('keydown', { keycode: 'KeyW', sequenceNumber });
-                // } else {
-                //     // yourPlayer.velocity.x *= FRICTION;
-                //     // yourPlayer.velocity.y *= FRICTION;
-                // }
 
                 if (keys.a.pressed) {
                     playerInputs.push({
@@ -126,16 +106,6 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
                     yourPlayer.position.x -= SPEED;
                     socket.emit('keydown', { keycode: 'KeyA', sequenceNumber});
                 }
-                // if (keys.a.pressed) {
-                //     sequenceNumber++;
-                //     playerInputs.push({
-                //         sequenceNumber, 
-                //         dx: 0,
-                //         dy: 0,
-                //     });
-                //     yourPlayer.angle -= ROTATIONAL_SPEED;
-                //     socket.emit('keydown', { keycode: 'KeyA', sequenceNumber });  
-                // }
 
                 if (keys.s.pressed) {
                     playerInputs.push({
@@ -160,16 +130,6 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
                     yourPlayer.position.x += SPEED;
                     socket.emit('keydown', { keycode: 'KeyD', sequenceNumber});
                 }
-                // if (keys.d.pressed) {
-                //     sequenceNumber++;
-                //     playerInputs.push({
-                //         sequenceNumber, 
-                //         dx: 0,
-                //         dy: 0,
-                //     });
-                //     yourPlayer.angle += ROTATIONAL_SPEED;
-                //     socket.emit('keydown', { keycode: 'KeyD', sequenceNumber });
-                // }
             }
         }, 15)
 
@@ -177,35 +137,26 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
         // Listen for Events
         window.addEventListener('keydown', async (event) => {
             // check if player exists
-        if (!frontendPlayers.hasOwnProperty(socket.id as string)) return;
-
-            // let player = frontendPlayers[index];
+            if (!frontendPlayers.hasOwnProperty(socket.id as string)) return;
             switch (event.code) {
                 case 'KeyW':
                     keys.w.pressed = true;
-                    // console.log('W was pressed!');
-                    // socket.emit('keydown', 'KeyW');
                     break;
                 case 'KeyA':
                     keys.a.pressed = true;
-                    // console.log('A was pressed!');
-                    // socket.emit('keydown', 'KeyA');
                     break;
                 case 'KeyS':
                     keys.s.pressed = true;
-                    // socket.emit('keydown', 'KeyS');
                     break;
                 case 'KeyD':
                     keys.d.pressed = true;
-                    // console.log('D was pressed!');   
-                    // socket.emit('keydown', 'KeyD');
                     break;
             }
-
-            // console.log('frontendPlayers: ', frontendPlayers);
         })
 
         window.addEventListener('keyup', async (event) => {
+            // check if player exists
+            if (!frontendPlayers.hasOwnProperty(socket.id as string)) return;
             switch (event.code) {
               case 'KeyW':
                 keys.w.pressed = false
@@ -227,8 +178,8 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
     }
 
     // Update frontend data with backend data
-    function syncData(backendPlayers: {[id: string]: Player2}) {
-        // Remove players not in the backend
+    function syncData(backendPlayers: {[id: string]: MultiplayerPlayer}) {
+        // Remove players from frontend if not in the backend
         for (const id in frontendPlayers ) {
             if (!(id in backendPlayers)) {
                 delete frontendPlayers[id];
@@ -242,7 +193,7 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
     
             if (!frontendPlayer) {
                 // Add player if not in frontend
-                frontendPlayers[id] = new Player2({
+                frontendPlayers[id] = new MultiplayerPlayer({
                     id: backendPlayer.id,
                     position: backendPlayer.position
                 });
@@ -250,12 +201,6 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
                 // Update a player based on backend data
                 frontendPlayer.position = { ...backendPlayer.position};
 
-                // Update player based on backend data
-                // frontendPlayer.position = { ...backendPlayer.position };
-                // frontendPlayer.velocity = { ...backendPlayer.velocity };
-                // frontendPlayer.hp = backendPlayer.hp;
-                // frontendPlayer.angle = backendPlayer.angle;
-    
                 // Perform server reconciliation for the client's player
                 if (id === socket.id) {
                     const lastBackendInputIndex = playerInputs.findIndex(input => {
@@ -271,7 +216,7 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
                         frontendPlayer.position.y += input.velocity.y;
                     })
                 } else {
-                    // Apply Player Interpolation for other players
+                    // Animate other players movemnt using GSAP and player interpolation
                     // let backendTicRate = 0.015;
                     // gsap.to(frontendPlayer, {
                     //     x: backendPlayer.position.x,
@@ -280,23 +225,6 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
                     //     ease: 'linear'
                     // })
                 }
-
-                // if (id === socket.id) {
-                //     const lastBackendInputIndex = playerInputs.findIndex(input => {
-                //         return backendPlayer.sequenceNumber === input.sequenceNumber;
-                //     });
-    
-                //     if (lastBackendInputIndex > -1) {
-                //         playerInputs.splice(0, lastBackendInputIndex + 1);
-                //     }
-    
-                //     playerInputs.forEach((input) => {
-                //         frontendPlayer.velocity.x += input.dx;
-                //         frontendPlayer.velocity.y += input.dy;
-                //         frontendPlayer.position.x += frontendPlayer.velocity.x;
-                //         frontendPlayer.position.y += frontendPlayer.velocity.y;
-                //     });
-                // }
             }
     
             // Indicate which player is the user

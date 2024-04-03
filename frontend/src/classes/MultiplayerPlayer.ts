@@ -1,6 +1,6 @@
 import { Position } from "../interfaces/Position";
 
-export class Player2 {
+export class MultiplayerPlayer {
     id: string;
     position: Position;
     radius: number;
