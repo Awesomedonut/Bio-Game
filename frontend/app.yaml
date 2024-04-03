@@ -23,3 +23,6 @@ handlers:
     static_files: build/index.html
     upload: build/index.html
     secure: always
+
+  - network:
+    session_affinity: true
