@@ -9,6 +9,8 @@ import playerRoutes from './routes/player'
 import { gamemodel } from './models/gamedb';
 import get_answer from './services/openai';
 import jwt from 'jsonwebtoken';
+import { createServer } from 'http';
+import { initializeSocketIO } from './socketLogic';
 
 // setup local environment variables from .env file
 const app = express()
@@ -16,6 +18,9 @@ const app = express()
 app.use(express.json());
 app.use(cors());
 
+// Setup Socket.io
+const server = createServer(app);
+initializeSocketIO(server);
 
 // for debugging
 app.use((req: Request, res: Response, next: NextFunction) => {
@@ -101,10 +106,10 @@ app.post('/dialogue', async (req: Request, res: Response) => {
 // Start the server
 const port = process.env.PORT || 3000;
 //Existing routes defined by app.get(), app.post(), etc should still work as expected
-// server.listen(port, () => {
-//   console.log(`Server is running on http://localhost:${port}`);
-// });
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
+// app.listen(port, () => {
+//   console.log(`Server is running on http://localhost:${port}`);
+// });
 

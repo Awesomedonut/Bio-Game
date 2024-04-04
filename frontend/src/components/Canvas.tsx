@@ -89,8 +89,8 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
             PLAYER_HP.current = playerData.hp;
             PLAYER_CURRENCY.current = playerData.currency;
 
-            console.log(playerData);
-            console.log(enemiesData);
+            console.log('playerData', playerData);
+            console.log('enemiesData', enemiesData);
             start(ctx, width, height);
             setGameStarted(true);
         }

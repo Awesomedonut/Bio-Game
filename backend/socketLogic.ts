@@ -1,55 +1,83 @@
-//import { Server, Socket } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { Server as HttpServer } from 'http';
-import { Player } from './classes/Player';
+import { MultiplayerPlayer } from './classes/MultiplayerPlayer';
 import { Position } from './interfaces/Position';
 import { Velocity } from './interfaces/Velocity';
 
 export function initializeSocketIO(server: HttpServer):void {
-    const players: Player[] = [];
+    const SPEED = 3;
 
-   /* const io = new Server(server, {
+    const backendPlayers: {[id: string]: MultiplayerPlayer} = {};
+
+    const io = new Server(server, {
         cors: {
             origin: 'http://localhost:3000',
             methods: ["GET", "POST", "DELETE", "UPDATE"]
-        }
+        },
+        pingInterval: 2000,
+        pingTimeout: 5000
     });
 
     io.on('connection', (socket: Socket) => {
-        // Add player to the array upon connection
         console.log(`A user connected with ID: ${socket.id}`);
-        createPlayer(socket.id);
-        console.log(players);
 
-        // Tell frontend about changes
-        io.emit('updatePlayers', players);
+        // Add player to the array upon joining the game
+        socket.on('join', ({width, height}) => {
+            console.log(`A user joined the game!`);
+            createPlayer(socket.id, width, height);
+            console.log(backendPlayers);
+            io.emit('updatePlayers', backendPlayers);
+        });
 
         // Removes player from the array when disconnected
-        socket.on('disconnect', () => {
-            console.log(`User with ID ${socket.id} disconnected`);
+        socket.on('disconnect', (reason) => {
+            console.log(`User with ID ${socket.id} disconnected due to: ${reason}`);
             deletePlayer(socket.id);
-            console.log(players);
+            console.log(backendPlayers);
+            io.emit('updatePlayers', backendPlayers);
+        })
+
+        // Respond to player movement
+        socket.on('keydown', ({keycode, sequenceNumber}) => {
+            let player = backendPlayers[socket.id];
+            if (!player) return;
             
-            // Tell fronend about changes
-            io.emit('updatePlayers', players);
+            player.sequenceNumber = sequenceNumber;
+            switch(keycode) {
+                case 'KeyW':
+                    backendPlayers[socket.id].position.y -= SPEED;
+                    break;
+                case 'KeyA':
+                    backendPlayers[socket.id].position.x -= SPEED;
+                    break;
+                case 'KeyS':
+                    backendPlayers[socket.id].position.y += SPEED;
+                    break;
+                case 'KeyD':
+                    backendPlayers[socket.id].position.x += SPEED;
+            }
         })
     })
+    
+    // backend tic rate to give users ~66fps
+    setInterval(() => {
+        io.emit('updatePlayers', backendPlayers);
+    }, 15);
 
-    // helper function to create a player and add it to the players array
-    function createPlayer(id: string) {
-        let player = new Player({
-            id: id,
-            position: {x: 100, y: 100},
-            velocity: {x: 0, y: 0},
-            hp: 1
+    // helper function to create a player on a random spot and add it to the players array
+    function createPlayer(socketID: string, width: number, height: number) {
+        let player = new MultiplayerPlayer({
+                id: socketID,
+                position: {
+                    x: width / 2,
+                    y: height / 2
+                }
         })
-        players.push(player);
+        backendPlayers[socketID] = player;
     }
 
     // helper function to delete a player from the players array
     function deletePlayer(id: string) {
-        let index = players.findIndex(player => player.id === id);
-        if (index !== -1) {
-            players.splice(index, 1);
-        }
-    }*/
+        delete backendPlayers[id];
+    }
 }
