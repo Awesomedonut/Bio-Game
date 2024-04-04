@@ -6,7 +6,7 @@ import { Position } from '../interfaces/Position';
 import { Velocity } from '../interfaces/Velocity';
 import { playerHit } from '../utils/collision';
 import { posix } from 'path';
-// import gsap from 'gsap';
+import gsap from 'gsap';
 
 
 // Register AttrPlugin to allow GSAP to animate custom properties
@@ -96,6 +96,7 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
                 }
 
                 if (keys.a.pressed) {
+                    sequenceNumber++;
                     playerInputs.push({
                         sequenceNumber,
                         velocity: {
@@ -108,6 +109,7 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
                 }
 
                 if (keys.s.pressed) {
+                    sequenceNumber++;
                     playerInputs.push({
                         sequenceNumber,
                         velocity: {
@@ -120,6 +122,7 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
                 }
 
                 if (keys.d.pressed) {
+                    sequenceNumber++;
                     playerInputs.push({
                         sequenceNumber,
                         velocity: {
@@ -209,6 +212,7 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
 
                     if (lastBackendInputIndex > -1) {
                         playerInputs.splice(0, lastBackendInputIndex + 1);
+                        // console.log(JSON.stringify(playerInputs));
                     }
 
                     playerInputs.forEach((input) => {
@@ -217,13 +221,13 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
                     })
                 } else {
                     // Animate other players movemnt using GSAP and player interpolation
-                    // let backendTicRate = 0.015;
-                    // gsap.to(frontendPlayer, {
-                    //     x: backendPlayer.position.x,
-                    //     y: backendPlayer.position.y,
-                    //     duration: backendTicRate,
-                    //     ease: 'linear'
-                    // })
+                    let backendTicRate = 0.015;
+                    gsap.to(frontendPlayer.position, {
+                        x: backendPlayer.position.x,
+                        y: backendPlayer.position.y,
+                        duration: backendTicRate,
+                        ease: 'linear'
+                    })
                 }
             }
     
