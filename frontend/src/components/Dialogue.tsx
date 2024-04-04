@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './styles/dialogue.css';
-
-interface Message {
-  role: string;
-  content: string;
-}
+import '../styles/dialogue.css';
+import callApi from '../api/Dialogue';
+import { Message } from "../models/Message";
 
 const Dialogue: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -13,7 +10,16 @@ const Dialogue: React.FC = () => {
 
   const navigate = useNavigate();
   const handleStartGame = () => {
-    navigate('/game');
+    navigate('/flappy');
+  }
+
+  const appendNewBotMessage = (inputText: string) => {
+    appendNewMessage(inputText, "bot");
+  }
+
+  const appendNewMessage = (inputText: string, role: string) => {
+    const newMessage: Message = { role: role, content: inputText };
+    setMessages((prevMessages) => [...prevMessages, newMessage]);
   }
 
   const sendMessage = async () => {
@@ -21,7 +27,8 @@ const Dialogue: React.FC = () => {
 
     const newMessage: Message = { role: 'player', content: inputText };
     setMessages((prevMessages) => [...prevMessages, newMessage]);
-
+    // const backendUri ="http://localhost:4000/dialogue";
+    // const back = "https://backend-dot-group-project372.uw.r.appspot.com/dialogue";
     try {
       const response = await fetch('https://backend-dot-group-project372.uw.r.appspot.com/dialogue', {
         method: 'POST',
@@ -38,6 +45,8 @@ const Dialogue: React.FC = () => {
       console.error('Error sending message:', error);
     }
 
+    appendNewMessage(inputText, "player");
+    callApi(inputText, appendNewBotMessage);
     setInputText('');
 };
 

@@ -7,7 +7,6 @@ const openai = new OpenAI({
   });
 
 async function get_answer(prompt: string) {
-  console.log("get ans function");
   console.log(prompt);
   if (prompt == null || prompt.trim() === '') {
     throw new Error('Prompt cannot be empty');

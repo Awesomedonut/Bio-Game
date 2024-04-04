@@ -1,22 +1,22 @@
 import dotenv from 'dotenv';
+
+dotenv.config();
+
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
-import get_answer from './openai';
-import { createServer } from 'http';
-import { initializeSocketIO } from './socketLogic';
 import enemyRoutes from './routes/enemy'
 import playerRoutes from './routes/player'
+import { gamemodel } from './models/gamedb';
+import get_answer from './services/openai';
+import jwt from 'jsonwebtoken';
+import { createServer } from 'http';
+import { initializeSocketIO } from './socketLogic';
 
 // setup local environment variables from .env file
-dotenv.config();
-import { gamemodel } from './models/gamedb';
+const app = express()
 
-// express app
-const app = express();
-
-// middleware
-app.use(cors());
 app.use(express.json());
+app.use(cors());
 
 // Setup Socket.io
 const server = createServer(app);
@@ -28,10 +28,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-// app.get('/', (req: Request, res: Response) => {
-//   res.status(200).send('Hello World?');
-// })
-app.get('/enemy/init', async (req, res) => {
+app.get('/', async (req, res) => {
   try {
     await gamemodel.init();
     res.send('Database has been initialized');
@@ -59,6 +56,7 @@ app.post('/register', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch data' });
   } 
 });
+
 app.get('/users', async (req, res) => {
   try {
     const allUsers = await gamemodel.getAllUsers();
@@ -70,31 +68,27 @@ app.get('/users', async (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
-  try{
-    const status = await gamemodel.getUser(req.body.username, req.body.password);
-    if(status){
-      res.json("Success");
+  try {
+    const { username, password } = req.body;
+    const user = await gamemodel.getUser(username, password);
+    if (user) {
+      const token = jwt.sign(user, 'secret_key', { expiresIn: '1h' });
+      res.json({ success: true, token });
+    } else {
+      res.status(401).json({ error: 'Incorrect username or password' });
     }
-    else{
-      res.status(500).json({ error: 'Incorrect user Password for login' });
-    }  
-  }catch (error) {
-    console.error('Error fetching data:', error);
-    res.status(500).json({ error: 'Failed to fetch data' });
-  } 
+  } catch (error) {
+    console.error('Error during login:', error);
+    res.status(500).json({ error: 'Failed to login' });
+  }
 });
 
 app.use('/game', enemyRoutes);
 app.use('/game', playerRoutes);
 
 
-// app.post('/', (req: Request, res: Response) => {
-//   res.status(200).send('Hello World?');
-// })
-
 app.post('/dialogue', async (req: Request, res: Response) => {
   console.log(req.body);
-
   try {
     const output = await get_answer(req.body.prompt);
     console.log(output);
@@ -108,9 +102,14 @@ app.post('/dialogue', async (req: Request, res: Response) => {
 
 })
 
+
 // Start the server
 const port = process.env.PORT || 3000;
 //Existing routes defined by app.get(), app.post(), etc should still work as expected
 server.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
+// app.listen(port, () => {
+//   console.log(`Server is running on http://localhost:${port}`);
+// });
+

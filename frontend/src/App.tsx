@@ -5,10 +5,12 @@ import LandingPage from './LandingPage';
 import HomePage from './components/HomePage';
 import Canvas from './components/Canvas';
 import Flappy from './components/Flappy';
-import Dialogue from './Dialogue';
-import { CanvasProps } from './interfaces/CanvasProps';
+import Dialogue from './components/Dialogue';
 import Signup from './Signup';
 import MultiplayerCanvas from './components/MultiplayerCanvas';
+import Pac from './components/Pac';
+import Intro from './components/Intro';
+import PrivateRoutes from './utils/PrivateRoutes';
 
 function App() {
 
@@ -19,12 +21,16 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/home" element={<HomePage />} />
-        <Route path="/dialogue" element={<Dialogue />} />
-        <Route path="/game" element={<Canvas width={width} height={height}/>} />
         <Route path="/signup" element={<Signup />} />
-        <Route path='/multiplayer' element={<MultiplayerCanvas width={width} height={height}/>}/>
-        <Route path="/flappy" element={<Flappy width={width} height={height} />} />
+        <Route element={<PrivateRoutes />}>
+            <Route path="/home" element={<HomePage />} />
+            <Route path="/dialogue" element={<Dialogue />} />
+            <Route path="/game" element={<Canvas width={width} height={height}/>} />
+            <Route path='/multiplayer' element={<MultiplayerCanvas width={width} height={height}/>}/>
+            <Route path="/flappy" element={<Flappy width={width} height={height} />} />
+            <Route path="/pac" element={<Pac />} />
+            <Route path="/intro" element={<Intro />} />
+        </Route>
       </Routes>
     </Router>
   );
