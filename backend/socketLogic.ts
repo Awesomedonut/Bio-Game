@@ -19,13 +19,15 @@ export function initializeSocketIO(server: HttpServer):void {
     });
 
     io.on('connection', (socket: Socket) => {
-        // Add player to the array upon connection
         console.log(`A user connected with ID: ${socket.id}`);
-        createPlayer(socket.id);
-        console.log(backendPlayers);
 
-        // Tell frontend about changes
-        io.emit('updatePlayers', backendPlayers);
+        // Add player to the array upon joining the game
+        socket.on('join', ({width, height}) => {
+            console.log(`A user joined the game!`);
+            createPlayer(socket.id, width, height);
+            console.log(backendPlayers);
+            io.emit('updatePlayers', backendPlayers);
+        });
 
         // Removes player from the array when disconnected
         socket.on('disconnect', (reason) => {
@@ -63,12 +65,12 @@ export function initializeSocketIO(server: HttpServer):void {
     }, 15);
 
     // helper function to create a player on a random spot and add it to the players array
-    function createPlayer(socketID: string) {
+    function createPlayer(socketID: string, width: number, height: number) {
         let player = new MultiplayerPlayer({
                 id: socketID,
                 position: {
-                    x: 1000 * Math.random(),
-                    y: 1000 * Math.random(),
+                    x: width / 2,
+                    y: height / 2
                 }
         })
         backendPlayers[socketID] = player;

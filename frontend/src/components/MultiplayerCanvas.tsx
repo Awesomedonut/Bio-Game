@@ -39,6 +39,7 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
         const ctx = canvas?.getContext('2d');
 
         if (ctx) {
+            socket.emit('join', {width, height});
             start(ctx, width, height);
         }
 

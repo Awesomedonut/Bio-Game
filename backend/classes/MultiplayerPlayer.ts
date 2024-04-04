@@ -5,7 +5,8 @@ export class MultiplayerPlayer {
     position: Position;
     radius: number;
     color: string;
-    sequenceNumber: number
+    sequenceNumber: number;
+  
 
     constructor({id, position}: {id: string, position: Position}) {
         this.id = id;
