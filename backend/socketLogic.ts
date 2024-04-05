@@ -69,6 +69,7 @@ export function initializeSocketIO(server: HttpServer):void {
     setInterval(() => {
         io.emit('updatePlayers', backendPlayers);
         moveEnemies();
+        checkForCollision();
         removeOffscreenEnemies();
         io.emit('updateEnemies', backendEnemies);
     }, 15);
@@ -80,8 +81,7 @@ export function initializeSocketIO(server: HttpServer):void {
             createEnemy();
             io.emit('updateEnemies', backendEnemies);
         }
-        console.log('# enemies: ', backendEnemies.length);
-    }, 3000);
+    }, 2000);
 
     // helper function to create a player on a random spot and add it to the players array
     function createPlayer(socketID: string, width: number, height: number) {
@@ -194,6 +194,33 @@ export function initializeSocketIO(server: HttpServer):void {
 
             if (is_offscreen_left || is_offscreen_right || is_offscreen_top || is_offscreen_bot) {
                 backendEnemies.splice(i, 1);
+            }
+        }
+    }
+
+    // helper functions to detect collisions between two circle
+    function playerHit(player: MultiplayerPlayer, enemy: Enemy):boolean {
+        let xDifference = player.position.x - enemy.position.x;
+        let yDifference = player.position.y - enemy.position.y;
+        
+        let distance = Math.sqrt(Math.pow(xDifference, 2) + Math.pow(yDifference, 2));
+        if (distance <= player.radius + enemy.radius) {
+            return true;
+        }
+
+        return false;
+    }
+
+    function checkForCollision() {
+        for (let i=0; i<backendEnemies.length; i++) {
+            let enemy = backendEnemies[i];
+
+            for (const id in backendPlayers) {
+                let player = backendPlayers[id];
+
+                if (playerHit(player, enemy)) {
+                    deletePlayer(id);
+                }
             }
         }
     }
