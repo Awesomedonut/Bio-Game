@@ -33,7 +33,7 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
     let PLAYER_CURRENCY: MutableRefObject<number> = useRef(1);
 
     const upgradeDamage = () => {
-        PLAYER_DAMAGE.current += 5;
+        PLAYER_DAMAGE.current += 1;
         console.log(`Player damage upgraded to ${PLAYER_DAMAGE.current}`);
     }
 
@@ -57,9 +57,14 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
         console.log(`Player hp upgraded to ${PLAYER_HP.current}`);
     }
 
+    const decrementCurrency = (cost: number) => {
+        PLAYER_CURRENCY.current -= cost;
+        console.log(`Player currency: ${PLAYER_HP.current}`);
+    }
+
     const navigate = useNavigate();
 
-    const handleGameOver = useCallback(() => {
+    const handleGameOver = async () => {
         const token = localStorage.getItem('token');
 
         axios.put(backendUri + '/game/player/update', {
@@ -79,7 +84,7 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
         })
 
         navigate('/home');
-    }, [navigate]);
+    };
 
     useEffect(() => {
         const fetchPlayer = async () => {
@@ -118,9 +123,13 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
             console.log('enemiesData', enemiesData);
             start(ctx, width, height);
             setGameStarted(true);
+            console.log("GAME STARTED");
         }
     }, [width, height, playerData, enemiesData]);
 
+    // BUG: Seems to call handleGameOver() multiple times at the end or during the game for no reason.
+    //      Hopefully adding this flag will fix it, seems to work but unsure in long run.
+    let gameEndedFlag = false;
     // Animates the player/enemies/projectiles and detect collisions, and detect keyboard input
     function start(ctx: CanvasRenderingContext2D, width: number, height: number) {
         // initialize constants
@@ -208,9 +217,13 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
                         clearInterval(interval);
 
                         // Redirect to homescreen after 3 seconds
-                        setTimeout(() => {
-                            handleGameOver();
-                        }, 3000);
+                        if (!gameEndedFlag) {
+                            gameEndedFlag = true;
+                            setTimeout(async () => {
+                                console.log("GAME OVER");
+                                await handleGameOver();
+                            }, 3000);
+                        }
                     }
                 }
             }
@@ -227,7 +240,7 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
                             enemies.splice(i, 1);
                             // console.log('Boom!');
                             PLAYER_CURRENCY.current += enemy.currency_drop;
-                            console.log(`Currency: ${PLAYER_CURRENCY.current}`);
+                            console.log(`Player currency: ${PLAYER_CURRENCY.current}`);
                         }
                         projectiles.splice(j, 1);
                     }
@@ -450,8 +463,10 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
         <>
             <canvas ref={canvasRef} width={width} height={height} />
             {showShop &&
-                <Shop upgradeDamage={upgradeDamage} upgradeHp={upgradeHp} upgradeProjectileCount={upgradeProjectileCount}
-                    upgradeProjectileSpeed={upgradeProjectileSpeed} upgradeSpeed={upgradeSpeed} />}
+                <Shop playerDamageRef={PLAYER_DAMAGE.current} playerSpeedRef={PLAYER_SPEED.current} playerProjCountRef={PLAYER_NUM_PROJECTILES.current}
+                    playerProjSpeedRef={PLAYER_PROJECTILE_SPEED.current} playerCurrencyRef={PLAYER_CURRENCY.current} upgradeDamage={upgradeDamage} upgradeHp={upgradeHp}
+                    upgradeProjectileCount={upgradeProjectileCount} upgradeProjectileSpeed={upgradeProjectileSpeed}
+                    upgradeSpeed={upgradeSpeed} decrementCurrencyRef={decrementCurrency} />}
         </>
     );
 }
