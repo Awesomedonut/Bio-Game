@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
 import { CanvasProps } from "../interfaces/CanvasProps";
 import { MultiplayerPlayer } from '../classes/MultiplayerPlayer';
@@ -19,8 +20,8 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
     const playerInputs: {sequenceNumber: number, velocity: Velocity}[] = [];
     let sequenceNumber = 0;
     let playerAlive: boolean = true;
-
     const SPEED = 3;
+    const navigate = useNavigate();
 
     const keys = {
         w: {
@@ -46,7 +47,6 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
             start(ctx, width, height);
         }
 
-        // Listen for 'connect' event
         socket.on('connect', () => {
             console.log('Connected to server');
         })
@@ -59,8 +59,12 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
             updateEnemiesData(backendEnemies);
         });
 
+        // Navigate to the homepage 3 seconds after the player dies
         socket.on('playerKilled', () => {
             playerAlive = false;
+            setTimeout(() => {
+                navigate('/home');
+            }, 3000);
         })
 
         return () => {
@@ -69,11 +73,20 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
         }
     }, [socket])
 
+    // useEffect(() => {
+    //     if (!playerAlive) {
+    //         setTimeout(() => {
+    //             navigate('/home');
+    //         }, 3000);
+    //     }
+    // }, [playerAlive, navigate]);
+
     function start(ctx: CanvasRenderingContext2D, width: number, height: number) {
         let animationFrameID: number;
 
         function animate() {
             // Clear background in frame
+            // ctx.clearRect(0, 0, width, height);
             ctx.fillStyle = "rgb(255, 131, 122";
             ctx.fillRect(0, 0, width, height);
 
