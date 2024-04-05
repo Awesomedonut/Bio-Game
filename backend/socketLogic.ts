@@ -12,7 +12,7 @@ export function initializeSocketIO(server: HttpServer):void {
     let maxScreenHeight = 0;
     
     const backendPlayers: {[id: string]: MultiplayerPlayer} = {};
-    const enemies: Enemy[] = [];
+    const backendEnemies: Enemy[] = [];
 
     const io = new Server(server, {
         cors: {
@@ -68,6 +68,8 @@ export function initializeSocketIO(server: HttpServer):void {
     // backend tic rate to give users ~66fps
     setInterval(() => {
         io.emit('updatePlayers', backendPlayers);
+        moveEnemies();
+        io.emit('updateEnemies', backendEnemies);
     }, 15);
 
     // Spawn an enmey every 3 seconds if there are players in the game
@@ -75,8 +77,7 @@ export function initializeSocketIO(server: HttpServer):void {
         let activePlayers: boolean = Object.keys(backendPlayers).length > 0;
         if (activePlayers) {
             createEnemy();
-            console.log(enemies);
-            // io.emit('updateEnemies', enemies);
+            io.emit('updateEnemies', backendEnemies);
         }
     }, 3000);
 
@@ -165,6 +166,15 @@ export function initializeSocketIO(server: HttpServer):void {
             radius: radius
         })
         
-        enemies.push(enemy);
+        backendEnemies.push(enemy);
+    }
+
+    // helper function to move enemies position
+    function moveEnemies() {
+        let enemy: Enemy;
+        for(let i=0; i<backendEnemies.length; i++) {
+            enemy = backendEnemies[i];
+            enemy.move();
+        }
     }
 }

@@ -6,6 +6,7 @@ import { Position } from '../interfaces/Position';
 import { Velocity } from '../interfaces/Velocity';
 import { playerHit } from '../utils/collision';
 import { posix } from 'path';
+import { MultiplayerEnemy } from '../classes/MultiplayerEnemy';
 // import gsap from 'gsap';
 
 // establish WebSocket connection to server
@@ -14,6 +15,7 @@ const socket = io('http://localhost:4000');
 const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const frontendPlayers: {[id: string]: MultiplayerPlayer} = {};
+    const frontendEnemies: MultiplayerEnemy[] = [];
     const playerInputs: {sequenceNumber: number, velocity: Velocity}[] = [];
     let sequenceNumber = 0;
 
@@ -49,8 +51,12 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
         })
 
         socket.on('updatePlayers', (backendPlayers: {[id: string]: MultiplayerPlayer}) => {
-            syncData(backendPlayers);
+            updatePlayersData(backendPlayers);
         })
+
+        socket.on('updateEnemies', (backendEnemies: MultiplayerEnemy[]) => {
+            updateEnemiesData(backendEnemies);
+        });
 
         return () => {
             socket.disconnect();
@@ -70,6 +76,11 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
             for (const id in frontendPlayers) {
                 frontendPlayers[id].draw(ctx);
             }
+
+            // Draw the enemies
+            frontendEnemies.forEach((enemy: MultiplayerEnemy) => {
+                enemy.draw(ctx);
+            })
             
             // Create an animation loop by requesting next frame
             animationFrameID = window.requestAnimationFrame(animate);
@@ -177,8 +188,8 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
         animate();
     }
 
-    // Update frontend data with backend data
-    function syncData(backendPlayers: {[id: string]: MultiplayerPlayer}) {
+    // Update frontend player data with backend data
+    function updatePlayersData(backendPlayers: {[id: string]: MultiplayerPlayer}) {
         // Remove players from frontend if not in the backend
         for (const id in frontendPlayers ) {
             if (!(id in backendPlayers)) {
@@ -235,6 +246,22 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
         }
     }
     
+    // Update frontend enemies data with backend data
+    function updateEnemiesData(backendEnemies: MultiplayerEnemy[]) {
+        frontendEnemies.length = 0;
+        let enemy: MultiplayerEnemy;
+        let position: Position;
+        let velocity: Velocity;
+        let radius: number;
+        for (let i=0; i<backendEnemies.length; i++) {
+            position = backendEnemies[i].position;
+            velocity = backendEnemies[i].velocity;
+            radius = backendEnemies[i].radius;
+
+            enemy = new MultiplayerEnemy(position, velocity, radius);
+            frontendEnemies.push(enemy);
+        }
+    }
 
     return ( 
         <canvas ref={canvasRef} width={width} height={height}/>

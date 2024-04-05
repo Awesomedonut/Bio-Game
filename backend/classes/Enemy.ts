@@ -12,4 +12,9 @@ export class Enemy {
         this.velocity = velocity;
         this.radius = radius;
     }
+
+    move() {
+        this.position.x += this.velocity.x;
+        this.position.y += this.velocity.y;
+    }
 }
