@@ -69,6 +69,7 @@ export function initializeSocketIO(server: HttpServer):void {
     setInterval(() => {
         io.emit('updatePlayers', backendPlayers);
         moveEnemies();
+        removeOffscreenEnemies();
         io.emit('updateEnemies', backendEnemies);
     }, 15);
 
@@ -79,6 +80,7 @@ export function initializeSocketIO(server: HttpServer):void {
             createEnemy();
             io.emit('updateEnemies', backendEnemies);
         }
+        console.log('# enemies: ', backendEnemies.length);
     }, 3000);
 
     // helper function to create a player on a random spot and add it to the players array
@@ -175,6 +177,24 @@ export function initializeSocketIO(server: HttpServer):void {
         for(let i=0; i<backendEnemies.length; i++) {
             enemy = backendEnemies[i];
             enemy.move();
+        }
+    }
+
+    // helper function to remove enemies that are offscreen
+    function removeOffscreenEnemies() {
+        let is_offscreen_left: boolean, is_offscreen_right: boolean, is_offscreen_top: boolean, is_offscreen_bot: boolean;
+
+        for (let i=0; i<backendEnemies.length; i++) {
+            let enemy = backendEnemies[i];
+
+            is_offscreen_left = enemy.position.x + enemy.radius < 0;
+            is_offscreen_right = enemy.position.x - enemy.radius > maxScreenWidth;
+            is_offscreen_top = enemy.position.y + enemy.radius > maxScreenHeight;
+            is_offscreen_bot = enemy.position.y + enemy.radius < 0;
+
+            if (is_offscreen_left || is_offscreen_right || is_offscreen_top || is_offscreen_bot) {
+                backendEnemies.splice(i, 1);
+            }
         }
     }
 }
