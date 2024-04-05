@@ -51,10 +51,10 @@ const playerModel = {
       try {
           const result = await pool.query("SELECT * FROM player WHERE user_id = $1;", [id]);
           if (result.rows.length > 0) {
-            return result.rows;
+            return result.rows[0];
           } else {
             console.log(`Player linked with user id ${id} not found`);
-            return {};
+            return null;
           }
         } catch (err) {
           console.log(err);
