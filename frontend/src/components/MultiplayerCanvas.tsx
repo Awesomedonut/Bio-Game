@@ -18,6 +18,7 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
     const frontendEnemies: MultiplayerEnemy[] = [];
     const playerInputs: {sequenceNumber: number, velocity: Velocity}[] = [];
     let sequenceNumber = 0;
+    let playerAlive: boolean = true;
 
     const SPEED = 3;
 
@@ -58,6 +59,10 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
             updateEnemiesData(backendEnemies);
         });
 
+        socket.on('playerKilled', () => {
+            playerAlive = false;
+        })
+
         return () => {
             socket.disconnect();
             console.log('Disconnected from server');
@@ -71,6 +76,14 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
             // Clear background in frame
             ctx.fillStyle = "rgb(255, 131, 122";
             ctx.fillRect(0, 0, width, height);
+
+            // Display Game over text if player is dead
+            if (!playerAlive) {
+                ctx.font = "60px Arial";
+                ctx.fillStyle = "white";
+                ctx.textAlign = "center";
+                ctx.fillText("GAME OVER", width / 2, height /2);
+            }
 
             // Draw the players
             for (const id in frontendPlayers) {

@@ -219,7 +219,9 @@ export function initializeSocketIO(server: HttpServer):void {
                 let player = backendPlayers[id];
 
                 if (playerHit(player, enemy)) {
+                    console.log(`Player ${id} was killed!`);
                     deletePlayer(id);
+                    io.to(id).emit('playerKilled');
                 }
             }
         }
