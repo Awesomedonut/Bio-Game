@@ -39,32 +39,57 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
 
     const upgradeSpeed = () => {
         PLAYER_SPEED.current += 1;
-        console.log(`Player damage upgraded to ${PLAYER_SPEED.current}`);
+        console.log(`Player speed upgraded to ${PLAYER_SPEED.current}`);
     }
 
     const upgradeProjectileCount = () => {
         PLAYER_NUM_PROJECTILES.current += 1;
-        console.log(`Player damage upgraded to ${PLAYER_NUM_PROJECTILES.current}`);
+        console.log(`Player number of projectiles upgraded to ${PLAYER_NUM_PROJECTILES.current}`);
     }
 
     const upgradeProjectileSpeed = () => {
         PLAYER_PROJECTILE_SPEED.current += 1;
-        console.log(`Player damage upgraded to ${PLAYER_PROJECTILE_SPEED.current}`);
+        console.log(`Player speed upgraded to ${PLAYER_PROJECTILE_SPEED.current}`);
     }
 
     const upgradeHp = () => {
         PLAYER_HP.current += 5;
-        console.log(`Player damage upgraded to ${PLAYER_HP.current}`);
+        console.log(`Player hp upgraded to ${PLAYER_HP.current}`);
     }
 
     const navigate = useNavigate();
+
     const handleGameOver = useCallback(() => {
+        const token = localStorage.getItem('token');
+
+        axios.put(backendUri + '/game/player/update', {
+            damage: PLAYER_DAMAGE.current,
+            movement_speed: PLAYER_SPEED.current,
+            projectile_number: PLAYER_NUM_PROJECTILES.current,
+            projectile_speed: PLAYER_PROJECTILE_SPEED.current,
+            currency: PLAYER_CURRENCY.current
+        }, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }).then(() => {
+            console.log("Success: Data saved");
+        }).catch(() => {
+            console.log("Error: Could not save data");
+        })
+
         navigate('/home');
     }, [navigate]);
 
     useEffect(() => {
         const fetchPlayer = async () => {
-            const playerRes = await axios.get(backendUri + '/game/player/1');
+            const token = localStorage.getItem('token');
+
+            const playerRes = await axios.post(backendUri + '/game/player/get', null, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
             const enemyRes = await axios.get(backendUri + '/game/enemy');
 
             setPlayer(playerRes.data.player);
@@ -183,9 +208,9 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
                         clearInterval(interval);
 
                         // Redirect to homescreen after 3 seconds
-                        // setTimeout(() => {
-                        //     handleGameOver();
-                        // }, 3000);
+                        setTimeout(() => {
+                            handleGameOver();
+                        }, 3000);
                     }
                 }
             }

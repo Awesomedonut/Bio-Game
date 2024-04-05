@@ -64,14 +64,14 @@ router.post('/player/get', verifyToken, async (req: UserRequest, res: Response) 
       })
     }
     
-    let playerRes = await playerModel.getPlayerByUserId(userId);
+    let player = await playerModel.getPlayerByUserId(userId);
 
-    if (!playerRes) {
+    if (!player) {
       await playerModel.createPlayer(userId);
-      playerRes = await playerModel.getPlayerByUserId(userId);
+      player = await playerModel.getPlayerByUserId(userId);
     } 
 
-    return res.json({ playerRes });
+    return res.json({ player });
 
   } catch (e) {
     console.error(e);
@@ -84,7 +84,7 @@ router.post('/player/get', verifyToken, async (req: UserRequest, res: Response) 
 
 router.put('/player/update', verifyToken, async (req: UserRequest, res: Response) => {
 
-  const { damage, hp, movement_speed, projectile_number, projectile_speed, currency } = req.body;
+  const { damage, movement_speed, projectile_number, projectile_speed, currency } = req.body;
   
   try {
     const userId = req.userId;
@@ -99,7 +99,7 @@ router.put('/player/update', verifyToken, async (req: UserRequest, res: Response
     const playerRes = await playerModel.getPlayerByUserId(userId);
     const playerId = playerRes.id
 
-    const updateRes = await playerModel.updatePlayer(playerId, damage, hp, movement_speed, projectile_number, projectile_speed, currency);
+    const updateRes = await playerModel.updatePlayer(playerId, damage, movement_speed, projectile_number, projectile_speed, currency);
 
     if (updateRes) {
       const updatedPlayer = await playerModel.getPlayerById(playerId);
