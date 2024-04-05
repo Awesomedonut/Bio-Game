@@ -1,8 +1,33 @@
-import express from 'express';
+import express, { NextFunction } from 'express';
 import { Request, Response } from 'express';
 import playerModel from '../models/player';
+import jwt from 'jsonwebtoken';
 
 const router = express.Router();
+
+interface UserRequest extends Request {
+  userId?: number;
+}
+
+interface JWTUserId {
+  id: number;
+}
+
+const verifyToken = (req: UserRequest, res: Response, next: NextFunction) => {
+  const token = req.headers.authorization?.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({error: 'Unauthorized: Token is not valid'});
+  }
+
+  try {
+    const decodedToken = jwt.verify(token, 'secret_key') as JWTUserId;
+    req.userId = decodedToken.id;
+    next()
+  } catch (e) {
+    return res.status(400).json({error: 'Error verifying token'});
+  }
+}
 
 router.get("/player/init", async (req, res) => {
   try {
@@ -27,16 +52,27 @@ router.get("/player/init", async (req, res) => {
   }
 });
 
-router.get('/player/:id', async (req: Request, res: Response) => {
-  const id = parseInt(req.params.id);
+router.post('/player/get', verifyToken, async (req: UserRequest, res: Response) => {
 
   try {
-    const player = await playerModel.getPlayerById(id);
-    if (player) {
-      return res.json({ player });
-    } else {
-      return res.json({ "message": `Player linked with user with id ${id} not found` });
+    const userId = req.userId;
+
+    if (!userId) {
+      return res.json({
+        "message": "Error occured",
+        "error": "Error updating the player"
+      })
     }
+    
+    let player = await playerModel.getPlayerByUserId(userId);
+
+    if (!player) {
+      await playerModel.createPlayer(userId);
+      player = await playerModel.getPlayerByUserId(userId);
+    } 
+
+    return res.json({ player });
+
   } catch (e) {
     console.error(e);
     return res.json({
@@ -46,33 +82,27 @@ router.get('/player/:id', async (req: Request, res: Response) => {
   }
 });
 
-router.get('/players/:userId', async (req: Request, res: Response) => {
-  const userId = parseInt(req.params.userId);
+router.put('/player/update', verifyToken, async (req: UserRequest, res: Response) => {
 
+  const { damage, movement_speed, projectile_number, projectile_speed, currency } = req.body;
+  
   try {
-    const player = await playerModel.getPlayerByUserId(userId);
-    if (player) {
-      return res.json({ player });
-    } else {
-      return res.json({ "message": `Player linked with user with id ${userId} not found` });
+    const userId = req.userId;
+
+    if (!userId) {
+      return res.json({
+        "message": "Error occured",
+        "error": "Error updating the player"
+      })
     }
-  } catch (e) {
-    console.error(e);
-    return res.json({
-      "message": "Error Occured",
-      "error": e
-    });
-  }
-});
 
-router.put('/player/update', async (req: Request, res: Response) => {
-  const { id, damage, hp, movement_speed, projectile_number, projectile_speed, currency } = req.body;
+    const playerRes = await playerModel.getPlayerByUserId(userId);
+    const playerId = playerRes.id
 
-  try {
-    const updateRes = await playerModel.updatePlayer(id, damage, hp, movement_speed, projectile_number, projectile_speed, currency);
-    console.log(updateRes);
+    const updateRes = await playerModel.updatePlayer(playerId, damage, movement_speed, projectile_number, projectile_speed, currency);
+
     if (updateRes) {
-      const updatedPlayer = await playerModel.getPlayerById(id);
+      const updatedPlayer = await playerModel.getPlayerById(playerId);
       return res.json({ updatedPlayer });
     } else {
       return res.json({
