@@ -58,7 +58,15 @@ const HighScoreModel = {
             throw new Error('Failed to fetch highscore by id');
         }
     },
-
+    updateHighscore: async function(playerId: number, level: number, newScore: number) {
+        try {
+          const query = 'UPDATE highscores SET score = $1 WHERE player_id = $2 AND level = $3';
+          return await pool.query(query, [newScore, playerId, level]);
+        } catch (error) {
+          console.error('Error updating highscore:', error);
+          throw new Error('Failed to update highscore');
+        }
+      }
   };
   
   export default HighScoreModel;
