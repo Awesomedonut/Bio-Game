@@ -28,7 +28,7 @@ const HighScoreModel = {
             return {};
         }
     },   
-    
+
     getAllHighscores: async function() {
         try {
             const query = 'SELECT * FROM highscores';
@@ -46,6 +46,16 @@ const HighScoreModel = {
         } catch (error) {
             console.error('Error fetching highscores:', error);
             throw new Error('Failed to fetch highscores');
+        }
+    },
+
+    getHighscoreById: async function(playerId: number) {
+        try {
+            const query = 'SELECT * FROM highscores WHERE player_id = $1';
+            return await pool.query(query, [playerId]);
+        } catch (error) {
+            console.error('Error fetching highscore by id:', error);
+            throw new Error('Failed to fetch highscore by id');
         }
     },
 
