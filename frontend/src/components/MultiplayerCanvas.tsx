@@ -9,7 +9,9 @@ import { posix } from 'path';
 // import gsap from 'gsap';
 
 // establish WebSocket connection to server
-const socket = io('http://localhost:4000');
+const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com/";
+const socket = io(backendUri);
+
 
 const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);

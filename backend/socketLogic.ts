@@ -9,9 +9,11 @@ export function initializeSocketIO(server: HttpServer):void {
 
     const backendPlayers: {[id: string]: MultiplayerPlayer} = {};
 
+    const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com/";
+
     const io = new Server(server, {
         cors: {
-            origin: 'http://localhost:3000',
+            origin: backendUri,
             methods: ["GET", "POST", "DELETE", "UPDATE"]
         },
         pingInterval: 2000,
