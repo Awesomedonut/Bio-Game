@@ -27,4 +27,26 @@ router.get("/highscore/init", async (req, res) => {
     }
 });
 
+router.get('/highScore/:playerId', async (req: Request, res: Response) => {
+
+    try {
+      const userId = parseInt(req.params.playerId);
+      if (!userId) {
+        return res.json({
+          "message": "Error occured",
+          "error": "Error updating the player"
+        })
+      }
+      let scoreData = await highScoreModel.getHighscoreById(userId);
+      return res.json(scoreData);
+  
+    } catch (e) {
+      console.error(e);
+      return res.json({
+        "message": "Error Occured",
+        "error": e
+      });
+    }
+});
+
 export default router;
