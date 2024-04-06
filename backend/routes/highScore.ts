@@ -49,4 +49,19 @@ router.get('/highScore/:playerId', async (req: Request, res: Response) => {
     }
 });
 
+router.put('/highscores/:playerId/:level', async (req: Request, res: Response) => {
+    const { playerId, level } = req.params;
+    const newScore = req.body.score;
+    try {
+        await highScoreModel.updateHighscore(parseInt(playerId), parseInt(level), newScore);
+        res.json({ message: 'Highscore updated successfully' });
+    } catch (e) {
+    console.error(e);
+    return res.json({
+      "message": "Error occured",
+      "error": e
+    })
+  }
+});
+
 export default router;
