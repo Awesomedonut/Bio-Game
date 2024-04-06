@@ -24,10 +24,20 @@ const HighScoreModel = {
             console.log('High Score table has been initialized');
             return 1
         } catch (err) {
-            console.error('Error initializing HightScore table:', err);
+            console.error('Error initializing High Score table:', err);
             return {};
         }
     },   
+    getAllHighscores: async function() {
+        try {
+            const query = 'SELECT * FROM highscores';
+            return await pool.query(query);
+        } catch (error) {
+            console.error('Error fetching highscores:', error);
+            throw new Error('Failed to fetch highscores');
+        }
+    },
+
   };
   
   export default HighScoreModel;
