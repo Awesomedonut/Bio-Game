@@ -64,4 +64,18 @@ router.put('/highscores/:playerId/:level', async (req: Request, res: Response) =
   }
 });
 
+router.post('/highscores', async (req: Request, res: Response) => {
+    const { playerId, level, score } = req.body;
+    try {
+        await highScoreModel.addHighscore(parseInt(playerId), parseInt(level), score);
+        res.status(201).json({ message: 'Highscore added successfully' });
+    } catch (e) {
+        console.error(e);
+        return res.json({
+        "message": "Error adding highscore:",
+        "error": e
+        })
+    }
+});
+
 export default router;
