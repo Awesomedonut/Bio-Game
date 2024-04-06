@@ -13,9 +13,11 @@
 
 .biogameHeader {
     font-size: 8rem;
+
 }
 
 .button {
     padding: 1rem 10rem;
     border-radius: 7px;
+    font-size: 20px;
 }
