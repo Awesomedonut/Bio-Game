@@ -4,7 +4,7 @@ import highScoreModel from '../models/highScore';
 
 const router = express.Router();
 
-router.get("/highscore/init", async (req, res) => {
+router.get("/highscores/init", async (req, res) => {
     try {
       const initRes = await highScoreModel.init();
       if (initRes) {
@@ -27,7 +27,7 @@ router.get("/highscore/init", async (req, res) => {
     }
 });
 
-router.get('/highScore/:playerId', async (req: Request, res: Response) => {
+router.get('/highScores/:playerId', async (req: Request, res: Response) => {
 
     try {
       const userId = parseInt(req.params.playerId);
