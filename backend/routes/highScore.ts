@@ -1,12 +1,12 @@
 import express from 'express';
 import { Request, Response } from 'express';
-import highScoreModel from '../models/highScore';
+import HighScoreModel from '../models/highScore';
 
 const router = express.Router();
 
 router.get("/highscores/init", async (req, res) => {
     try {
-      const initRes = await highScoreModel.init();
+      const initRes = await HighScoreModel.init();
       if (initRes) {
         return res.json({
           "message": "highScore table initialized in db"
@@ -37,7 +37,7 @@ router.get('/highScores/:playerId', async (req: Request, res: Response) => {
           "error": "Error updating the player"
         })
       }
-      let scoreData = await highScoreModel.getHighscoreById(userId);
+      let scoreData = await HighScoreModel.getHighscoreById(userId);
       return res.json(scoreData);
   
     } catch (e) {
@@ -53,7 +53,7 @@ router.put('/highscores/:playerId/:level', async (req: Request, res: Response) =
     const { playerId, level } = req.params;
     const newScore = req.body.score;
     try {
-        await highScoreModel.updateHighscore(parseInt(playerId), parseInt(level), newScore);
+        await HighScoreModel.updateHighscore(parseInt(playerId), parseInt(level), newScore);
         res.json({ message: 'Highscore updated successfully' });
     } catch (e) {
     console.error(e);
@@ -67,7 +67,7 @@ router.put('/highscores/:playerId/:level', async (req: Request, res: Response) =
 router.post('/highscores', async (req: Request, res: Response) => {
     const { playerId, level, score } = req.body;
     try {
-        await highScoreModel.addHighscore(parseInt(playerId), parseInt(level), score);
+        await HighScoreModel.addHighscore(parseInt(playerId), parseInt(level), score);
         res.status(201).json({ message: 'Highscore added successfully' });
     } catch (e) {
         console.error(e);
@@ -80,7 +80,7 @@ router.post('/highscores', async (req: Request, res: Response) => {
 
 router.delete('/highscores/:playerId/:level', async (req: Request, res: Response) => {
     try {
-      await highScoreModel.deleteHighscore(parseInt(req.params.playerId), parseInt(req.params.level));
+      await HighScoreModel.deleteHighscore(parseInt(req.params.playerId), parseInt(req.params.level));
       res.json({ message: 'Highscore deleted successfully' });
     } catch (error) {
       console.error('Error deleting highscore:', error);

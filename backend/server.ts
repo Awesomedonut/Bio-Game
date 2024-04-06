@@ -29,7 +29,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-app.get('/', async (req, res) => {
+app.get('/init/game', async (req, res) => {
   try {
     await gamemodel.init();
     res.send('Database has been initialized');
@@ -86,7 +86,7 @@ app.post('/login', async (req, res) => {
 
 app.use('/game', enemyRoutes);
 app.use('/game', playerRoutes);
-app.use('/highscores', highScoreRoutes);
+app.use('/score', highScoreRoutes);
 
 
 app.post('/dialogue', async (req: Request, res: Response) => {

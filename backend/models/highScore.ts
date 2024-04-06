@@ -12,11 +12,11 @@ const HighScoreModel = {
     init: async () => {
         try {
             await pool.query(`
-             CREATE TABLE IF NOT EXISTS highscores(
+             CREATE TABLE highscores(
                     id SERIAL PRIMARY KEY,
                     player_id INTEGER REFERENCES player(id),
-                    level INTEGER NOT NULL,
-                    score INTEGER NOT NULL,
+                    level INTEGER DEFAULT 1,
+                    score INTEGER DEFAULT 0,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
                 );
