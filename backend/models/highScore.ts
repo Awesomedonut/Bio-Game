@@ -28,10 +28,21 @@ const HighScoreModel = {
             return {};
         }
     },   
+    
     getAllHighscores: async function() {
         try {
             const query = 'SELECT * FROM highscores';
             return await pool.query(query);
+        } catch (error) {
+            console.error('Error fetching highscores:', error);
+            throw new Error('Failed to fetch highscores');
+        }
+    },
+
+    addHighscore: async function(playerId: number, level: number, score: number) {
+        try {
+            const query = 'INSERT INTO highscores (player_id, level, score) VALUES ($1, $2, $3)';
+            return await pool.query(query, [playerId, level, score]);
         } catch (error) {
             console.error('Error fetching highscores:', error);
             throw new Error('Failed to fetch highscores');
