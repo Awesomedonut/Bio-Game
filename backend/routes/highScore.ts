@@ -78,4 +78,14 @@ router.post('/highscores', async (req: Request, res: Response) => {
     }
 });
 
+router.delete('/highscores/:playerId/:level', async (req: Request, res: Response) => {
+    try {
+      await highScoreModel.deleteHighscore(parseInt(req.params.playerId), parseInt(req.params.level));
+      res.json({ message: 'Highscore deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting highscore:', error);
+      res.status(500).json({ message: 'Failed to delete highscore' });
+    }
+});
+
 export default router;
