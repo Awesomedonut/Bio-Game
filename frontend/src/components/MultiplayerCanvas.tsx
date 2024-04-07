@@ -11,7 +11,7 @@ import { MultiplayerEnemy } from '../classes/MultiplayerEnemy';
 // import gsap from 'gsap';
 
 // establish WebSocket connection to server
-const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com/";
+const backendUri = "http://localhost:4000";
 const socket = io(backendUri);
 
 
@@ -75,20 +75,11 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
         }
     }, [socket])
 
-    // useEffect(() => {
-    //     if (!playerAlive) {
-    //         setTimeout(() => {
-    //             navigate('/home');
-    //         }, 3000);
-    //     }
-    // }, [playerAlive, navigate]);
-
     function start(ctx: CanvasRenderingContext2D, width: number, height: number) {
         let animationFrameID: number;
 
         function animate() {
             // Clear background in frame
-            // ctx.clearRect(0, 0, width, height);
             ctx.fillStyle = "rgb(255, 131, 122";
             ctx.fillRect(0, 0, width, height);
 
@@ -114,7 +105,7 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
             animationFrameID = window.requestAnimationFrame(animate);
         }
 
-        // Client side prediction (immediately move player)
+        // Client side prediction (immediately move player) and send message to backend
         setInterval(() => {
             let yourPlayer: MultiplayerPlayer = frontendPlayers[socket.id as string];
             if (yourPlayer) {
@@ -255,15 +246,6 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
                         frontendPlayer.position.x += input.velocity.x;
                         frontendPlayer.position.y += input.velocity.y;
                     })
-                } else {
-                    // Animate other players movemnt using GSAP and player interpolation
-                    // let backendTicRate = 0.015;
-                    // gsap.to(frontendPlayer.position, {
-                    //     x: backendPlayer.position.x,
-                    //     y: backendPlayer.position.y,
-                    //     duration: backendTicRate,
-                    //     ease: 'linear'
-                    // })
                 }
             }
     
