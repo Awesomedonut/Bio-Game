@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import io from 'socket.io-client';
+import io, { Socket} from 'socket.io-client';
 import { CanvasProps } from "../interfaces/CanvasProps";
 import { MultiplayerPlayer } from '../classes/MultiplayerPlayer';
 import { Position } from '../interfaces/Position';
@@ -12,9 +12,9 @@ import InstructionsPopup from './InstructionsPopup';
 // import gsap from 'gsap';
 
 // establish WebSocket connection to server
-const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com/";
-//const backendUri = "http://localhost:4000";
-const socket = io(backendUri);
+// const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com/";
+const backendUri = "http://localhost:4000";
+// const socket = io(backendUri);
 
 
 const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
@@ -22,6 +22,7 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
     const frontendPlayers: {[id: string]: MultiplayerPlayer} = {};
     const frontendEnemies: MultiplayerEnemy[] = [];
 
+    const [socket, setSocket] = useState<Socket | null>(null);
     const [showInstructions, setShowInstructions] = useState(true);
 
     const playerInputs: {sequenceNumber: number, velocity: Velocity}[] = [];
@@ -45,42 +46,62 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
         },
     }
 
+    // establish websocket connection to server before starting game
     useEffect(() => {
-        if(showInstructions){
-            return;
-        }
-        const canvas = canvasRef.current;
-        const ctx = canvas?.getContext('2d');
+        // Establish WebSocket connection with the server
+        const newSocket = io('http://localhost:4000');
 
-        if (ctx) {
-            socket.emit('join', {width, height});
-            start(ctx, width, height);
-        }
-
-        socket.on('connect', () => {
-            console.log('Connected to server');
-        })
-
-        socket.on('updatePlayers', (backendPlayers: {[id: string]: MultiplayerPlayer}) => {
-            updatePlayersData(backendPlayers);
-        })
-
-        socket.on('updateEnemies', (backendEnemies: MultiplayerEnemy[]) => {
-            updateEnemiesData(backendEnemies);
+        newSocket.on('connect', () => {
+            setSocket(newSocket); // Update the state of socket with the newly created socket
+            console.log(`Connected to server with User ID: ${newSocket.id}`);
         });
 
-        // Navigate to the homepage 3 seconds after the player dies
-        socket.on('playerKilled', () => {
-            playerAlive = false;
-            setTimeout(() => {
-                navigate('/home');
-            }, 3000);
-        })
-
         return () => {
-            socket.disconnect();
-            console.log('Disconnected from server');
+            newSocket.disconnect();
         }
+    }, []);
+
+    useEffect(() => {
+        // if(showInstructions){
+        //     return;
+        // }
+
+        if (socket && !showInstructions) {
+            const canvas = canvasRef.current;
+            const ctx = canvas?.getContext('2d');
+    
+            if (ctx) {
+                socket.emit('join', {width, height});
+                console.log('Entered Multiplayer Mode as User ' + socket.id);
+                start(ctx, width, height);
+            }
+    
+            // socket.on('connect', () => {
+            //     console.log('Connected to server');
+            // })
+    
+            socket.on('updatePlayers', (backendPlayers: {[id: string]: MultiplayerPlayer}) => {
+                // console.log(backendPlayers);
+                updatePlayersData(backendPlayers);
+            })
+    
+            socket.on('updateEnemies', (backendEnemies: MultiplayerEnemy[]) => {
+                updateEnemiesData(backendEnemies);
+            });
+    
+            // Navigate to the homepage 3 seconds after the player dies
+            socket.on('playerKilled', () => {
+                playerAlive = false;
+                setTimeout(() => {
+                    navigate('/home');
+                }, 3000);
+            })   
+        }
+
+        // return () => {
+        //     socket.disconnect();
+        //     console.log('Disconnected from server');
+        // }
     }, [socket, showInstructions])
 
     function start(ctx: CanvasRenderingContext2D, width: number, height: number) {
@@ -115,7 +136,7 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
 
         // Client side prediction (immediately move player) and send message to backend
         setInterval(() => {
-            let yourPlayer: MultiplayerPlayer = frontendPlayers[socket.id as string];
+            let yourPlayer: MultiplayerPlayer = frontendPlayers[socket?.id as string];
             if (yourPlayer) {
                 if (keys.w.pressed) {
                     sequenceNumber++;
@@ -127,7 +148,7 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
                         }
                     });
                     yourPlayer.position.y -= SPEED;
-                    socket.emit('keydown', { keycode: 'KeyW', sequenceNumber});
+                    socket?.emit('keydown', { keycode: 'KeyW', sequenceNumber});
                 }
 
                 if (keys.a.pressed) {
@@ -140,7 +161,7 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
                         }
                     });
                     yourPlayer.position.x -= SPEED;
-                    socket.emit('keydown', { keycode: 'KeyA', sequenceNumber});
+                    socket?.emit('keydown', { keycode: 'KeyA', sequenceNumber});
                 }
 
                 if (keys.s.pressed) {
@@ -153,7 +174,7 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
                         }
                     });
                     yourPlayer.position.y += SPEED;
-                    socket.emit('keydown', { keycode: 'KeyS', sequenceNumber});
+                    socket?.emit('keydown', { keycode: 'KeyS', sequenceNumber});
                 }
 
                 if (keys.d.pressed) {
@@ -166,50 +187,49 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
                         }
                     });
                     yourPlayer.position.x += SPEED;
-                    socket.emit('keydown', { keycode: 'KeyD', sequenceNumber});
+                    socket?.emit('keydown', { keycode: 'KeyD', sequenceNumber});
                 }
             }
         }, 15)
 
-
-        // Listen for Events
-        window.addEventListener('keydown', async (event) => {
-            // check if player exists
-            if (!frontendPlayers.hasOwnProperty(socket.id as string)) return;
-            switch (event.code) {
-                case 'KeyW':
-                    keys.w.pressed = true;
-                    break;
-                case 'KeyA':
-                    keys.a.pressed = true;
-                    break;
-                case 'KeyS':
-                    keys.s.pressed = true;
-                    break;
-                case 'KeyD':
-                    keys.d.pressed = true;
-                    break;
-            }
-        })
-
-        window.addEventListener('keyup', async (event) => {
-            // check if player exists
-            if (!frontendPlayers.hasOwnProperty(socket.id as string)) return;
-            switch (event.code) {
-              case 'KeyW':
-                keys.w.pressed = false
-                break
-              case 'KeyA':
-                keys.a.pressed = false
-                break
-            case 'KeyS':
-                keys.s.pressed = false
-                break
-              case 'KeyD':
-                keys.d.pressed = false
-                break
-            }
-          })
+                // Listen for Events
+                window.addEventListener('keydown', async (event) => {
+                    // check if player exists
+                    if (!frontendPlayers.hasOwnProperty(socket?.id as string)) return;
+                    switch (event.code) {
+                        case 'KeyW':
+                            keys.w.pressed = true;
+                            break;
+                        case 'KeyA':
+                            keys.a.pressed = true;
+                            break;
+                        case 'KeyS':
+                            keys.s.pressed = true;
+                            break;
+                        case 'KeyD':
+                            keys.d.pressed = true;
+                            break;
+                    }
+                })
+        
+                window.addEventListener('keyup', async (event) => {
+                    // check if player exists
+                    if (!frontendPlayers.hasOwnProperty(socket?.id as string)) return;
+                    switch (event.code) {
+                      case 'KeyW':
+                        keys.w.pressed = false
+                        break
+                      case 'KeyA':
+                        keys.a.pressed = false
+                        break
+                    case 'KeyS':
+                        keys.s.pressed = false
+                        break
+                      case 'KeyD':
+                        keys.d.pressed = false
+                        break
+                    }
+                  })
 
         // Start animation loop
         animate();
@@ -240,7 +260,7 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
                 frontendPlayer.position = { ...backendPlayer.position};
 
                 // Perform server reconciliation for the client's player
-                if (id === socket.id) {
+                if (id === socket?.id) {
                     const lastBackendInputIndex = playerInputs.findIndex(input => {
                         return backendPlayer.sequenceNumber === input.sequenceNumber;
                     })
@@ -258,7 +278,7 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
             }
     
             // Indicate which player is the user
-            if (frontendPlayers[id].id === socket.id) {
+            if (frontendPlayers[id].id === socket?.id) {
                 frontendPlayers[id].color = 'lime';
             }
         }

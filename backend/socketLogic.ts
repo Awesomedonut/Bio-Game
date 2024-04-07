@@ -14,8 +14,8 @@ export function initializeSocketIO(server: HttpServer):void {
     const backendPlayers: {[id: string]: MultiplayerPlayer} = {};
     const backendEnemies: Enemy[] = [];
 
-    const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com/";
-    const frontendUri = "https://frontend-dot-group-project372.uw.r.appspot.com";
+    const backendUri = "http://localhost:4000";
+    const frontendUri = "http://localhost:3000";
 
     const io = new Server(server, {
         cors: {
@@ -32,7 +32,7 @@ export function initializeSocketIO(server: HttpServer):void {
 
         // Add player to the array upon joining the game
         socket.on('join', ({width, height}) => {
-            console.log(`A user joined the game!`);
+            console.log(`A user with joined the game with ID: ${socket.id}`);
             createPlayer(socket.id, width, height);
             updateScreenDimensions(width, height);
             console.log(backendPlayers);
