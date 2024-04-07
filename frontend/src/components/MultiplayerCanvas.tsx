@@ -49,11 +49,13 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
         if(showInstructions){
             return;
         }
+        
         const canvas = canvasRef.current;
         const ctx = canvas?.getContext('2d');
 
         if (ctx) {
             socket.emit('join', {width, height});
+            console.log('Entered Multiplayer Mode as User ' + socket.id);
             start(ctx, width, height);
         }
 
