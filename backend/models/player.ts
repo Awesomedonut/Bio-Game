@@ -51,10 +51,10 @@ const playerModel = {
       try {
           const result = await pool.query("SELECT * FROM player WHERE user_id = $1;", [id]);
           if (result.rows.length > 0) {
-            return result.rows;
+            return result.rows[0];
           } else {
             console.log(`Player linked with user id ${id} not found`);
-            return {};
+            return null;
           }
         } catch (err) {
           console.log(err);
@@ -89,20 +89,19 @@ const playerModel = {
       return {};
     }
   },
-  updatePlayer: async function(id: number, damage: number, hp: number, movement_speed: number , projectile_number: number, projectile_speed: number, currency: number) {
+  updatePlayer: async function(id: number, damage: number, movement_speed: number , projectile_number: number, projectile_speed: number, currency: number) {
     const updateQuery = "\
       UPDATE player \
       SET \
         damage = $1, \
-        hp = $2, \
-        movement_speed = $3, \
-        projectile_number = $4, \
-        projectile_speed = $5, \
-        currency = $6 \
-      WHERE id = ($7);\
+        movement_speed = $2, \
+        projectile_number = $3, \
+        projectile_speed = $4, \
+        currency = $5 \
+      WHERE id = ($6);\
     ";
     try {
-      await pool.query(updateQuery, [damage, hp, movement_speed, projectile_number, projectile_speed, currency, id]);
+      await pool.query(updateQuery, [damage, movement_speed, projectile_number, projectile_speed, currency, id]);
       return 1;
     } catch (e) {
       console.error(e);

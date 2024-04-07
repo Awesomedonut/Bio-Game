@@ -14,8 +14,8 @@ import { useNavigate } from 'react-router-dom';
 
 import Shop from '../components/Shop';
 
-const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com/";
-
+ const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com/";
+//const backendUri ="http://localhost:4000"
 // Initialize Canvase
 const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -33,38 +33,68 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
     let PLAYER_CURRENCY: MutableRefObject<number> = useRef(1);
 
     const upgradeDamage = () => {
-        PLAYER_DAMAGE.current += 5;
+        PLAYER_DAMAGE.current += 1;
         console.log(`Player damage upgraded to ${PLAYER_DAMAGE.current}`);
     }
 
     const upgradeSpeed = () => {
         PLAYER_SPEED.current += 1;
-        console.log(`Player damage upgraded to ${PLAYER_SPEED.current}`);
+        console.log(`Player speed upgraded to ${PLAYER_SPEED.current}`);
     }
 
     const upgradeProjectileCount = () => {
         PLAYER_NUM_PROJECTILES.current += 1;
-        console.log(`Player damage upgraded to ${PLAYER_NUM_PROJECTILES.current}`);
+        console.log(`Player number of projectiles upgraded to ${PLAYER_NUM_PROJECTILES.current}`);
     }
 
     const upgradeProjectileSpeed = () => {
         PLAYER_PROJECTILE_SPEED.current += 1;
-        console.log(`Player damage upgraded to ${PLAYER_PROJECTILE_SPEED.current}`);
+        console.log(`Player speed upgraded to ${PLAYER_PROJECTILE_SPEED.current}`);
     }
 
     const upgradeHp = () => {
         PLAYER_HP.current += 5;
-        console.log(`Player damage upgraded to ${PLAYER_HP.current}`);
+        console.log(`Player hp upgraded to ${PLAYER_HP.current}`);
+    }
+
+    const decrementCurrency = (cost: number) => {
+        PLAYER_CURRENCY.current -= cost;
+        console.log(`Player currency: ${PLAYER_HP.current}`);
     }
 
     const navigate = useNavigate();
-    const handleGameOver = useCallback(() => {
+
+    const handleGameOver = async () => {
+        const token = localStorage.getItem('token');
+
+        axios.put(backendUri + '/game/player/update', {
+            damage: PLAYER_DAMAGE.current,
+            movement_speed: PLAYER_SPEED.current,
+            projectile_number: PLAYER_NUM_PROJECTILES.current,
+            projectile_speed: PLAYER_PROJECTILE_SPEED.current,
+            currency: PLAYER_CURRENCY.current
+        }, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }).then(() => {
+            console.log("Success: Data saved");
+        }).catch(() => {
+            console.log("Error: Could not save data");
+        })
+
         navigate('/home');
-    }, [navigate]);
+    };
 
     useEffect(() => {
         const fetchPlayer = async () => {
-            const playerRes = await axios.get(backendUri + '/game/player/1');
+            const token = localStorage.getItem('token');
+
+            const playerRes = await axios.post(backendUri + '/game/player/get', null, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
             const enemyRes = await axios.get(backendUri + '/game/enemy');
 
             setPlayer(playerRes.data.player);
@@ -89,13 +119,17 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
             PLAYER_HP.current = playerData.hp;
             PLAYER_CURRENCY.current = playerData.currency;
 
-            console.log(playerData);
-            console.log(enemiesData);
+            console.log('playerData', playerData);
+            console.log('enemiesData', enemiesData);
             start(ctx, width, height);
             setGameStarted(true);
+            console.log("GAME STARTED");
         }
     }, [width, height, playerData, enemiesData]);
 
+    // BUG: Seems to call handleGameOver() multiple times at the end or during the game for no reason.
+    //      Hopefully adding this flag will fix it, seems to work but unsure in long run.
+    let gameEndedFlag = false;
     // Animates the player/enemies/projectiles and detect collisions, and detect keyboard input
     function start(ctx: CanvasRenderingContext2D, width: number, height: number) {
         // initialize constants
@@ -183,9 +217,13 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
                         clearInterval(interval);
 
                         // Redirect to homescreen after 3 seconds
-                        // setTimeout(() => {
-                        //     handleGameOver();
-                        // }, 3000);
+                        if (!gameEndedFlag) {
+                            gameEndedFlag = true;
+                            setTimeout(async () => {
+                                console.log("GAME OVER");
+                                await handleGameOver();
+                            }, 3000);
+                        }
                     }
                 }
             }
@@ -202,7 +240,7 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
                             enemies.splice(i, 1);
                             // console.log('Boom!');
                             PLAYER_CURRENCY.current += enemy.currency_drop;
-                            console.log(`Currency: ${PLAYER_CURRENCY.current}`);
+                            console.log(`Player currency: ${PLAYER_CURRENCY.current}`);
                         }
                         projectiles.splice(j, 1);
                     }
@@ -425,8 +463,10 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
         <>
             <canvas ref={canvasRef} width={width} height={height} />
             {showShop &&
-                <Shop upgradeDamage={upgradeDamage} upgradeHp={upgradeHp} upgradeProjectileCount={upgradeProjectileCount}
-                    upgradeProjectileSpeed={upgradeProjectileSpeed} upgradeSpeed={upgradeSpeed} />}
+                <Shop playerDamageRef={PLAYER_DAMAGE.current} playerSpeedRef={PLAYER_SPEED.current} playerProjCountRef={PLAYER_NUM_PROJECTILES.current}
+                    playerProjSpeedRef={PLAYER_PROJECTILE_SPEED.current} playerCurrencyRef={PLAYER_CURRENCY.current} upgradeDamage={upgradeDamage} upgradeHp={upgradeHp}
+                    upgradeProjectileCount={upgradeProjectileCount} upgradeProjectileSpeed={upgradeProjectileSpeed}
+                    upgradeSpeed={upgradeSpeed} decrementCurrencyRef={decrementCurrency} />}
         </>
     );
 }

@@ -25,3 +25,6 @@ handlers:
   - url: /.*
     script: auto
     secure: always
+
+network:
+  session_affinity: true

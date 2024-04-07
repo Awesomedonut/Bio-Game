@@ -3,16 +3,22 @@ import { Position } from "../interfaces/Position";
 import { Velocity } from "../interfaces/Velocity";
 
 export class Player {
+    id?: string
     position: Position;
     velocity: Velocity;
     angle: number;  // radians
     hp: number;
+    color: string;
+    sequenceNumber: number;
 
     constructor({position, velocity, hp}: PlayerProps) {
+        this.id = ''; 
         this.position = position;
         this.velocity = velocity;
         this.angle = 0;
         this.hp = hp;
+        this.color = 'green';
+        this.sequenceNumber = 0;
     }
 
     // Draw the player based on it's current position, velocity
@@ -31,7 +37,7 @@ export class Player {
         ctx.lineTo(this.position.x - 10, this.position.y + 10);
         ctx.closePath();
 
-        ctx.strokeStyle = 'green';
+        ctx.strokeStyle = this.color;
         ctx.stroke();
 
         ctx.restore();
