@@ -11,7 +11,8 @@ import { MultiplayerEnemy } from '../classes/MultiplayerEnemy';
 // import gsap from 'gsap';
 
 // establish WebSocket connection to server
-const backendUri = "http://localhost:4000";
+const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com/";
+//const backendUri = "http://localhost:4000";
 const socket = io(backendUri);
 
 
