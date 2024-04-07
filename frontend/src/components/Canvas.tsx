@@ -109,28 +109,33 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
     }, [])
 
     useEffect(() => {
-        if (!gameStarted) return; // Ensure game has started
+        // Only proceed if the game is set to start
+        if (!gameStarted) return;
+    
         const canvas = canvasRef.current;
         const ctx = canvas?.getContext('2d');
-
-        console.log(enemiesData);
-
-        if (playerData != null && enemiesData.length > 0 && canvas && ctx && !gameStarted) {
-
-            PLAYER_DAMAGE.current = playerData.damage;
-            PLAYER_SPEED.current = playerData.movement_speed;
-            PLAYER_NUM_PROJECTILES.current = playerData.projectile_number;
-            PLAYER_PROJECTILE_SPEED.current = playerData.projectile_speed;
-            PLAYER_HP.current = playerData.hp;
-            PLAYER_CURRENCY.current = playerData.currency;
-
-            console.log('playerData', playerData);
-            console.log('enemiesData', enemiesData);
-            start(ctx, width, height);
-            setGameStarted(true);
-            console.log("GAME STARTED");
-        }
-    }, [width, height, playerData, enemiesData, gameStarted]);
+    
+        // Log current game data for debugging
+        console.log('Player Data:', playerData);
+        console.log('Enemies Data:', enemiesData);
+    
+        // Ensure the canvas context and necessary data are available
+        if (!canvas || !ctx || !playerData || enemiesData.length === 0) return;
+    
+        // Initialize player and game settings from fetched data
+        PLAYER_DAMAGE.current = playerData.damage;
+        PLAYER_SPEED.current = playerData.movement_speed;
+        PLAYER_NUM_PROJECTILES.current = playerData.projectile_number;
+        PLAYER_PROJECTILE_SPEED.current = playerData.projectile_speed;
+        PLAYER_HP.current = playerData.hp;
+        PLAYER_CURRENCY.current = playerData.currency;
+    
+        // Call the start function to begin the game logic
+        start(ctx, width, height);
+    
+        // Since the game is starting, no need to set `gameStarted` to true again
+    }, [gameStarted, width, height, playerData, enemiesData]);
+    
 
     // BUG: Seems to call handleGameOver() multiple times at the end or during the game for no reason.
     //      Hopefully adding this flag will fix it, seems to work but unsure in long run.
