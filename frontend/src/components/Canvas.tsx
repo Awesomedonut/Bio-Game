@@ -477,7 +477,7 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
     return (
         <>
                     {showInstructions && (
-                <InstructionsPopup onClose={startGame} />
+                <InstructionsPopup onClose={startGame }gameLevel='asteroid' />
             )}
             <canvas ref={canvasRef} width={width} height={height} />
             {showShop &&

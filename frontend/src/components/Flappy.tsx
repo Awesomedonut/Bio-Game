@@ -139,7 +139,7 @@ const Flappy: React.FC<CanvasProps> = ({ width, height }) => {
 
     return (
         <>
-            {showInstructions && <InstructionsPopup onClose={closeInstructions} />}
+            {showInstructions && <InstructionsPopup onClose={closeInstructions} gameLevel='flappy'/>}
             <canvas ref={canvasRef} width={width.toString()} height={height.toString()} />
         </>
     );
