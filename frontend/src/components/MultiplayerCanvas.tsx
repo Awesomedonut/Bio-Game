@@ -20,6 +20,9 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const frontendPlayers: {[id: string]: MultiplayerPlayer} = {};
     const frontendEnemies: MultiplayerEnemy[] = [];
+
+    const [showInstructions, setShowInstructions] = useState(true);
+
     const playerInputs: {sequenceNumber: number, velocity: Velocity}[] = [];
     let sequenceNumber = 0;
     let playerAlive: boolean = true;
