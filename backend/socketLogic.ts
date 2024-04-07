@@ -15,7 +15,7 @@ export function initializeSocketIO(server: HttpServer):void {
     const backendEnemies: Enemy[] = [];
 
     const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com/";
-    const frontendUri = "https://frontend-dot-group-project372.uw.r.appspot.com/";
+    const frontendUri = "https://frontend-dot-group-project372.uw.r.appspot.com";
 
     const io = new Server(server, {
         cors: {
