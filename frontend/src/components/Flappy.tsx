@@ -12,9 +12,12 @@ const Flappy: React.FC<CanvasProps> = ({ width, height }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [isGameOver, setIsGameOver] = useState(false);
     const [showInstructions, setShowInstructions] = useState(true); // State to manage instructions popup visibility
+    const [gameStarted, setGameStarted] = useState(false);
 
 
     useEffect(() => {
+        if (!gameStarted) return; // Ensure game has started
+
         const canvas = canvasRef.current;
         if (!canvas) return; // Ensure canvas is not null
 
@@ -123,10 +126,15 @@ const Flappy: React.FC<CanvasProps> = ({ width, height }) => {
             window.cancelAnimationFrame(frameId);
             document.removeEventListener('keydown', handleKeyDown);
         };
-    }, [height, width, isGameOver]);
+    }, [height, width, isGameOver, gameStarted]);
 
     const closeInstructions = () => {
         setShowInstructions(false); // Function to hide the instructions popup
+        startGame();
+    };
+
+    const startGame = () => {
+        setGameStarted(true); // Function to start the game
     };
 
     return (
