@@ -89,7 +89,7 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
     };
 
     useEffect(() => {
-        if (!gameStarted) return;
+
 
         const fetchPlayer = async () => {
             const token = localStorage.getItem('token');
@@ -109,6 +109,7 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
     }, [])
 
     useEffect(() => {
+        if (!gameStarted) return; // Ensure game has started
         const canvas = canvasRef.current;
         const ctx = canvas?.getContext('2d');
 
