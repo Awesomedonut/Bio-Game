@@ -19,7 +19,7 @@ const playerModel = {
                   hp INTEGER DEFAULT 1,
                   movement_speed INTEGER DEFAULT 1,
                   projectile_number INTEGER DEFAULT 1,
-                  projectile_speed INTEGER DEFAULT 1,
+                  projectile_speed INTEGER DEFAULT 2,
                   currency INTEGER DEFAULT 0,
                   createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                   PRIMARY KEY (id, user_id),
