@@ -15,9 +15,44 @@ import { initializeSocketIO } from './socketLogic';
 
 // setup local environment variables from .env file
 const app = express()
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
 
 app.use(express.json());
 app.use(cors());
+
+app.get('/', (req, res) => {
+  // Access cookies from the request object
+  console.log(req.cookies);
+  res.send('Cookies: ' + JSON.stringify(req.cookies));
+});
+
+app.get('/set-cookie', (req, res) => {
+  // Set a cookie named 'token' with a value 'your_jwt_token_here'
+  res.cookie('token', 'your_jwt_token_here', { httpOnly: true, maxAge: 3600000 }); // HttpOnly for security, maxAge in milliseconds
+  res.send('Cookie has been set');
+});
+
+app.use(session({
+  secret: 'your_secret_key',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: 'auto', maxAge: 3600000 } // Use 'secure: true' for HTTPS. 'auto' will adapt based on the connection
+}));
+
+app.get('/session', (req, res) => {
+  if ((req.session as any).views) {
+    console.log('Session exists', (req.session as any).views);
+    console.log('Session ID:', req.sessionID);
+    (req.session as any).views++;
+    res.write(`<p>Views: ${(req.session as any).views}</p>`);
+    res.end();
+  } else {
+    (req.session as any).views = 1;
+    res.end('Welcome to the session demo. Refresh!');
+  }
+});
+
 
 // Setup Socket.io
 const server = createServer(app);
@@ -74,6 +109,9 @@ app.post('/login', async (req, res) => {
     const user = await gamemodel.getUser(username, password);
     if (user) {
       const token = jwt.sign(user, 'secret_key', { expiresIn: '1h' });
+      console.log('token:', token);
+      req.session.cookie
+      console.log(req.cookies.token);
       res.json({ success: true, token });
     } else {
       res.status(401).json({ error: 'Incorrect username or password' });
