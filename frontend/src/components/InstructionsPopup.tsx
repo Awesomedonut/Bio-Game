@@ -5,7 +5,7 @@ import '../styles/instructionsPopup.css';
 
 interface InstructionsPopupProps {
     onClose: () => void; // Defines a function type that takes no arguments and returns void
-    gameLevel: 'flappy' | 'asteroid';
+    gameLevel: 'flappy' | 'asteroid' | 'multi';
 }
 
 
@@ -17,7 +17,9 @@ const InstructionsPopup: React.FC<InstructionsPopupProps> = ({ onClose, gameLeve
             instructionsText = "Here are the instructions for playing the game. Press Space to jump and avoid the obstacles.";
         } else if (gameLevel === 'asteroid') {
             instructionsText = "Here are the instructions for playing the game. Change directions using the A and D keys, move forward using the W key, and shoot using the Space key. Press P to open the shop; gain currency by killing enemies!";
-        } else {
+        } else if (gameLevel == 'multi') {
+            instructionsText = "Here are the instructions for playing the game. Change directions using the A and D keys, move forward using the W key, and shoot using the Space key. Press P to open the shop; gain currency by killing enemies!";
+        }else {
             instructionsText = "Invalid game level.";
         }
         

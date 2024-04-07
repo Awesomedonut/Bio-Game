@@ -8,6 +8,7 @@ import { Velocity } from '../interfaces/Velocity';
 import { playerHit } from '../utils/collision';
 import { posix } from 'path';
 import { MultiplayerEnemy } from '../classes/MultiplayerEnemy';
+import InstructionsPopup from './InstructionsPopup';
 // import gsap from 'gsap';
 
 // establish WebSocket connection to server
@@ -45,6 +46,9 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
     }
 
     useEffect(() => {
+        if(showInstructions){
+            return;
+        }
         const canvas = canvasRef.current;
         const ctx = canvas?.getContext('2d');
 
@@ -77,7 +81,7 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
             socket.disconnect();
             console.log('Disconnected from server');
         }
-    }, [socket])
+    }, [socket, showInstructions])
 
     function start(ctx: CanvasRenderingContext2D, width: number, height: number) {
         let animationFrameID: number;
@@ -277,8 +281,16 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
         }
     }
 
+    const startGame = () => {
+        setShowInstructions(false); // Hide instructions popup and start the game
+    };
+
     return ( 
-        <canvas ref={canvasRef} width={width} height={height}/>
+        <>
+            {showInstructions && <InstructionsPopup onClose={startGame} gameLevel='multi'/>}
+            <canvas ref={canvasRef} width={width} height={height}/>
+        </>
+        
     );
 }
  
