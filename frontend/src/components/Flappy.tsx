@@ -1,4 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
+import InstructionsPopup from './InstructionsPopup'; 
+
+// game logic referenced from https://gist.github.com/Pro496951/a7537d2f313fbc6ebad1f74b83f84244
 
 interface CanvasProps {
   width: number;
@@ -8,8 +11,13 @@ interface CanvasProps {
 const Flappy: React.FC<CanvasProps> = ({ width, height }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [isGameOver, setIsGameOver] = useState(false);
+    const [showInstructions, setShowInstructions] = useState(true); // State to manage instructions popup visibility
+    const [gameStarted, setGameStarted] = useState(false);
+
 
     useEffect(() => {
+        if (!gameStarted) return; // Ensure game has started
+
         const canvas = canvasRef.current;
         if (!canvas) return; // Ensure canvas is not null
 
@@ -118,9 +126,23 @@ const Flappy: React.FC<CanvasProps> = ({ width, height }) => {
             window.cancelAnimationFrame(frameId);
             document.removeEventListener('keydown', handleKeyDown);
         };
-    }, [height, width, isGameOver]);
+    }, [height, width, isGameOver, gameStarted]);
 
-    return <canvas ref={canvasRef} width={width.toString()} height={height.toString()} />;
+    const closeInstructions = () => {
+        setShowInstructions(false); // Function to hide the instructions popup
+        startGame();
+    };
+
+    const startGame = () => {
+        setGameStarted(true); // Function to start the game
+    };
+
+    return (
+        <>
+            {showInstructions && <InstructionsPopup onClose={closeInstructions} gameLevel='flappy'/>}
+            <canvas ref={canvasRef} width={width.toString()} height={height.toString()} />
+        </>
+    );
 };
 
 export default Flappy;

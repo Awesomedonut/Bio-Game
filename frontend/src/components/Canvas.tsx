@@ -13,9 +13,11 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 import Shop from '../components/Shop';
+import InstructionsPopup from './InstructionsPopup';
 
 //  const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com/";
 const backendUri ="http://localhost:4000"
+
 // Initialize Canvase
 const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -23,6 +25,7 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
     const [enemiesData, setEnemies] = useState<EnemyInterface[]>([]);
     const [gameStarted, setGameStarted] = useState(false);
     const [showShop, setShowShop] = useState(false);
+    const [showInstructions, setShowInstructions] = useState(true);
 
     // Can't use React state for the game as react never rerenders past the initial useEffects
     let PLAYER_DAMAGE: MutableRefObject<number> = useRef(1);
@@ -100,6 +103,8 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
     };
 
     useEffect(() => {
+
+
         const fetchPlayer = async () => {
             const token = localStorage.getItem('token');
 
@@ -118,27 +123,33 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
     }, [])
 
     useEffect(() => {
+        // Only proceed if the game is set to start
+        if (!gameStarted) return;
+    
         const canvas = canvasRef.current;
         const ctx = canvas?.getContext('2d');
-
-        console.log(enemiesData);
-
-        if (playerData != null && enemiesData.length > 0 && canvas && ctx && !gameStarted) {
-
-            PLAYER_DAMAGE.current = playerData.damage;
-            PLAYER_SPEED.current = playerData.movement_speed;
-            PLAYER_NUM_PROJECTILES.current = playerData.projectile_number;
-            PLAYER_PROJECTILE_SPEED.current = playerData.projectile_speed;
-            PLAYER_HP.current = playerData.hp;
-            PLAYER_CURRENCY.current = playerData.currency;
-
-            console.log('playerData', playerData);
-            console.log('enemiesData', enemiesData);
-            start(ctx, width, height);
-            setGameStarted(true);
-            console.log("GAME STARTED");
-        }
-    }, [width, height, playerData, enemiesData]);
+    
+        // Log current game data for debugging
+        console.log('Player Data:', playerData);
+        console.log('Enemies Data:', enemiesData);
+    
+        // Ensure the canvas context and necessary data are available
+        if (!canvas || !ctx || !playerData || enemiesData.length === 0) return;
+    
+        // Initialize player and game settings from fetched data
+        PLAYER_DAMAGE.current = playerData.damage;
+        PLAYER_SPEED.current = playerData.movement_speed;
+        PLAYER_NUM_PROJECTILES.current = playerData.projectile_number;
+        PLAYER_PROJECTILE_SPEED.current = playerData.projectile_speed;
+        PLAYER_HP.current = playerData.hp;
+        PLAYER_CURRENCY.current = playerData.currency;
+    
+        // Call the start function to begin the game logic
+        start(ctx, width, height);
+    
+        // Since the game is starting, no need to set `gameStarted` to true again
+    }, [gameStarted, width, height, playerData, enemiesData]);
+    
 
     // BUG: Seems to call handleGameOver() multiple times at the end or during the game for no reason.
     //      Hopefully adding this flag will fix it, seems to work but unsure in long run.
@@ -473,8 +484,16 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
+    const startGame = () => {
+        setShowInstructions(false); // Hide instructions popup
+        setGameStarted(true); // Start the game
+    };
+
     return (
         <>
+                    {showInstructions && (
+                <InstructionsPopup onClose={startGame }gameLevel='asteroid' />
+            )}
             <canvas ref={canvasRef} width={width} height={height} />
             {showShop &&
                 <Shop playerDamageRef={PLAYER_DAMAGE.current} playerSpeedRef={PLAYER_SPEED.current} playerProjCountRef={PLAYER_NUM_PROJECTILES.current}
