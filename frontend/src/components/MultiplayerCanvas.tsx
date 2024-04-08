@@ -226,7 +226,6 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
 
                     if (lastBackendInputIndex > -1) {
                         playerInputs.splice(0, lastBackendInputIndex + 1);
-                        // console.log(JSON.stringify(playerInputs));
                     }
 
                     playerInputs.forEach((input) => {
