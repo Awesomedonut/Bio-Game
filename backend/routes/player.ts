@@ -7,10 +7,12 @@ const router = express.Router();
 
 interface UserRequest extends Request {
   userId?: number;
+  supporter?: boolean;
 }
 
 interface JWTUserId {
   id: number;
+  supporter: boolean;
 }
 
 const verifyToken = (req: UserRequest, res: Response, next: NextFunction) => {
@@ -23,6 +25,7 @@ const verifyToken = (req: UserRequest, res: Response, next: NextFunction) => {
   try {
     const decodedToken = jwt.verify(token, 'secret_key') as JWTUserId;
     req.userId = decodedToken.id;
+    req.supporter = decodedToken.supporter;
     next()
   } catch (e) {
     return res.status(400).json({error: 'Error verifying token'});
@@ -56,6 +59,7 @@ router.post('/player/get', verifyToken, async (req: UserRequest, res: Response) 
 
   try {
     const userId = req.userId;
+    const isSupporter = req.supporter;
 
     if (!userId) {
       return res.json({
@@ -66,10 +70,13 @@ router.post('/player/get', verifyToken, async (req: UserRequest, res: Response) 
     
     let player = await playerModel.getPlayerByUserId(userId);
 
-    if (!player) {
+    if (!player && isSupporter) {
+      await playerModel.createSupporterPlayer(userId);
+      player = await playerModel.getPlayerByUserId(userId);
+    } else {
       await playerModel.createPlayer(userId);
       player = await playerModel.getPlayerByUserId(userId);
-    } 
+    }
 
     return res.json({ player });
 

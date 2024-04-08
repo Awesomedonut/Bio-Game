@@ -27,7 +27,7 @@ router.get("/highscores/init", async (req, res) => {
     }
 });
 
-router.get('/highScores/:playerId', async (req: Request, res: Response) => {
+router.get('/highscores/:playerId', async (req: Request, res: Response) => {
 
     try {
       const userId = parseInt(req.params.playerId);
@@ -49,34 +49,87 @@ router.get('/highScores/:playerId', async (req: Request, res: Response) => {
     }
 });
 
-router.put('/highscores/:playerId/:level', async (req: Request, res: Response) => {
-    const { playerId, level } = req.params;
-    const newScore = req.body.score;
-    try {
-        await HighScoreModel.updateHighscore(parseInt(playerId), parseInt(level), newScore);
-        res.json({ message: 'Highscore updated successfully' });
-    } catch (e) {
+router.get('/highscores/level/:levelNumber', async (req: Request, res: Response) => {
+
+  try {
+    const levelNumber = parseInt(req.params.levelNumber);
+    if (!levelNumber) {
+      return res.json({
+        "message": "Error occured",
+        "error": "Error fetching level highscores"
+      })
+    }
+    let scoreData = await HighScoreModel.getHighscoresByLevel(levelNumber);
+    return res.json(scoreData);
+
+  } catch (e) {
     console.error(e);
     return res.json({
-      "message": "Error occured",
+      "message": "Error Occured",
       "error": e
-    })
+    });
   }
 });
 
-router.post('/highscores', async (req: Request, res: Response) => {
+router.put('/highscores', async (req: Request, res: Response) => {
+
     const { playerId, level, score } = req.body;
-    try {
-        await HighScoreModel.addHighscore(parseInt(playerId), parseInt(level), score);
-        res.status(201).json({ message: 'Highscore added successfully' });
-    } catch (e) {
-        console.error(e);
-        return res.json({
-        "message": "Error adding highscore:",
-        "error": e
-        })
-    }
+
+      try {
+          const highscore = await HighScoreModel.getHighscoreById(playerId);
+          if (highscore.length == 0) {
+            await HighScoreModel.addHighscore(parseInt(playerId), parseInt(level), score);
+          } else {
+            let found = false;
+            for (let scoreInDb of highscore) {
+              if (scoreInDb.level == level && scoreInDb.score < score) {
+                await HighScoreModel.updateHighscore(parseInt(playerId), parseInt(level), score);
+                found = true;
+              }
+            }
+
+            if (!found) {
+              await HighScoreModel.addHighscore(parseInt(playerId), parseInt(level), score);
+            }
+          }
+          res.status(201).json({ message: 'Highscore received successfully' });
+      } catch (e) {
+          console.error(e);
+          return res.json({
+          "message": "Error adding highscore:",
+          "error": e
+          })
+      }
 });
+
+// router.put('/highscores/:playerId/:level', async (req: Request, res: Response) => {
+//     const { playerId, level } = req.params;
+//     const newScore = req.body.score;
+//     try {
+//         await HighScoreModel.updateHighscore(parseInt(playerId), parseInt(level), newScore);
+//         res.json({ message: 'Highscore updated successfully' });
+//     } catch (e) {
+//     console.error(e);
+//     return res.json({
+//       "message": "Error occured",
+//       "error": e
+//     })
+//   }
+// });
+
+// router.post('/highscores', async (req: Request, res: Response) => {
+//     const { playerId, level, score } = req.body;
+//     try {
+//         await HighScoreModel.addHighscore(parseInt(playerId), parseInt(level), score);
+//         res.status(201).json({ message: 'Highscore added successfully' });
+//     } catch (e) {
+//         console.error(e);
+//         return res.json({
+//         "message": "Error adding highscore:",
+//         "error": e
+//         })
+//     }
+// });
 
 router.delete('/highscores/:playerId/:level', async (req: Request, res: Response) => {
     try {

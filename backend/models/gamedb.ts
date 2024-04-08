@@ -11,6 +11,9 @@ const pool = new Pool({
 });
 
 export const gamemodel = {
+    updateDB: async () => {
+        await pool.query("ALTER TABLE users ADD supporter BOOLEAN DEFAULT FALSE;");
+    },
     init: async () => {
         try {
             await pool.query(`
@@ -19,7 +22,7 @@ export const gamemodel = {
                     username VARCHAR(255) UNIQUE NOT NULL,
                     email VARCHAR(255) UNIQUE NOT NULL,
                     password VARCHAR(255) NOT NULL,
-                    level INTEGER DEFAULT 1,
+                    supporter BOOLEAN DEFAULT FALSE,
                     experience INTEGER DEFAULT 0,
                     points INTEGER DEFAULT 0,
                     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -84,6 +87,14 @@ export const gamemodel = {
         } catch (err) {
           console.error('Error in getUser:', err);
           throw err; 
+        }
+    },
+    upgradeUserToSupporter: async function upgradeUserToSupporter(user_id: number) {
+        try {
+            await pool.query("UPDATE users SET supporter = TRUE WHERE id = $1", [user_id]);
+            return 1;
+        } catch (e) {
+            return 0;
         }
     }
 };

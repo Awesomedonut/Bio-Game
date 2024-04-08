@@ -14,11 +14,11 @@ const HighScoreModel = {
             await pool.query(`
              CREATE TABLE highscores(
                     id SERIAL PRIMARY KEY,
-                    player_id INTEGER REFERENCES player(id),
+                    player_id SERIAL,
                     level INTEGER DEFAULT 1,
                     score INTEGER DEFAULT 0,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                    FOREIGN KEY (player_id) REFERENCES player(id)
                 );
             `);
             console.log('High Score table has been initialized');
@@ -39,6 +39,24 @@ const HighScoreModel = {
         }
     },
 
+    getHighscoresByLevel: async function(level: number) {
+        try {
+            const query = `
+                SELECT hs.level, hs.score, u.username
+                FROM highscores hs
+                    INNER JOIN player p on hs.player_id = p.id
+                    INNER JOIN users u on p.user_id = u.id
+                WHERE level = $1
+                ORDER BY hs.score DESC;
+            `
+            return (await pool.query(query, [level])).rows;
+        } catch (error) {
+            console.log(error);
+            console.error(`Error fetching highscores for level ${level}`);
+            throw new Error('Failed to fetch highscores');
+        }
+    },
+
     addHighscore: async function(playerId: number, level: number, score: number) {
         try {
             const query = 'INSERT INTO highscores (player_id, level, score) VALUES ($1, $2, $3)';
@@ -52,7 +70,7 @@ const HighScoreModel = {
     getHighscoreById: async function(playerId: number) {
         try {
             const query = 'SELECT * FROM highscores WHERE player_id = $1';
-            return await pool.query(query, [playerId]);
+            return (await pool.query(query, [playerId])).rows;
         } catch (error) {
             console.error('Error fetching highscore by id:', error);
             throw new Error('Failed to fetch highscore by id');
