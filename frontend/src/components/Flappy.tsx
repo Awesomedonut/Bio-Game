@@ -10,8 +10,8 @@ interface CanvasProps {
   height: number;
 }
 
-// const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com/";
-const backendUri ="http://localhost:4000"
+const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com/";
+// const backendUri ="http://localhost:4000"
 
 
 const Flappy: React.FC<CanvasProps> = ({ width, height }) => {
