@@ -80,6 +80,26 @@ const playerModel = {
       return {};
     }
   },
+  createSupporterPlayer: async function(user_id: number) {
+    try {
+      const SUPPORTER_CURRENCY_BONUS = 1000;
+      const result = await pool.query(
+        "INSERT INTO player(user_id, currency) VALUES ($1, $2) RETURNING id;", [user_id, SUPPORTER_CURRENCY_BONUS]
+      );
+
+      const { id } = result.rows[0];
+
+      if (id) {
+        const selectRes = await pool.query("SELECT * FROM player WHERE id = ($1);", [id]);
+        return selectRes.rows[0];
+      } else {
+        return {};
+      }
+    } catch (err) {
+      console.log(err);
+      return {};
+    }
+  },
   deletePlayer: async function(id: number) {
     try {
       await pool.query("DELETE FROM player WHERE id = $1;", [id]);

@@ -39,6 +39,21 @@ app.get('/init/game', async (req, res) => {
   } 
 });
 
+app.get('/supporter/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    const supporterRes = await gamemodel.upgradeUserToSupporter(parseInt(id));
+    if (supporterRes) {
+      res.status(200).json({message: "User updated to type supporter"});
+    } else {
+      res.status(400).json({message: "User not updated"});
+    }
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    res.status(500).json({ error: 'Failed to fetch data' });
+  } 
+});
+
 app.get('/test', async (req, res) => {
   try {
     res.send("test success");
