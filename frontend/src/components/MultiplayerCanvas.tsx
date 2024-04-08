@@ -12,9 +12,9 @@ import InstructionsPopup from './InstructionsPopup';
 // import gsap from 'gsap';
 
 // establish WebSocket connection to server
-// const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com/";
-const backendUri = "http://localhost:4000";
-// const socket = io(backendUri);
+const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com/";
+// const backendUri = "http://localhost:4000";
+
 
 
 const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
@@ -49,7 +49,7 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
     // establish websocket connection to server before starting game
     useEffect(() => {
         // Establish WebSocket connection with the server
-        const newSocket = io('http://localhost:4000');
+        const newSocket = io(backendUri);
 
         newSocket.on('connect', () => {
             setSocket(newSocket);
