@@ -46,7 +46,8 @@ const HighScoreModel = {
                 FROM highscores hs
                     INNER JOIN player p on hs.player_id = p.id
                     INNER JOIN users u on p.user_id = u.id
-                WHERE level = $1;
+                WHERE level = $1
+                ORDER BY hs.score DESC;
             `
             return (await pool.query(query, [level])).rows;
         } catch (error) {

@@ -77,13 +77,22 @@ router.put('/highscores', async (req: Request, res: Response) => {
 
       try {
           const highscore = await HighScoreModel.getHighscoreById(playerId);
-          console.log(highscore);
           if (highscore.length == 0) {
             await HighScoreModel.addHighscore(parseInt(playerId), parseInt(level), score);
           } else {
-            await HighScoreModel.updateHighscore(parseInt(playerId), parseInt(level), score);
+            let found = false;
+            for (let scoreInDb of highscore) {
+              if (scoreInDb.level == level && scoreInDb.score < score) {
+                await HighScoreModel.updateHighscore(parseInt(playerId), parseInt(level), score);
+                found = true;
+              }
+            }
+
+            if (!found) {
+              await HighScoreModel.addHighscore(parseInt(playerId), parseInt(level), score);
+            }
           }
-          res.status(201).json({ message: 'Highscore updated successfully' });
+          res.status(201).json({ message: 'Highscore received successfully' });
       } catch (e) {
           console.error(e);
           return res.json({

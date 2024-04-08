@@ -14,8 +14,8 @@ import { useNavigate } from 'react-router-dom';
 
 import Shop from '../components/Shop';
 
- const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com/";
-//const backendUri ="http://localhost:4000"
+//  const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com/";
+const backendUri ="http://localhost:4000"
 // Initialize Canvase
 const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -31,6 +31,8 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
     let PLAYER_PROJECTILE_SPEED: MutableRefObject<number> = useRef(1);
     let PLAYER_HP: MutableRefObject<number> = useRef(1);
     let PLAYER_CURRENCY: MutableRefObject<number> = useRef(1);
+
+    let SCORE = 0;
 
     const upgradeDamage = () => {
         PLAYER_DAMAGE.current += 1;
@@ -81,6 +83,17 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
             console.log("Success: Data saved");
         }).catch(() => {
             console.log("Error: Could not save data");
+        })
+
+        axios.put(backendUri + '/score/highscores', {
+            playerId: playerData?.id,
+            level: 2,
+            score: SCORE
+        }).then(() => {
+            console.log("Success: score saved");
+        }).catch((e) => {
+            console.log(e);
+            console.log("Error: Could not save score");
         })
 
         navigate('/home');
@@ -240,6 +253,7 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
                             enemies.splice(i, 1);
                             // console.log('Boom!');
                             PLAYER_CURRENCY.current += enemy.currency_drop;
+                            SCORE += enemy.currency_drop;
                             console.log(`Player currency: ${PLAYER_CURRENCY.current}`);
                         }
                         projectiles.splice(j, 1);

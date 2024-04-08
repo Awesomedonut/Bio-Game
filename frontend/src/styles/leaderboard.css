@@ -1,0 +1,90 @@
+.leaderboardContainer {
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: grid;
+    place-items: center;
+}
+
+.leaderboard {
+    width: 65%;
+    height: 50%;
+    background-color: #FFFFFF;
+    padding: 2rem;
+    gap: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1rem;
+    border-radius: 9px;
+}
+
+.leaderboardHeader {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.leaderboardRadioButtonContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.leaderboardRadioButtonContainer label {
+    border: 1px solid black;
+    border-radius: 7px;
+    padding: 0.5rem 2rem;
+}
+
+.leaderboardRadioButtonContainer input[type="radio"]{
+    display: none;
+}
+
+.leaderboardRadioButtonContainer input[type="radio"]:checked {
+    background-color: blue;
+}
+
+.leaderboardContainer ul {
+    list-style-type: none;
+    width: 100%;
+    padding: 1rem 2rem;
+    overflow-y: scroll;
+}
+
+.leaderboardContainer li {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 0.25rem 0rem;
+}
+
+.scoresContainer {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    border: 1px solid black;
+    border-radius: 7px;
+    height: 100%;
+}
+
+.leaderboardRadioButtonContainer input[type="radio"]:checked + label {
+    color: red;
+}
+
+.checked {
+    background-color: #C6DEF1;
+}
+
+.unchecked {
+    background-color: #FFFFFF;
+}
