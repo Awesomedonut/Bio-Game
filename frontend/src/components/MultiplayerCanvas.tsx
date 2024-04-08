@@ -52,7 +52,7 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
         const newSocket = io('http://localhost:4000');
 
         newSocket.on('connect', () => {
-            setSocket(newSocket); // Update the state of socket with the newly created socket
+            setSocket(newSocket);
             console.log(`Connected to server with User ID: ${newSocket.id}`);
         });
 
@@ -61,6 +61,8 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
         }
     }, []);
 
+
+    // Starts the game once connection to the server has been established and player has read the instructionss
     useEffect(() => {
         if (socket && !showInstructions) {
             const canvas = canvasRef.current;
@@ -69,11 +71,10 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
             if (ctx) {
                 socket.emit('join', {width, height});
                 console.log('Entered Multiplayer Mode as User ' + socket.id);
-                start(ctx, width, height);
+                startAnimation(ctx, width, height);
             }
     
             socket.on('updatePlayers', (backendPlayers: {[id: string]: MultiplayerPlayer}) => {
-                // console.log(backendPlayers);
                 updatePlayersData(backendPlayers);
             })
     
@@ -151,53 +152,17 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
         // Listen for Events
         window.addEventListener('keydown', handleKeyDown);
         window.addEventListener('keyup', handleKeyUp);
-        // window.addEventListener('keydown', async (event) => {
-        //     // check if player exists
-        //     if (!frontendPlayers.hasOwnProperty(socket?.id as string)) return;
-        //     switch (event.code) {
-        //         case 'KeyW':
-        //             keys.w.pressed = true;
-        //             break;
-        //         case 'KeyA':
-        //             keys.a.pressed = true;
-        //             break;
-        //         case 'KeyS':
-        //             keys.s.pressed = true;
-        //             break;
-        //         case 'KeyD':
-        //             keys.d.pressed = true;
-        //             break;
-        //     }
-        // })
 
-        // window.addEventListener('keyup', async (event) => {
-        //     // check if player exists
-        //     if (!frontendPlayers.hasOwnProperty(socket?.id as string)) return;
-        //     switch (event.code) {
-        //         case 'KeyW':
-        //         keys.w.pressed = false
-        //         break
-        //         case 'KeyA':
-        //         keys.a.pressed = false
-        //         break
-        //     case 'KeyS':
-        //         keys.s.pressed = false
-        //         break
-        //         case 'KeyD':
-        //         keys.d.pressed = false
-        //         break
-        //     }
-        // })
-
+        // Clear interval and remove event listeners to prevent memory leaks
         return () => {
             clearInterval(interval);
             window.removeEventListener('keydown', handleKeyDown);
             window.removeEventListener('keyup', handleKeyUp);
-            // window.removeEventListener('keydown');
         }
     }, [socket, showInstructions])
 
-    function start(ctx: CanvasRenderingContext2D, width: number, height: number) {
+    // Create animation loop based on data in frontendPlayers and frontendEnemies
+    function startAnimation(ctx: CanvasRenderingContext2D, width: number, height: number) {
         let animationFrameID: number;
 
         function animate() {
@@ -296,10 +261,12 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
         }
     }
 
-    const startGame = () => {
+    // hides Instructions
+    const hideInstructions = () => {
         setShowInstructions(false); // Hide instructions popup and start the game
     };
 
+    // helper function to collect player inputs
     const handleKeyDown = (event: KeyboardEvent) => {
         // check if player exists
         if (!frontendPlayers.hasOwnProperty(socket?.id as string)) return;
@@ -319,6 +286,7 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
         }
     }
 
+    // helper function to collect player inputs
     const handleKeyUp = (event: KeyboardEvent) => {
         // check if player exists
         if (!frontendPlayers.hasOwnProperty(socket?.id as string)) return;
@@ -340,7 +308,7 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
 
     return ( 
         <>
-            {showInstructions && <InstructionsPopup onClose={startGame} gameLevel='multi'/>}
+            {showInstructions && <InstructionsPopup onClose={hideInstructions} gameLevel='multi'/>}
             <canvas ref={canvasRef} width={width} height={height}/>
         </>
         
