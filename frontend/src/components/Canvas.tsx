@@ -15,8 +15,8 @@ import { useNavigate } from 'react-router-dom';
 import Shop from '../components/Shop';
 import InstructionsPopup from './InstructionsPopup';
 
-const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com/";
-//const backendUri ="http://localhost:4000"
+// const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com/";
+const backendUri ="http://localhost:4000"
 
 // Initialize Canvase
 const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
@@ -214,6 +214,7 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
             ctx.fillStyle = "rgb(255, 131, 122)";
             ctx.fillRect(0, 0, width, height);
 
+
             // Draw player
             player.update(ctx)
 
@@ -222,6 +223,9 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
 
             // animate enemies
             animateEnemies(ctx, enemies, width, height);
+
+            // update score
+            updateScoreOnScreen(ctx, SCORE);
 
             // check if player hit and game over
             for (let i = enemies.length - 1; i >= 0; i--) {
@@ -478,6 +482,13 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
                 enemies.splice(i, 1);
             }
         }
+    }
+
+    function updateScoreOnScreen(ctx: CanvasRenderingContext2D, score: number) {
+        ctx.font = "12px Arial";
+        ctx.fillStyle = "white";
+        ctx.textAlign = "left";
+        ctx.fillText(`Score: ${score}`, 5, 15);
     }
 
     function sleep(ms: number) {
