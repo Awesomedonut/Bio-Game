@@ -104,6 +104,25 @@ app.use('/game', playerRoutes);
 app.use('/score', highScoreRoutes);
 
 
+function verifyToken(req: Request, res: Response, next: NextFunction) {
+  const token = req.headers.authorization;
+
+  if (!token) {
+      return res.status(401).json({ message: 'No token provided' });
+  }
+
+  jwt.verify(token.split(' ')[1], 'secret_key', (err, decoded: any) => {
+      if (err) {
+          return res.status(403).json({ message: 'Failed to authenticate token' });
+      }
+      (req as any).userId = decoded.id;
+      (req as any).isGuest = decoded.isGuest;
+      next();
+      
+  });
+}
+
+
 app.post('/dialogue', async (req: Request, res: Response) => {
   console.log(req.body);
   try {
