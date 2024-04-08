@@ -62,10 +62,6 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
     }, []);
 
     useEffect(() => {
-        // if(showInstructions){
-        //     return;
-        // }
-
         if (socket && !showInstructions) {
             const canvas = canvasRef.current;
             const ctx = canvas?.getContext('2d');
@@ -75,10 +71,6 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
                 console.log('Entered Multiplayer Mode as User ' + socket.id);
                 start(ctx, width, height);
             }
-    
-            // socket.on('connect', () => {
-            //     console.log('Connected to server');
-            // })
     
             socket.on('updatePlayers', (backendPlayers: {[id: string]: MultiplayerPlayer}) => {
                 // console.log(backendPlayers);
@@ -98,44 +90,8 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
             })   
         }
 
-        // return () => {
-        //     socket.disconnect();
-        //     console.log('Disconnected from server');
-        // }
-    }, [socket, showInstructions])
-
-    function start(ctx: CanvasRenderingContext2D, width: number, height: number) {
-        let animationFrameID: number;
-
-        function animate() {
-            // Clear background in frame
-            ctx.fillStyle = "rgb(255, 131, 122";
-            ctx.fillRect(0, 0, width, height);
-
-            // Display Game over text if player is dead
-            if (!playerAlive) {
-                ctx.font = "60px Arial";
-                ctx.fillStyle = "white";
-                ctx.textAlign = "center";
-                ctx.fillText("GAME OVER", width / 2, height /2);
-            }
-
-            // Draw the players
-            for (const id in frontendPlayers) {
-                frontendPlayers[id].draw(ctx);
-            }
-
-            // Draw the enemies
-            frontendEnemies.forEach((enemy: MultiplayerEnemy) => {
-                enemy.draw(ctx);
-            })
-            
-            // Create an animation loop by requesting next frame
-            animationFrameID = window.requestAnimationFrame(animate);
-        }
-
         // Client side prediction (immediately move player) and send message to backend
-        setInterval(() => {
+        const interval = setInterval(() => {
             let yourPlayer: MultiplayerPlayer = frontendPlayers[socket?.id as string];
             if (yourPlayer) {
                 if (keys.w.pressed) {
@@ -192,45 +148,84 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
             }
         }, 15)
 
-                // Listen for Events
-                window.addEventListener('keydown', async (event) => {
-                    // check if player exists
-                    if (!frontendPlayers.hasOwnProperty(socket?.id as string)) return;
-                    switch (event.code) {
-                        case 'KeyW':
-                            keys.w.pressed = true;
-                            break;
-                        case 'KeyA':
-                            keys.a.pressed = true;
-                            break;
-                        case 'KeyS':
-                            keys.s.pressed = true;
-                            break;
-                        case 'KeyD':
-                            keys.d.pressed = true;
-                            break;
-                    }
-                })
-        
-                window.addEventListener('keyup', async (event) => {
-                    // check if player exists
-                    if (!frontendPlayers.hasOwnProperty(socket?.id as string)) return;
-                    switch (event.code) {
-                      case 'KeyW':
-                        keys.w.pressed = false
-                        break
-                      case 'KeyA':
-                        keys.a.pressed = false
-                        break
-                    case 'KeyS':
-                        keys.s.pressed = false
-                        break
-                      case 'KeyD':
-                        keys.d.pressed = false
-                        break
-                    }
-                  })
+        // Listen for Events
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
+        // window.addEventListener('keydown', async (event) => {
+        //     // check if player exists
+        //     if (!frontendPlayers.hasOwnProperty(socket?.id as string)) return;
+        //     switch (event.code) {
+        //         case 'KeyW':
+        //             keys.w.pressed = true;
+        //             break;
+        //         case 'KeyA':
+        //             keys.a.pressed = true;
+        //             break;
+        //         case 'KeyS':
+        //             keys.s.pressed = true;
+        //             break;
+        //         case 'KeyD':
+        //             keys.d.pressed = true;
+        //             break;
+        //     }
+        // })
 
+        // window.addEventListener('keyup', async (event) => {
+        //     // check if player exists
+        //     if (!frontendPlayers.hasOwnProperty(socket?.id as string)) return;
+        //     switch (event.code) {
+        //         case 'KeyW':
+        //         keys.w.pressed = false
+        //         break
+        //         case 'KeyA':
+        //         keys.a.pressed = false
+        //         break
+        //     case 'KeyS':
+        //         keys.s.pressed = false
+        //         break
+        //         case 'KeyD':
+        //         keys.d.pressed = false
+        //         break
+        //     }
+        // })
+
+        return () => {
+            clearInterval(interval);
+            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keyup', handleKeyUp);
+            // window.removeEventListener('keydown');
+        }
+    }, [socket, showInstructions])
+
+    function start(ctx: CanvasRenderingContext2D, width: number, height: number) {
+        let animationFrameID: number;
+
+        function animate() {
+            // Clear background in frame
+            ctx.fillStyle = "rgb(255, 131, 122";
+            ctx.fillRect(0, 0, width, height);
+
+            // Display Game over text if player is dead
+            if (!playerAlive) {
+                ctx.font = "60px Arial";
+                ctx.fillStyle = "white";
+                ctx.textAlign = "center";
+                ctx.fillText("GAME OVER", width / 2, height /2);
+            }
+
+            // Draw the players
+            for (const id in frontendPlayers) {
+                frontendPlayers[id].draw(ctx);
+            }
+
+            // Draw the enemies
+            frontendEnemies.forEach((enemy: MultiplayerEnemy) => {
+                enemy.draw(ctx);
+            })
+            
+            // Create an animation loop by requesting next frame
+            animationFrameID = window.requestAnimationFrame(animate);
+        }
         // Start animation loop
         animate();
     }
@@ -304,6 +299,44 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
     const startGame = () => {
         setShowInstructions(false); // Hide instructions popup and start the game
     };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+        // check if player exists
+        if (!frontendPlayers.hasOwnProperty(socket?.id as string)) return;
+        switch (event.code) {
+            case 'KeyW':
+                keys.w.pressed = true;
+                break;
+            case 'KeyA':
+                keys.a.pressed = true;
+                break;
+            case 'KeyS':
+                keys.s.pressed = true;
+                break;
+            case 'KeyD':
+                keys.d.pressed = true;
+                break;
+        }
+    }
+
+    const handleKeyUp = (event: KeyboardEvent) => {
+        // check if player exists
+        if (!frontendPlayers.hasOwnProperty(socket?.id as string)) return;
+        switch (event.code) {
+            case 'KeyW':
+            keys.w.pressed = false
+            break
+            case 'KeyA':
+            keys.a.pressed = false
+            break
+        case 'KeyS':
+            keys.s.pressed = false
+            break
+            case 'KeyD':
+            keys.d.pressed = false
+            break
+        }
+    }
 
     return ( 
         <>
