@@ -32,10 +32,10 @@ export function initializeSocketIO(server: HttpServer):void {
 
         // Add player to the array upon joining the game
         socket.on('join', ({width, height}) => {
-            console.log(`A user joined the game!`);
+            console.log(`A user with joined the game with ID: ${socket.id}`);
             createPlayer(socket.id, width, height);
             updateScreenDimensions(width, height);
-            console.log(backendPlayers);
+            // console.log(backendPlayers);
             io.emit('updatePlayers', backendPlayers);
         });
 
@@ -43,7 +43,7 @@ export function initializeSocketIO(server: HttpServer):void {
         socket.on('disconnect', (reason) => {
             console.log(`User with ID ${socket.id} disconnected due to: ${reason}`);
             deletePlayer(socket.id);
-            console.log(backendPlayers);
+            // console.log(backendPlayers);
             io.emit('updatePlayers', backendPlayers);
         })
 
@@ -78,14 +78,14 @@ export function initializeSocketIO(server: HttpServer):void {
         io.emit('updateEnemies', backendEnemies);
     }, 15);
 
-    // Spawn an enmey every 3 seconds if there are players in the game
+    // Spawn an enmey every second if there are players in the game
     setInterval(() => {
         let activePlayers: boolean = Object.keys(backendPlayers).length > 0;
         if (activePlayers) {
             createEnemy();
             io.emit('updateEnemies', backendEnemies);
         }
-    }, 2000);
+    }, 1000);
 
     // helper function to create a player on a random spot and add it to the players array
     function createPlayer(socketID: string, width: number, height: number) {
