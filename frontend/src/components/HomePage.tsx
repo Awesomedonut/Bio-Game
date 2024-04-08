@@ -25,7 +25,6 @@ const HomePage: React.FC = () => {
     return (
       <div className='homepage'>
         <h1 className="biogameHeader">Anatomy Adventure</h1>
-        console.log("ISAAC WAS HERE")
         <button className="button" onClick={() => setShowLevelSelector(true)}>Singleplayer</button>
         <button className='button' onClick={() => redirectMultiplayer()}>Multiplayer</button>
         {showLevelSelector && <LevelSelector closeLevelSelector={closeLevelSelector}></LevelSelector>}
