@@ -46,9 +46,8 @@ const MultiplayerCanvas: React.FC<CanvasProps> = ({width, height}) => {
         },
     }
 
-    // establish websocket connection to server before starting game
+    // Establish websocket connection to server before starting game
     useEffect(() => {
-        // Establish WebSocket connection with the server
         const newSocket = io(backendUri);
 
         newSocket.on('connect', () => {
