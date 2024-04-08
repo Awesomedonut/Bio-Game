@@ -18,7 +18,7 @@ const InstructionsPopup: React.FC<InstructionsPopupProps> = ({ onClose, gameLeve
         } else if (gameLevel === 'asteroid') {
             instructionsText = "Here are the instructions for playing the game. Change directions using the A and D keys, move forward using the W key, and shoot using the Space key. Press P to open the shop; gain currency by killing enemies!";
         } else if (gameLevel == 'multi') {
-            instructionsText = "Here are the instructions for playing the game. Change directions using the A and D keys, move forward using the W key, and shoot using the Space key. Press P to open the shop; gain currency by killing enemies!";
+            instructionsText = "Here are the instructions for playing the game. Change directions using the A and D keys, and move forward using the W key. Press P to open the shop; gain currency by killing enemies!";
         }else {
             instructionsText = "Invalid game level.";
         }
