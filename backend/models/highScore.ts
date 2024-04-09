@@ -13,12 +13,12 @@ const HighScoreModel = {
         try {
             await pool.query(`
              CREATE TABLE highscores(
-                    id SERIAL PRIMARY KEY,
+                    id SERIAL,
                     player_id SERIAL,
                     level INTEGER DEFAULT 1,
                     score INTEGER DEFAULT 0,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (player_id) REFERENCES player(id)
+                    PRIMARY KEY (id, level),
+                    FOREIGN KEY (player_id) REFERENCES player(id) ON DELETE CASCADE
                 );
             `);
             console.log('High Score table has been initialized');

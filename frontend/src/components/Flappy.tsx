@@ -1,5 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import InstructionsPopup from './InstructionsPopup'; 
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 // game logic referenced from https://gist.github.com/Pro496951/a7537d2f313fbc6ebad1f74b83f84244
 
@@ -8,14 +10,64 @@ interface CanvasProps {
   height: number;
 }
 
+const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com/";
+// const backendUri ="http://localhost:4000"
+
+
 const Flappy: React.FC<CanvasProps> = ({ width, height }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [isGameOver, setIsGameOver] = useState(false);
     const [showInstructions, setShowInstructions] = useState(true); // State to manage instructions popup visibility
     const [gameStarted, setGameStarted] = useState(false);
+    const [playerId, setPlayerId] = useState(null);
+    const score = useRef(0);
 
+    const navigate = useNavigate();
+
+    const handleGameOver = async () => {
+
+        console.log(score.current);
+
+        if (playerId) {
+            axios.put(backendUri + '/score/highscores', {
+                playerId: playerId,
+                level: 3,
+                score: score.current
+            }).then(() => {
+                console.log("Success: score saved");
+            }).catch((e) => {
+                console.log(e);
+                console.log("Error: Could not save score");
+            })
+        }
+
+        navigate('/home');
+    };
+
+    const incrementScore = () => {
+        score.current += 1;
+    }
 
     useEffect(() => {
+        const fetchPlayer = async () => {
+            const token = localStorage.getItem('token');
+
+            const playerRes = await axios.post(backendUri + '/game/player/get', null, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            setPlayerId(playerRes.data.player.id);
+        }
+
+        fetchPlayer();
+    }, [])
+
+    useEffect(() => {
+        
+
+
         if (!gameStarted) return; // Ensure game has started
 
         const canvas = canvasRef.current;
@@ -85,6 +137,15 @@ const Flappy: React.FC<CanvasProps> = ({ width, height }) => {
         function updateGame() {
             ctx?.clearRect(0, 0, width, height);
 
+            incrementScore();
+
+            if (ctx) {
+                ctx.font = "12px Arial";
+                ctx.fillStyle = "black";
+                ctx.textAlign = "left";
+                ctx.fillText(`Score: ${score.current}`, 5, 15);
+            }
+
             speed += gravity;
             bacteria.y += speed;
 
@@ -117,6 +178,8 @@ const Flappy: React.FC<CanvasProps> = ({ width, height }) => {
                 ctx.font = '30px Arial';
                 ctx.fillStyle = 'red';
                 ctx.fillText('Game Over', width / 2 - 100, height / 2);
+
+                handleGameOver();
             }
         }
 

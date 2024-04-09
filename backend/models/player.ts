@@ -13,13 +13,13 @@ const playerModel = {
       try {
           await pool.query(`
               CREATE TABLE IF NOT EXISTS player(
-                  id SERIAL,
+                  id SERIAL UNIQUE,
                   user_id SERIAL,
                   damage INTEGER DEFAULT 1,
                   hp INTEGER DEFAULT 1,
                   movement_speed INTEGER DEFAULT 1,
                   projectile_number INTEGER DEFAULT 1,
-                  projectile_speed INTEGER DEFAULT 1,
+                  projectile_speed INTEGER DEFAULT 2,
                   currency INTEGER DEFAULT 0,
                   createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                   PRIMARY KEY (id, user_id),
@@ -51,6 +51,7 @@ const playerModel = {
       try {
           const result = await pool.query("SELECT * FROM player WHERE user_id = $1;", [id]);
           if (result.rows.length > 0) {
+            console.log(result.rows);
             return result.rows[0];
           } else {
             console.log(`Player linked with user id ${id} not found`);
