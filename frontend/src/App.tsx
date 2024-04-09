@@ -11,7 +11,7 @@ import MultiplayerCanvas from './components/MultiplayerCanvas';
 import Pac from './components/Pac';
 import Intro from './components/Intro';
 import PrivateRoutes from './utils/PrivateRoutes';
-
+import Header from './components/Header';
 function App() {
 
   const width: number = window.innerWidth;
@@ -19,6 +19,7 @@ function App() {
 
   return (
     <Router>
+      <Header />
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/signup" element={<Signup />} />
