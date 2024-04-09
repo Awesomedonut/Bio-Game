@@ -82,9 +82,11 @@ router.put('/highscores', async (req: Request, res: Response) => {
           } else {
             let found = false;
             for (let scoreInDb of highscore) {
-              if (scoreInDb.level == level && scoreInDb.score < score) {
-                await HighScoreModel.updateHighscore(parseInt(playerId), parseInt(level), score);
+              if (scoreInDb.level == level) {
                 found = true;
+                if (scoreInDb.score < score) {
+                  await HighScoreModel.updateHighscore(parseInt(playerId), parseInt(level), score);
+                }
               }
             }
 

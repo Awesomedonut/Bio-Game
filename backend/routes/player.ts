@@ -70,13 +70,15 @@ router.post('/player/get', verifyToken, async (req: UserRequest, res: Response) 
     
     let player = await playerModel.getPlayerByUserId(userId);
 
-    if (!player && isSupporter) {
-      await playerModel.createSupporterPlayer(userId);
-      player = await playerModel.getPlayerByUserId(userId);
-    } else {
-      await playerModel.createPlayer(userId);
-      player = await playerModel.getPlayerByUserId(userId);
-    }
+    if (!player) {
+      if (isSupporter) {
+        await playerModel.createSupporterPlayer(userId);
+        player = await playerModel.getPlayerByUserId(userId);
+      } else {
+        await playerModel.createPlayer(userId);
+        player = await playerModel.getPlayerByUserId(userId);
+      }
+    } 
 
     return res.json({ player });
 
