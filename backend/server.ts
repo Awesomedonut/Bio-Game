@@ -104,7 +104,7 @@ app.use('/game', playerRoutes);
 app.use('/score', highScoreRoutes);
 
 
-app.post('/dialogue', async (req: Request, res: Response) => {
+/*app.post('/dialogue', async (req: Request, res: Response) => {
   console.log(req.body);
   try {
     const output = await get_answer(req.body.prompt);
@@ -117,7 +117,7 @@ app.post('/dialogue', async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to fetch the response' });
   }
 
-})
+})*/
 
 
 // Start the server
