@@ -25,11 +25,10 @@ const Dialogue: React.FC = () => {
   const sendMessage = async () => {
     if (inputText.trim() === '') return;
 
-    const newMessage: Message = { role: 'player', content: inputText };
-    setMessages((prevMessages) => [...prevMessages, newMessage]);
+  appendNewMessage(inputText, "player");
     // const backendUri ="http://localhost:4000/dialogue";
     // const back = "https://backend-dot-group-project372.uw.r.appspot.com/dialogue";
-    try {
+  /*  try {
       const response = await fetch('https://backend-dot-group-project372.uw.r.appspot.com/dialogue', {
         method: 'POST',
         headers: {
@@ -43,9 +42,9 @@ const Dialogue: React.FC = () => {
       setMessages((prevMessages) => [...prevMessages, apiResponse]);
     } catch (error) {
       console.error('Error sending message:', error);
-    }
+    }*/
 
-    appendNewMessage(inputText, "player");
+    
     callApi(inputText, appendNewBotMessage);
     setInputText('');
 };
