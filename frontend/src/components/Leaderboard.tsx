@@ -20,8 +20,8 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ closeLeaderboard }) => {
         axios.get(backendUri + `/score/highscores/level/${1}`).then((res) => {setScores(res.data)})
     }, [])
   
-    const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com/";
-    // const backendUri ="http://localhost:4000"
+    // const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com/";
+    const backendUri ="http://localhost:4000"
     const getScoresForLevel = async (level: number) => {
         const res = await axios.get(backendUri + `/score/highscores/level/${level}`)
         setScores(res.data);
