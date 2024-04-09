@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { INTRO_TEXT_LIST } from '../Constants';
-
 const Intro: React.FC = () => {
   const navigate = useNavigate();
 

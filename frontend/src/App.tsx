@@ -22,6 +22,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/intro" element={<Intro />} />
         <Route element={<PrivateRoutes />}>
             <Route path="/home" element={<HomePage />} />
             <Route path="/dialogue" element={<Dialogue />} />
@@ -29,7 +30,6 @@ function App() {
             <Route path='/multiplayer' element={<MultiplayerCanvas width={width} height={height}/>}/>
             <Route path="/flappy" element={<Flappy width={width} height={height} />} />
             <Route path="/pac" element={<Pac />} />
-            <Route path="/intro" element={<Intro />} />
         </Route>
       </Routes>
     </Router>
