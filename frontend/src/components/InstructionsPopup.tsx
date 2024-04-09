@@ -18,7 +18,7 @@ const InstructionsPopup: React.FC<InstructionsPopupProps> = ({ onClose, gameLeve
         } else if (gameLevel === 'asteroid') {
             instructionsText = "Change directions using the A and D keys, move forward using the W key, and shoot using the Space key. Press P to open the shop; gain currency by killing enemies! Survive the innate immune response! The white blood cells kill bacteria by engulfing and breaking them down after contact; your goal is to avoid or shoot them. The green bullets represent the toxins that bacteria release to harm the human body.";
         } else if (gameLevel == 'multi') {
-            instructionsText = "Change directions using the A and D keys, and move forward using the W key. Avoid collision with the white blood cells and survive until the end!";
+            instructionsText = "Use WASD to move. Avoid collision with the white blood cells and survive as long as possible!";
         }else {
             instructionsText = "Invalid game level.";
         }
