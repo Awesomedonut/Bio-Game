@@ -27,10 +27,10 @@ const Dialogue: React.FC = () => {
 
     const newMessage: Message = { role: 'player', content: inputText };
     setMessages((prevMessages) => [...prevMessages, newMessage]);
-    // const backendUri ="http://localhost:4000/dialogue";
+    const backendUri ="http://localhost:4000/dialogue";
     // const back = "https://backend-dot-group-project372.uw.r.appspot.com/dialogue";
     try {
-      const response = await fetch('https://backend-dot-group-project372.uw.r.appspot.com/dialogue', {
+      const response = await fetch(backendUri, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

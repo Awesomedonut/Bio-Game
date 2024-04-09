@@ -14,8 +14,10 @@ export function initializeSocketIO(server: HttpServer):void {
     const backendPlayers: {[id: string]: MultiplayerPlayer} = {};
     const backendEnemies: Enemy[] = [];
 
-    const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com/";
-    const frontendUri = "https://frontend-dot-group-project372.uw.r.appspot.com";
+    // const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com/";
+    // const frontendUri = "https://frontend-dot-group-project372.uw.r.appspot.com";
+    const backendUri = "http://localhost:4000";
+    const frontendUri = "http://localhost:3000";
 
     const io = new Server(server, {
         cors: {
