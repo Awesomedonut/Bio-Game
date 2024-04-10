@@ -9,7 +9,7 @@ const LevelPassPopup: React.FC<LevelPassPopupProps> = ({ onClose }) => {
     <div style={overlayStyle}>
       <div style={popupStyle}>
         <h2>Level Complete!</h2>
-        <p>Congratulations on successfully navigating the challenges!</p>
+        <p>Bacteria can enter the human body through various pathways. Common entry points include the respiratory tract, via inhalation of airborne particles, the digestive tract, through consumption of contaminated food or water, and breaks in the skin, due to cuts or abrasions. Once inside, they can multiply and spread, potentially leading to infections if not promptly addressed by the body's immune system. Our bodies can trap and destroy bacteria using mucous.</p>
         <button onClick={onClose} style={buttonStyle}>Continue</button>
       </div>
     </div>
