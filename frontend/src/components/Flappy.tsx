@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import InstructionsPopup from './InstructionsPopup'; 
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import LevelPassPopup from './LevelPassPopup';
 
 // game logic referenced from https://gist.github.com/Pro496951/a7537d2f313fbc6ebad1f74b83f84244
 
