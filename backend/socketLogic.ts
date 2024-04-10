@@ -5,7 +5,6 @@ import { Position } from './interfaces/Position';
 import { Velocity } from './interfaces/Velocity';
 import { Enemy } from './classes/Enemy';
 import { SpawnLocation } from './interfaces/SpawnLocation';
-import { backendUri } from './Constants';
 
 export function initializeSocketIO(server: HttpServer):void {
     const SPEED = 3;
@@ -15,7 +14,7 @@ export function initializeSocketIO(server: HttpServer):void {
     const backendPlayers: {[id: string]: MultiplayerPlayer} = {};
     const backendEnemies: Enemy[] = [];
   
-     backendUri = "https://backend-dot-group-project372.uw.r.appspot.com/";
+  
     const frontendUri = "https://frontend-dot-group-project372.uw.r.appspot.com";
 
     
