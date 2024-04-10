@@ -15,8 +15,8 @@ import { useNavigate } from 'react-router-dom';
 import Shop from '../components/Shop';
 import InstructionsPopup from './InstructionsPopup';
 
-const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com/";
-// const backendUri ="http://localhost:4000"
+// const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com/";
+const backendUri ="http://localhost:4000"
 
 // Initialize Canvase
 const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
