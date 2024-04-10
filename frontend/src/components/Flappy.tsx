@@ -68,7 +68,7 @@ const Flappy: React.FC<CanvasProps> = ({ width, height }) => {
     }, [])
 
     useEffect(() => {
-        console.log("useEffect");
+    //    console.log("useEffect");
         if (!gameStarted) return; // Ensure game has started
 
         const canvas = canvasRef.current;
@@ -147,7 +147,7 @@ const Flappy: React.FC<CanvasProps> = ({ width, height }) => {
         }
 
         function updateGame() {
-            console.log("updateGame");
+      //      console.log("updateGame");
             ctx?.clearRect(0, 0, width, height);
 
             incrementScore();
@@ -171,7 +171,7 @@ const Flappy: React.FC<CanvasProps> = ({ width, height }) => {
             }
 
             spawnObstacles();
-            console.log("obstacles");
+          //  console.log("obstacles");
             obstacles.forEach(obstacle => obstacle.x -= 2);
             drawBacteria();
             drawObstacles();
