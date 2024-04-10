@@ -12,16 +12,18 @@ const Header: React.FC = () => {
   };
 
   const headerStyle: React.CSSProperties = {
-    // position: 'relative',
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100%',
     backgroundColor: '#333',
     color: '#fff',
     padding: '10px 20px',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    // zIndex: 9999
+    zIndex: 9999,
   };
-
  
 
   const buttonStyle: React.CSSProperties = {
