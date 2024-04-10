@@ -8,4 +8,6 @@ const INTRO_TEXT_LIST = [
     "Are you ready, brave microbe? Your Anatomy Adventure begins... NOW!"
   ];
 
+  const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com";
+
   export { INTRO_TEXT_LIST };
