@@ -11,6 +11,7 @@ import MultiplayerCanvas from './components/MultiplayerCanvas';
 import Intro from './components/Intro';
 import PrivateRoutes from './utils/PrivateRoutes';
 import Header from './components/Header';
+import Win from './components/Win';
 function App() {
 
   const width: number = window.innerWidth;
@@ -30,6 +31,7 @@ function App() {
             <Route path='/multiplayer' element={<MultiplayerCanvas width={width} height={height}/>}/>
             <Route path="/flappy" element={<Flappy width={width} height={height} />} />
             <Route path="/intro" element={<Intro />} />
+            <Route path="/win" element={<Win />} />
         </Route>
       </Routes>
     </Router>
