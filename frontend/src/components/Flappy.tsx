@@ -68,6 +68,7 @@ const Flappy: React.FC<CanvasProps> = ({ width, height }) => {
     }, [])
 
     useEffect(() => {
+        console.log("useEffect");
         if (!gameStarted) return; // Ensure game has started
 
         const canvas = canvasRef.current;
@@ -91,17 +92,17 @@ const Flappy: React.FC<CanvasProps> = ({ width, height }) => {
         const obstacleWidth = 30;
         const obstacleGap = 200;
 
-        const levelPassTimer = setTimeout(() => {
-            if (!isGameOver) { // Check if the game isn't over
-                navigate('/game');
-            //    setIsGamePaused(true); 
-            //   setLevelPassed(true); // Show the level pass popup
-            }
-        }, 10000); // 10 seconds
+        // const levelPassTimer = setTimeout(() => {
+        //     if (!isGameOver) { // Check if the game isn't over
+        //         navigate('/game');
+        //     //    setIsGamePaused(true); 
+        //     //   setLevelPassed(true); // Show the level pass popup
+        //     }
+        // }, 10000); // 10 seconds
 
-        return () => {
-            clearTimeout(levelPassTimer); // Clean up the timer
-        };
+        // return () => {
+        //     clearTimeout(levelPassTimer); // Clean up the timer
+        // };
 
         const handleKeyDown = (event: KeyboardEvent) => {
             if (event.code === 'Space') {
