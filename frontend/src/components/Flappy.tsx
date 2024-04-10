@@ -3,7 +3,7 @@ import InstructionsPopup from './InstructionsPopup';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import LevelPassPopup from './LevelPassPopup';
-
+import { backendUri } from '../Constants';
 // game logic referenced from https://gist.github.com/Pro496951/a7537d2f313fbc6ebad1f74b83f84244
 
 interface CanvasProps {
@@ -11,7 +11,7 @@ interface CanvasProps {
   height: number;
 }
 
-const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com";
+//const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com";
 // const backendUri ="http://localhost:4000"
 
 
