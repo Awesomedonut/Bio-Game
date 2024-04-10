@@ -68,9 +68,6 @@ const Flappy: React.FC<CanvasProps> = ({ width, height }) => {
     }, [])
 
     useEffect(() => {
-
-
-
         if (!gameStarted) return; // Ensure game has started
 
         const canvas = canvasRef.current;
@@ -89,7 +86,6 @@ const Flappy: React.FC<CanvasProps> = ({ width, height }) => {
             width: 20,
             height: 20,
         };
-
 
         const obstacles: { x: number, y: number, width: number, height: number }[] = [];
         const obstacleWidth = 30;
@@ -149,8 +145,8 @@ const Flappy: React.FC<CanvasProps> = ({ width, height }) => {
             }
         }
 
-
         function updateGame() {
+            console.log("updateGame");
             ctx?.clearRect(0, 0, width, height);
 
             incrementScore();
@@ -174,6 +170,7 @@ const Flappy: React.FC<CanvasProps> = ({ width, height }) => {
             }
 
             spawnObstacles();
+            console.log("obstacles");
             obstacles.forEach(obstacle => obstacle.x -= 2);
             drawBacteria();
             drawObstacles();
@@ -188,7 +185,7 @@ const Flappy: React.FC<CanvasProps> = ({ width, height }) => {
                 }
             });
 
-            if (!isGameOver && !isGamePaused) {
+            if (!isGameOver) {
                 frameId = window.requestAnimationFrame(updateGame);
             } else if (ctx) {
                 ctx.font = '30px Arial';
