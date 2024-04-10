@@ -146,6 +146,18 @@ const Canvas: React.FC<CanvasProps> = ({ width, height }) => {
     
         // Call the start function to begin the game logic
         start(ctx, width, height);
+
+            // Set a timeout to redirect to the /win endpoint after 30 seconds
+    const winTimeout = setTimeout(() => {
+        if (!gameEndedFlag) { // Make sure the game isn't already over
+            navigate('/win');
+        }
+    }, 30000); // 30000 milliseconds = 30 seconds
+
+    return () => {
+        clearTimeout(winTimeout); // Clear the timeout if the component unmounts or the game ends early
+    };
+
     
         // Since the game is starting, no need to set `gameStarted` to true again
     }, [gameStarted, width, height, playerData, enemiesData]);
