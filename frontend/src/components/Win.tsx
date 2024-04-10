@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate hook from react-router-dom
+import '../styles/Intro.css'; // Import the CSS file for styling
 
 const Win: React.FC = () => {
   const navigate = useNavigate(); // Use the useNavigate hook for navigation
@@ -10,7 +11,7 @@ const Win: React.FC = () => {
   };
 
   return (
-    <div style={{ textAlign: 'center', marginTop: '50px' }}>
+    <div className='homepage' style={{ textAlign: 'center', marginTop: '50px' }}>
       <h1>Congratulations, You Won!</h1> {/* Display the winning message */}
       <p>Would you like to play again?</p>
       {/* Button to go back to home or play again */}
