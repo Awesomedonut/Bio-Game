@@ -3,14 +3,14 @@
 Group project for CMPT 372
 
 Deployed at https://frontend-dot-group-project372.uw.r.appspot.com/
+
 Backend: https://backend-dot-group-project372.uw.r.appspot.com
 
-
-Setup instructions:
-
-
-Tech stack:
 Contributors:
+- Tim Shyong (TimShyong)
+- Jin Song (Awesomedonut)
+- Manpreet Kaur (Manpreetsra-cmd)
+- Anson Chan (NsnGitHub)
 
 
 To create the front end gameplay, the following links were referenced:

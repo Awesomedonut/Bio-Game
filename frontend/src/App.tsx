@@ -8,7 +8,6 @@ import Flappy from './components/Flappy';
 import Dialogue from './components/Dialogue';
 import Signup from './Signup';
 import MultiplayerCanvas from './components/MultiplayerCanvas';
-import Pac from './components/Pac';
 import Intro from './components/Intro';
 import PrivateRoutes from './utils/PrivateRoutes';
 import Header from './components/Header';
@@ -30,7 +29,7 @@ function App() {
             <Route path="/game" element={<Canvas width={width} height={height}/>} />
             <Route path='/multiplayer' element={<MultiplayerCanvas width={width} height={height}/>}/>
             <Route path="/flappy" element={<Flappy width={width} height={height} />} />
-            <Route path="/pac" element={<Pac />} />
+            <Route path="/intro" element={<Intro />} />
         </Route>
       </Routes>
     </Router>

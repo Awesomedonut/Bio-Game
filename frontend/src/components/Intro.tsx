@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { INTRO_TEXT_LIST } from '../Constants';
+import '../styles/Intro.css';
+
 const Intro: React.FC = () => {
   const navigate = useNavigate();
 
@@ -25,12 +27,12 @@ const Intro: React.FC = () => {
   }, [currentSection, INTRO_TEXT_LIST.length]);
 
   return (
-    <div>
+    <div className='homepage'>
       <h1>Welcome!</h1>
       {currentSection <= INTRO_TEXT_LIST.length ? (
         <div>
           <h2>Press spacebar to continue</h2>
-          <p style={{ whiteSpace: 'pre-wrap' }}>{INTRO_TEXT_LIST[currentSection - 1]}</p>
+          <p className="introText" style={{ whiteSpace: 'pre-wrap' }}>{INTRO_TEXT_LIST[currentSection - 1]}</p>
         </div>
       ) : (
         <div>
