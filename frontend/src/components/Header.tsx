@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Header: React.FC = () => {
   const navigate = useNavigate(); 
-  const tockenExists = localStorage.getItem('token');
+  const tokenExists = localStorage.getItem('token');
 
   const handleLogout = () => {
     localStorage.removeItem('token'); 
@@ -36,7 +36,7 @@ const Header: React.FC = () => {
   return (
     <header style={headerStyle}>
       <h1 >Anatomy Adventure</h1>
-      {tockenExists && <button style={buttonStyle} onClick={handleLogout}>Logout</button>}
+      {tokenExists && <button style={buttonStyle} onClick={handleLogout}>Logout</button>}
     </header>
   );
 };
