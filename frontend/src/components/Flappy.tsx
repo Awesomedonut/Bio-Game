@@ -21,6 +21,7 @@ const Flappy: React.FC<CanvasProps> = ({ width, height }) => {
     const [gameStarted, setGameStarted] = useState(false);
     const [playerId, setPlayerId] = useState(null);
     const score = useRef(0);
+    const [levelPassed, setLevelPassed] = useState(false); // State to manage level pass popup visibility
 
     const navigate = useNavigate();
 
@@ -87,9 +88,20 @@ const Flappy: React.FC<CanvasProps> = ({ width, height }) => {
             height: 20,
         };
 
+
         const obstacles: {x: number, y: number, width: number, height: number}[] = [];
         const obstacleWidth = 30;
         const obstacleGap = 200;
+
+        const levelPassTimer = setTimeout(() => {
+            if (!isGameOver) { // Check if the game isn't over
+                setLevelPassed(true); // Show the level pass popup
+            }
+        }, 30000); // 30 seconds
+
+        return () => {
+            clearTimeout(levelPassTimer); // Clean up the timer
+        };
 
         const handleKeyDown = (event: KeyboardEvent) => {
             if (event.code === 'Space') {
@@ -200,9 +212,14 @@ const Flappy: React.FC<CanvasProps> = ({ width, height }) => {
         setGameStarted(true); // Function to start the game
     };
 
+    const goToNextLevel = () => {
+        navigate('/game');
+    };
+
     return (
         <>
             {showInstructions && <InstructionsPopup onClose={closeInstructions} gameLevel='flappy'/>}
+            {levelPassed && <LevelPassPopup onClose={goToNextLevel} />} // This is your level pass popup component
             <canvas ref={canvasRef} width={width.toString()} height={height.toString()} />
         </>
     );
