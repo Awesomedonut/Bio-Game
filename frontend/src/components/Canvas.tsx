@@ -6,7 +6,7 @@ import { Projectile } from '../classes/Projectile';
 import { Enemy } from '../classes/Enemy';
 import { Velocity } from '../interfaces/Velocity';
 import { circleCollision, playerHit } from '../utils/collision';
-
+import { backendUri } from '../Constants';
 import PlayerInterface from "../interfaces/Player";
 import { EnemyInterface } from '../interfaces/Enemy';
 import axios from 'axios';
@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import Shop from '../components/Shop';
 import InstructionsPopup from './InstructionsPopup';
 
-const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com";
+//const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com";
 // const backendUri ="http://localhost:4000"
 
 // Initialize Canvase

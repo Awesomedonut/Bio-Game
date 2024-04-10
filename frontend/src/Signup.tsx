@@ -1,7 +1,7 @@
 import { ChangeEvent, FormEvent, useState } from "react";
 import { Link } from 'react-router-dom';
-
- const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com";
+import { backendUri } from './Constants';
+ //const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com";
 // const backendUri ="http://localhost:4000";
 
 const Signup: React.FC = () => {

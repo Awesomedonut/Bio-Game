@@ -11,3 +11,4 @@ const INTRO_TEXT_LIST = [
   const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com";
 
   export { INTRO_TEXT_LIST };
+  export { backendUri };
