@@ -10,9 +10,9 @@ import { posix } from 'path';
 import { MultiplayerEnemy } from '../classes/MultiplayerEnemy';
 import InstructionsPopup from './InstructionsPopup';
 // import gsap from 'gsap';
-import { backendUri } from '../Constants';
+//import { backendUri } from '../Constants';
 // establish WebSocket connection to server
-//const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com/";
+const backendUri = "https://backend-dot-group-project372.uw.r.appspot.com/";
 // const backendUri = "http://localhost:4000";
 
 
