@@ -54,7 +54,7 @@ const Flappy: React.FC<CanvasProps> = ({ width, height }) => {
         const fetchPlayer = async () => {
             const token = localStorage.getItem('token');
 
-            const playerRes = await axios.post(backendUri + '/game/player/get', null, {
+            const playerRes = await axios.post(backendUri + '/player/get', null, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

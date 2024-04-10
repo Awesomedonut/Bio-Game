@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import '../styles/dialogue.css';
 import callApi from '../api/Dialogue';
 import { Message } from "../models/Message";
-
+import { backendUri } from '../Constants';
 const Dialogue: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
