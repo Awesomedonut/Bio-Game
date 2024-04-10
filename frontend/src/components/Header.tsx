@@ -1,8 +1,10 @@
+import { relative } from 'path';
 import React from 'react';
 import { useNavigate } from 'react-router-dom'; 
 
 const Header: React.FC = () => {
   const navigate = useNavigate(); 
+  const tockenExists = localStorage.getItem('token');
 
   const handleLogout = () => {
     localStorage.removeItem('token'); 
@@ -10,12 +12,14 @@ const Header: React.FC = () => {
   };
 
   const headerStyle: React.CSSProperties = {
+    // position: 'relative',
     backgroundColor: '#333',
     color: '#fff',
     padding: '10px 20px',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
+    // zIndex: 9999
   };
 
  
@@ -31,8 +35,8 @@ const Header: React.FC = () => {
 
   return (
     <header style={headerStyle}>
-      <h1 ></h1>
-      <button style={buttonStyle} onClick={handleLogout}>Logout</button>
+      <h1 >Anatomy Adventure</h1>
+      {tockenExists && <button style={buttonStyle} onClick={handleLogout}>Logout</button>}
     </header>
   );
 };
